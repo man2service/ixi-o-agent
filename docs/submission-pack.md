@@ -29,7 +29,7 @@ flowchart LR
   A["Channel Talk call/user chat"] --> B["n8n realtime webhook"]
   C["Private Mode local meeting input"] --> D["Phone-Claw local app"]
   B --> D
-  D --> E["private-voice-inbox/sessions"]
+  D --> E["PHONE_CLAW_STORAGE_DIR/sessions"]
   E --> F["Local EXAONE processing"]
   F --> G["Human review gate"]
   G --> H["Restricted MISO-facing API"]

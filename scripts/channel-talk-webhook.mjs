@@ -3,7 +3,7 @@ const accessSecret = process.env.CHANNEL_TALK_ACCESS_SECRET;
 const action = process.argv[2] ?? process.env.CHANNEL_TALK_WEBHOOK_ACTION ?? "list";
 const webhookName = process.env.CHANNEL_TALK_WEBHOOK_NAME ?? "Phone-Claw n8n realtime";
 const webhookUrl = process.env.CHANNEL_TALK_WEBHOOK_URL;
-const scopes = (process.env.CHANNEL_TALK_WEBHOOK_SCOPES ?? "userChatOpened")
+const scopes = (process.env.CHANNEL_TALK_WEBHOOK_SCOPES ?? "message.created.userChat,userChat.opened")
   .split(",")
   .map((scope) => scope.trim())
   .filter(Boolean);
@@ -19,8 +19,8 @@ if (action === "list") {
   process.exit(0);
 }
 
-if (action !== "create" && action !== "upsert") {
-  console.error("Usage: pnpm webhook:channel-talk [list|create|upsert]");
+if (action !== "create" && action !== "update" && action !== "upsert") {
+  console.error("Usage: pnpm webhook:channel-talk [list|create|update|upsert]");
   process.exit(1);
 }
 
@@ -31,8 +31,19 @@ if (!webhookUrl) {
 
 const existing = await listWebhooks();
 const matched = existing.find((webhook) => webhook.name === webhookName || webhook.url === webhookUrl);
-if (action === "upsert" && matched) {
-  printWebhooks({ ok: true, action, reused: true, webhooks: [matched] });
+if (action === "update" || (action === "upsert" && matched)) {
+  if (!matched) {
+    console.error(`No webhook matched name or URL: ${webhookName}`);
+    process.exit(1);
+  }
+  const updated = await updateWebhook(matched.id, {
+    name: webhookName,
+    url: webhookUrl,
+    scopes,
+    apiVersion: "v5",
+    blocked: false
+  });
+  printWebhooks({ ok: true, action, reused: true, webhooks: [updated] });
   process.exit(0);
 }
 
@@ -53,6 +64,17 @@ async function listWebhooks() {
 async function createWebhook(payload) {
   const response = await channelRequest("https://api.channel.io/open/v5/webhooks", {
     method: "POST",
+    headers: {
+      "content-type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+  return response.webhook;
+}
+
+async function updateWebhook(id, payload) {
+  const response = await channelRequest(`https://api.channel.io/open/v5/webhooks/${encodeURIComponent(id)}`, {
+    method: "PATCH",
     headers: {
       "content-type": "application/json"
     },

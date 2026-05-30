@@ -1,4 +1,4 @@
-import { listStoredVoiceSessions } from "@phone-claw/storage";
+import { getStorageDir, listStoredVoiceSessions } from "@phone-claw/storage";
 import Link from "next/link";
 import { LocalVoiceForm } from "./LocalVoiceForm";
 
@@ -6,6 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const sessions = await listStoredVoiceSessions();
+  const storageDir = getStorageDir();
   const latest = sessions[0];
   const demoCandidate = sessions.find((session) => session.utteranceCount > 0) ?? latest;
   const transcriptReadyCount = sessions.filter((session) => session.utteranceCount > 0).length;
@@ -99,7 +100,7 @@ export default async function Home() {
                 데모 세션 열기
               </Link>
             ) : null}
-            <code>private-voice-inbox/sessions</code>
+            <code>{storageDir}/sessions</code>
           </div>
         </div>
 

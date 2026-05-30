@@ -9,12 +9,12 @@ The first working path is implemented:
 1. Channel Talk Open API credentials are checked locally.
 2. Existing Channel Talk `UserChat` records are fetched by backfill.
 3. Each chat's messages are normalized into a local voice-session payload.
-4. The payload is written under `private-voice-inbox/sessions`.
+4. The payload is written under `PHONE_CLAW_STORAGE_DIR/sessions`; the current local target is the `call-context` workspace folder.
 5. The local dashboard lists stored voice sessions.
 6. A session detail page shows the local transcript, source metadata, EXAONE output, review state, and redacted MISO handoff payload.
 7. A local EXAONE button runs GGUF inference when available and falls back to deterministic local processing when the model/CLI fails.
 8. MISO-facing APIs hide the redacted payload until human review approves external workflow access.
-9. Channel Talk realtime webhook is registered through the UI and proven with a synthetic live event.
+9. Channel Talk realtime webhook is registered, n8n webhook/polling workflows are active, and the current quick tunnel URL is patched through Channel Talk Open API.
 10. The dashboard and session detail pages now show the demo golden path and review gate status directly.
 11. A credential-free local black-box smoke test verifies sample ingest, fallback-local processing, review gating, and redacted MISO payload availability.
 12. A local private voice frontdoor creates `local_voice_upload` sessions from pasted transcripts and can attempt local Whisper STT for uploaded audio files.
@@ -27,6 +27,7 @@ The first working path is implemented:
 19. Private Mode now supports browser microphone recording in addition to pasted transcripts and file upload.
 20. Kiya/Hermes notification attempts are persisted per session for demo review, even when Telegram delivery is a dry-run.
 21. Kiya/Hermes can report calendar action results back to Phone-Claw through an audit-only callback; Phone-Claw still does not own calendar execution.
+22. A toy Kiya calendar command endpoint records confirm/edit/cancel commands from Telegram callback data such as `pc:cal:ok:{sessionId}`.
 
 ## Local App
 
@@ -87,7 +88,7 @@ The live backfill stored Channel Talk sessions locally. Credentials were not wri
 Current quick tunnel:
 
 ```text
-https://survivors-medieval-stephanie-industry.trycloudflare.com/webhook/channel-talk-phone-claw
+https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-phone-claw
 ```
 
 Channel Talk webhook list API now returns one active webhook:
@@ -96,7 +97,7 @@ Channel Talk webhook list API now returns one active webhook:
 Name: Phone-Claw n8n realtime
 Channel: 218885
 Scopes: userChat.opened, message.created.userChat
-URL: https://survivors-medieval-stephanie-industry.trycloudflare.com/webhook/channel-talk-phone-claw
+URL: https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-phone-claw
 Blocked: false
 ```
 

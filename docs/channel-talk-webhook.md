@@ -11,7 +11,7 @@ Channel Talk Webhook
   -> Cloudflare Tunnel
   -> local n8n Webhook Trigger
   -> Phone-Claw ingest/openapi endpoint
-  -> private-voice-inbox/sessions
+  -> PHONE_CLAW_STORAGE_DIR/sessions
   -> EXAONE local processing
   -> human review
   -> MISO redacted handoff proposal
@@ -22,16 +22,15 @@ Channel Talk Webhook
 The current quick tunnel is:
 
 ```text
-https://survivors-medieval-stephanie-industry.trycloudflare.com/webhook/channel-talk-phone-claw
+https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-phone-claw
 ```
 
 This URL is ephemeral. If `cloudflared tunnel --url http://localhost:5678` is restarted, replace it with the new `trycloudflare.com` URL.
 
 The endpoint was checked on 2026-05-31 KST:
 
-- `POST` valid Channel Talk-shaped sample -> tunnel -> n8n -> local app returned HTTP `200` and `{"ok":true,"queued":true}`.
-- `POST {"event":"healthcheck","source":"phone-claw-t1-proof"}` -> tunnel -> n8n returned HTTP `200`; the local app treated it as an operational healthcheck and returned HTTP `202` internally.
-- n8n execution error count did not increase during these checks.
+- `POST {"event":"healthcheck","source":"phone-claw-tunnel-check"}` -> tunnel -> n8n returned HTTP `200`.
+- Local n8n webhook route `http://localhost:5678/webhook/channel-talk-phone-claw` also returned HTTP `200`.
 
 ## Manual Registration
 
@@ -45,7 +44,7 @@ Use:
 
 ```text
 Name: Phone-Claw n8n realtime
-URL:  https://survivors-medieval-stephanie-industry.trycloudflare.com/webhook/channel-talk-phone-claw
+URL:  https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-phone-claw
 Event: User chat / event notification
 ```
 
@@ -56,7 +55,7 @@ Keep the polling backup active even after realtime webhook registration. Channel
 - A persistent webhook was created from the Channel Talk UI.
 - Channel ID: `218885`
 - Webhook name: `Phone-Claw n8n realtime`
-- URL: `https://survivors-medieval-stephanie-industry.trycloudflare.com/webhook/channel-talk-phone-claw`
+- URL: `https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-phone-claw`
 - Scopes: `userChat.opened`, `message.created.userChat`
 - `GET /open/v5/webhooks` verifies it is present and not blocked.
 - The webhook secret/token is intentionally not committed or documented.
@@ -162,20 +161,23 @@ The local helper is:
 
 ```bash
 set -a; source .env.local; set +a
-CHANNEL_TALK_WEBHOOK_URL=https://survivors-medieval-stephanie-industry.trycloudflare.com/webhook/channel-talk-phone-claw \
+CHANNEL_TALK_WEBHOOK_URL=https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-phone-claw \
 pnpm webhook:channel-talk upsert
 ```
 
 Current observed result:
 
-- `GET /open/v5/webhooks` succeeded and returned `0` existing webhooks.
+- `GET /open/v5/webhooks` succeeds and returns the active `Phone-Claw n8n realtime` webhook.
+- `PATCH /open/v5/webhooks/{id}` succeeds and updates the current quick tunnel URL.
 - `POST /open/v5/webhooks` with the documented `scopes: ["userChatOpened"]` shape returned Channel Talk HTTP `500`.
 - v5 variants with `apiVersion`, `blocked`, and `keywords` also returned HTTP `500`.
 - v4 variants without `scopes` returned HTTP `422`, confirming that `scopes` is required.
 - v4 variants with `scopes` returned HTTP `500`.
 - `POST /open/v5/webhooks` without `scopes` returned HTTP `422`, so the scope field is required by the current API.
 
-Because creation failed server-side after endpoint health was proven, use the manual UI registration for the demo and keep the script for retrying once Channel Talk support/API behavior stabilizes.
+Because creation failed server-side after endpoint health was proven, use the
+manual UI registration for first-time creation. Once the webhook exists,
+`pnpm webhook:channel-talk upsert` can update its URL.
 
 ## Sources
 

@@ -277,9 +277,9 @@ async function planWithHermes(payload: ReturnType<typeof buildSafeSessionPayload
       body: JSON.stringify({
         event: "phone_claw.voice_session.calendar_check",
         instruction:
-          "요약과 액션아이템만 보고 캘린더 등록이 필요한지 판단하세요. 필요하면 사용자가 확인하거나 수정할 수 있는 일정 후보만 제안하세요. 원문 전사문이나 raw audio는 요청하지 마세요. 실제 캘린더 등록은 사용자가 Kiya에서 확인한 뒤 Kiya/Hermes가 처리합니다.",
+          "요약과 액션아이템만 보고 캘린더 등록이 필요한지 판단하세요. 필요하면 사용자가 확인하거나 수정할 수 있는 일정 후보만 제안하세요. 원문 전사문이나 raw audio는 요청하지 마세요. 실제 캘린더 등록은 사용자가 Kiya에서 확인한 뒤 Kiya/Hermes가 처리합니다. 확인/수정/취소 결과는 Phone-Claw의 /api/kiya/calendar-command 또는 /api/sessions/{sessionId}/kiya-calendar-result로 기록할 수 있습니다.",
         payload,
-        availableActions: ["calendar.create_event_draft"]
+        availableActions: ["calendar.create_event_draft", "phone_claw.record_calendar_command"]
       }),
       signal: controller.signal
     }).finally(() => clearTimeout(timeout));
@@ -503,6 +503,12 @@ function buildCalendarReplyMarkup(sessionId: string): Record<string, unknown> {
         {
           text: "시간/내용 수정",
           callback_data: `pc:cal:edit:${sessionId}`.slice(0, 64)
+        }
+      ],
+      [
+        {
+          text: "등록 취소",
+          callback_data: `pc:cal:cancel:${sessionId}`.slice(0, 64)
         }
       ]
     ]

@@ -11,7 +11,7 @@ Phone-Claw is a private local voice bridge for the OBA Weekend-thon S1 build. It
 - Local private voice frontdoor for pasted meeting/call transcripts, browser microphone recording, and optional local audio files
 - n8n workflows for sample ingest, webhook ingest, polling, and manual backfill
 - Local Next.js dashboard with demo golden-path status and session review screen
-- Storage contract under `private-voice-inbox/sessions`
+- Storage contract under `PHONE_CLAW_STORAGE_DIR/sessions`
 - Local STT small model and EXAONE 1.2B GGUF smoke-tested on the Mac mini M4
 - Local EXAONE post-processing for summaries, urgency, teams, and action items
 - Restricted MISO-facing API/OpenAPI draft that exposes only reviewed, redacted handoff payloads
