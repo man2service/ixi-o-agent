@@ -197,3 +197,34 @@ http://host.docker.internal:3000/api/ingest/channel-talk/openapi
 ```
 
 This first version stores the event text immediately. Polling or manual backfill can later consolidate the full `UserChat` message history.
+
+Important n8n detail:
+
+```json
+{
+  "sendBody": true,
+  "bodyContentType": "json",
+  "specifyBody": "json",
+  "jsonBody": "={{ JSON.stringify($json.body || $json) }}"
+}
+```
+
+The n8n Webhook node wraps incoming requests under `$json.body`. Without `specifyBody: "json"`, the HTTP Request node can send an empty-key wrapper such as `{ "": "[object Object]" }` and lose the Channel Talk event.
+
+Observed Channel Talk v5 message event shape:
+
+```json
+{
+  "event": "push",
+  "type": "message",
+  "entity": {
+    "channelId": "218885",
+    "chatType": "userChat",
+    "chatId": "USER_CHAT_ID",
+    "plainText": "..."
+  },
+  "refers": {
+    "userChat": { "id": "USER_CHAT_ID", "channelId": "218885" }
+  }
+}
+```

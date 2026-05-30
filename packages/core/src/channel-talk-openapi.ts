@@ -7,13 +7,16 @@ import {
 type RecordLike = Record<string, unknown>;
 
 export function normalizeChannelTalkOpenApiPayload(raw: unknown): ChannelTalkN8nPayload {
-  const root = asRecord(raw) ?? {};
-  const body = asRecord(root.body);
-  const webhookEvent = asRecord(root.webhookEvent) ?? body;
+  const envelope = unwrapEmptyKeyWrapper(asRecord(parseJsonString(raw)) ?? {});
+  const body = asRecord(parseJsonString(envelope.body));
+  const root = shouldUseWebhookBody(body) ? body : envelope;
+  const webhookEvent = asRecord(root.webhookEvent) ?? (isWebhookEventRoot(root) ? root : body);
   const entity = asRecord(webhookEvent?.entity) ?? asRecord(root.entity);
+  const refers = asRecord(root.refers) ?? asRecord(webhookEvent?.refers);
   const userChat =
     asRecord(root.userChat) ??
     asRecord(asRecord(root.userChatResponse)?.userChat) ??
+    asRecord(refers?.userChat) ??
     (webhookEvent?.type === "userChat" ? entity : undefined);
   const messages = extractMessages(root, webhookEvent, entity);
 
@@ -70,6 +73,40 @@ export function normalizeChannelTalkOpenApiPayload(raw: unknown): ChannelTalkN8n
   };
 
   return channelTalkN8nPayloadSchema.parse(payload);
+}
+
+function parseJsonString(value: unknown): unknown {
+  if (typeof value !== "string") return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
+function unwrapEmptyKeyWrapper(value: RecordLike): RecordLike {
+  const keys = Object.keys(value);
+  if (keys.length !== 1 || keys[0] !== "") return value;
+  return asRecord(parseJsonString(value[""])) ?? value;
+}
+
+function shouldUseWebhookBody(body: RecordLike | undefined): body is RecordLike {
+  if (!body) return false;
+  return Boolean(
+    body.source ||
+      body.userChat ||
+      body.userChatResponse ||
+      body.messages ||
+      body.messagesResponse ||
+      body.webhookEvent ||
+      body.entity ||
+      body.channelId ||
+      body.userChatId
+  );
+}
+
+function isWebhookEventRoot(value: RecordLike): boolean {
+  return Boolean(value.entity && (value.type || value.event));
 }
 
 function extractMessages(

@@ -34,7 +34,8 @@
         },
         "sendBody": true,
         "bodyContentType": "json",
-        "jsonBody": "={{$json}}"
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body || $json) }}"
       },
       "id": "post-to-phone-claw-openapi",
       "name": "POST Phone-Claw OpenAPI Ingest",

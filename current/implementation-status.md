@@ -1,6 +1,6 @@
 # Phone-Claw Implementation Status
 
-Updated: 2026-05-30
+Updated: 2026-05-31
 
 ## Current Build
 
@@ -14,6 +14,7 @@ The first working path is implemented:
 6. A session detail page shows the local transcript, source metadata, EXAONE output, review state, and redacted MISO handoff payload.
 7. A local EXAONE button runs GGUF inference when available and falls back to deterministic local processing when the model/CLI fails.
 8. MISO-facing APIs hide the redacted payload until human review approves external workflow access.
+9. Channel Talk realtime webhook is registered through the UI and proven with a synthetic live event.
 
 ## Local App
 
@@ -55,6 +56,7 @@ The polling and manual backfill workflows call the local backfill endpoint. Chan
 - `POST /api/sessions/{sessionId}/review`
 - MISO detail API blocks payload before review and returns `rawTranscriptIncluded: false` payload after review
 - Current Cloudflare tunnel -> n8n webhook returned HTTP `200`
+- Synthetic Channel Talk message event -> Cloudflare Tunnel -> n8n -> `POST /api/ingest/channel-talk/openapi` -> local session `20260530T153141_utc_channel_talk_e7b435ae0b`
 
 The live backfill stored Channel Talk sessions locally. Credentials were not written to source files.
 
@@ -66,11 +68,19 @@ Current quick tunnel:
 https://survivors-medieval-stephanie-industry.trycloudflare.com/webhook/channel-talk-phone-claw
 ```
 
-Channel Talk webhook list API returned `0` webhooks. The documented create API returned Channel Talk HTTP `500` with the required `scopes` field, so the demo path is manual UI registration:
+Channel Talk webhook list API now returns one active webhook:
 
 ```text
-Settings > Webhook > Create new webhook
+Name: Phone-Claw n8n realtime
+Channel: 218885
+Scopes: userChat.opened, message.created.userChat
+URL: https://survivors-medieval-stephanie-industry.trycloudflare.com/webhook/channel-talk-phone-claw
+Blocked: false
 ```
+
+The documented create API still returned Channel Talk HTTP `500` with the required `scopes` field, so webhook creation remains a manual UI step. The API list command is still useful for verification.
+
+The first real proof exposed an actual v5 webhook shape difference: Channel Talk sends `type: "message"` and `entity` at the top level. The parser now accepts this shape, as well as n8n's wrapped `body` shape.
 
 See `docs/channel-talk-webhook.md`.
 
@@ -80,5 +90,5 @@ The persistent task queue is now tracked in `current/agent-task-queue.md`.
 
 Recommended next work unit:
 
-1. `T1. Channel Talk Realtime Proof` - register the n8n webhook URL in Channel Talk UI, run one live event through the webhook, and confirm it lands in `private-voice-inbox`.
-2. If realtime registration is blocked, move to `T2. Demo Flow Hardening` so the sample/backfill -> EXAONE -> review -> MISO proposal path is presentation-safe.
+1. `T2. Demo Flow Hardening` - make the sample/backfill -> EXAONE -> review -> MISO proposal path presentation-safe.
+2. `T3. Reproducibility And Black-Box Test Pass` - confirm another Mac can clone, configure, and run the sample flow without secrets committed.

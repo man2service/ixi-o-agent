@@ -1,6 +1,6 @@
 # Phone-Claw Agent Task Queue
 
-Updated: 2026-05-30 KST
+Updated: 2026-05-31 KST
 
 ## Purpose
 
@@ -25,11 +25,12 @@ Updated: 2026-05-30 KST
 - EXAONE GGUF local processing 버튼과 fallback-local 처리
 - 검수 전 MISO payload 차단, 검수 후 redacted payload 공개
 - M1 MacBook 재현 셋업 문서
+- Channel Talk UI webhook 등록 및 합성 live event 기반 realtime proof
 
 현재 주요 리스크:
 
-- Channel Talk webhook 생성 API가 문서대로 호출해도 서버 500을 반환함
-- realtime webhook은 아직 실제 Channel Talk UI 수동 등록 후 live event로 검증 필요
+- Channel Talk webhook 생성 API가 문서대로 호출해도 서버 500을 반환하므로 생성은 UI 수동 단계로 남음
+- Cloudflare quick tunnel URL은 재시작 시 바뀌므로 Channel Talk UI webhook URL도 갱신해야 함
 - 제출용 화면/시연 캡처가 아직 정리되지 않음
 - MISO 쪽은 직접 push가 아니라 제안 schema/API로 설명해야 함
 
@@ -48,7 +49,7 @@ Updated: 2026-05-30 KST
 
 ### T1. Channel Talk Realtime Proof
 
-Status: `ready`
+Status: `completed`
 
 Goal:
 
@@ -70,6 +71,15 @@ Required steps:
 4. n8n execution 또는 Phone-Claw `/api/sessions`에서 신규 세션 여부를 확인한다.
 5. webhook event만으로 전사문이 부족하면 polling/manual backfill로 보강되는 흐름을 확인한다.
 
+Result:
+
+- Channel Talk UI에서 `Phone-Claw n8n realtime` webhook 생성 완료.
+- `GET /open/v5/webhooks`에서 channel `218885`, scopes `userChat.opened`, `message.created.userChat`, `blocked: false` 확인.
+- 합성 Channel Talk member/userChat/message를 Open API로 만들고 실제 webhook 수신 확인.
+- 실제 v5 이벤트는 `{ event, type, entity, refers }` 최상위 shape로 도착함을 확인.
+- 파서를 수정해 `type: "message"` 최상위 이벤트에서 transcript를 추출하도록 함.
+- 신규 proof session: `20260530T153141_utc_channel_talk_e7b435ae0b`, utterance count `1`.
+
 Verification:
 
 ```bash
@@ -85,9 +95,9 @@ curl -fsS http://localhost:3000/api/sessions
 
 Completion evidence:
 
-- 신규 세션 ID
-- n8n workflow 실행 성공 또는 Channel Talk UI webhook 등록 화면 캡처/메모
-- `current/implementation-status.md` 업데이트
+- 신규 세션 ID: `20260530T153141_utc_channel_talk_e7b435ae0b`
+- n8n -> app route logs: `POST /api/ingest/channel-talk/openapi 200`
+- `docs/channel-talk-webhook.md` and `current/implementation-status.md` updated
 
 Adversarial review focus:
 
@@ -311,13 +321,12 @@ Adversarial review focus:
 
 ## Recommended Next Work Unit
 
-가장 먼저 잡을 작업 단위는 **T1. Channel Talk Realtime Proof**다.
+가장 먼저 잡을 작업 단위는 **T2. Demo Flow Hardening**이다.
 
 이유:
 
-- 지금 구현은 backfill과 sample path는 충분히 보이지만, realtime webhook은 아직 "수동 등록 필요" 상태다.
-- 이 작업이 끝나면 Channel Talk 입력이 실제 데모 증거를 갖게 된다.
-- 실패하더라도 실패 원인이 `Channel Talk API 생성 500`, `UI 권한`, `전사 지연`, `n8n tunnel` 중 어디인지 구분할 수 있다.
+- realtime webhook은 실제 합성 이벤트로 증명됐고, 다음 병목은 심사위원에게 보이는 golden path다.
+- Channel Talk 입력이 들어온 뒤 `EXAONE 처리 -> human review -> MISO proposal`이 한 화면에서 설득력 있게 보여야 한다.
+- live webhook이 흔들려도 sample/backfill path로 같은 제품 가치를 보여줄 수 있어야 한다.
 
-T1이 막히면 바로 **T2. Demo Flow Hardening**으로 전환한다. Channel Talk realtime이 안 되어도 심사에서는 sample/backfill + local EXAONE + review gate + MISO proposal로 완성된 흐름을 보여줄 수 있어야 한다.
-
+T2가 끝나면 **T3. Reproducibility And Black-Box Test Pass**로 넘어가서 M1 MacBook에서도 문서만 보고 재현되는지 확인한다.

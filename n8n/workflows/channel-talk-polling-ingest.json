@@ -44,6 +44,7 @@
         },
         "sendBody": true,
         "bodyContentType": "json",
+        "specifyBody": "json",
         "jsonBody": "={{$json}}"
       },
       "id": "post-backfill",

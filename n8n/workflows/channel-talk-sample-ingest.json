@@ -40,6 +40,7 @@
         },
         "sendBody": true,
         "bodyContentType": "json",
+        "specifyBody": "json",
         "jsonBody": "={{$json}}"
       },
       "id": "post-to-phone-claw",
