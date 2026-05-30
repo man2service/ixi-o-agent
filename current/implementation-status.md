@@ -17,6 +17,7 @@ The first working path is implemented:
 9. Channel Talk realtime webhook is registered through the UI and proven with a synthetic live event.
 10. The dashboard and session detail pages now show the demo golden path and review gate status directly.
 11. A credential-free local black-box smoke test verifies sample ingest, fallback-local processing, review gating, and redacted MISO payload availability.
+12. A local private voice frontdoor creates `local_voice_upload` sessions from pasted transcripts and can attempt local Whisper STT for uploaded audio files.
 
 ## Local App
 
@@ -61,6 +62,7 @@ The polling and manual backfill workflows call the local backfill endpoint. Chan
 - Synthetic Channel Talk message event -> Cloudflare Tunnel -> n8n -> `POST /api/ingest/channel-talk/openapi` -> local session `20260530T153141_utc_channel_talk_e7b435ae0b`
 - Synthetic proof session `20260530T153141_utc_channel_talk_e7b435ae0b` processed with local EXAONE model path available, then approved for redacted MISO payload access
 - `pnpm smoke:local` with temp storage and no external credentials
+- Browser check for the dashboard `Private Mode` local form
 
 The live backfill stored Channel Talk sessions locally. Credentials were not written to source files.
 
@@ -94,8 +96,8 @@ The persistent task queue is now tracked in `current/agent-task-queue.md`.
 
 Recommended next work unit:
 
-1. `T4. Local Voice Capture Frontdoor` - add a non-Channel Talk local voice input path if time remains.
-2. `T6. Submission Pack` - polish the README/demo intro for judging and final GitHub submission.
+1. `T6. Submission Pack` - polish the README/demo intro for judging and final GitHub submission.
+2. `T5. MISO Custom Tool Proposal Pack` - if time remains, make the MISO proposal artifacts easier to inspect.
 
 ## Runtime Note
 

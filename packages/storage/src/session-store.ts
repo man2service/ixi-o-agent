@@ -136,7 +136,7 @@ export type MisoHandoffPayload = {
   schemaVersion: "phone-claw.miso.voice-session.v0";
   eventType: "voice-session.created";
   source: "phone-claw-private-local-voice-bridge";
-  sourceSystem: "channel_talk";
+  sourceSystem: "channel_talk" | "local_voice";
   sourceMode: string;
   sessionId: string;
   startedAt: string;
@@ -591,7 +591,7 @@ async function writeSessionFiles(args: {
       : "pending_processing";
   const metadata = {
     sessionId: path.basename(sessionPath),
-    source: "channel_talk_n8n",
+    source: payload.source,
     mode: payload.mode,
     status,
     reason:
@@ -630,7 +630,7 @@ async function writeSessionFiles(args: {
 
   await writeJson(path.join(sessionPath, "agent", "voice-session-draft.json"), {
     sessionId: path.basename(sessionPath),
-    source: "channel_talk_n8n",
+    source: payload.source,
     mode: payload.mode,
     sensitivity: "external",
     transcript: {
@@ -673,7 +673,7 @@ function buildInitialMisoHandoffPayload(args: {
     schemaVersion: "phone-claw.miso.voice-session.v0",
     eventType: "voice-session.created",
     source: "phone-claw-private-local-voice-bridge",
-    sourceSystem: "channel_talk",
+    sourceSystem: payload.source === "local_voice_upload" ? "local_voice" : "channel_talk",
     sourceMode: payload.mode,
     sessionId,
     startedAt: payload.startedAt,
@@ -712,7 +712,8 @@ function buildMisoHandoffPayloadFromProcessed(args: {
     schemaVersion: "phone-claw.miso.voice-session.v0",
     eventType: "voice-session.created",
     source: "phone-claw-private-local-voice-bridge",
-    sourceSystem: "channel_talk",
+    sourceSystem:
+      getString(agentDraft, ["source"]) === "local_voice_upload" ? "local_voice" : "channel_talk",
     sourceMode: getString(metadata, ["mode"]) ?? "call",
     sessionId,
     startedAt: getString(metadata, ["sourceStartedAt"]) ?? "",
@@ -770,7 +771,8 @@ function createSessionId(payload: ChannelTalkN8nPayload): string {
     .replace("+", "_")
     .replace("Z", "_utc");
   const suffix = shortHash(buildDedupeKey(payload));
-  return `${timestamp}_channel_talk_${suffix}`;
+  const sourceLabel = payload.source === "local_voice_upload" ? "local_voice" : "channel_talk";
+  return `${timestamp}_${sourceLabel}_${suffix}`;
 }
 
 function hashJson(value: unknown): string {

@@ -87,7 +87,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
           <div className="panel-head">
             <div>
               <p className="eyebrow">Local Transcript</p>
-              <h2>채널톡 전사문</h2>
+              <h2>{session.source === "local_voice_upload" ? "로컬 전사문" : "채널톡 전사문"}</h2>
             </div>
             <code>{session.utteranceCount} utterances</code>
           </div>
@@ -216,7 +216,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
 
         <article className="panel wide-panel">
           <p className="eyebrow">Source Metadata</p>
-          <h2>채널톡 원본 참조</h2>
+          <h2>{session.source === "local_voice_upload" ? "로컬 원본 참조" : "채널톡 원본 참조"}</h2>
           <dl className="metadata-grid">
             <div>
               <dt>Session ID</dt>

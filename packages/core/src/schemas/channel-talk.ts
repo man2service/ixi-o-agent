@@ -17,10 +17,10 @@ export const transcriptUtteranceSchema = z.object({
 });
 
 export const channelTalkN8nPayloadSchema = z.object({
-  source: z.literal("channel_talk_n8n"),
+  source: z.enum(["channel_talk_n8n", "local_voice_upload"]),
   status: channelTalkStatusSchema.optional(),
   reason: z.string().optional(),
-  mode: z.literal("call"),
+  mode: z.enum(["call", "meeting", "voice_note"]),
   channelId: z.string().min(1),
   userChatId: z.string().min(1),
   meetMessageId: z.string().optional(),
@@ -44,4 +44,3 @@ export type IngestResult =
   | "updated"
   | "skipped_no_transcript"
   | "fallback_pending";
-

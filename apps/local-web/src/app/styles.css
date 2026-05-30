@@ -17,7 +17,8 @@ body {
 .hero,
 .workbench,
 .demo-rail,
-.session-flow {
+.session-flow,
+.local-frontdoor {
   width: min(1120px, 100%);
   margin: 0 auto;
 }
@@ -114,7 +115,8 @@ a:hover {
 }
 
 .demo-rail,
-.session-flow {
+.session-flow,
+.local-frontdoor {
   border-top: 1px solid #d9dee7;
   padding: 20px 0 24px;
 }
@@ -197,6 +199,66 @@ a:hover {
 .stage.active > span {
   background: #b45309;
   color: #ffffff;
+}
+
+.local-frontdoor {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+  gap: 20px;
+}
+
+.local-form {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #d9dee7;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 180px);
+  gap: 12px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  color: #586273;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cfd6df;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #17202a;
+  font: inherit;
+  font-size: 14px;
+}
+
+input,
+select {
+  min-height: 40px;
+  padding: 0 10px;
+}
+
+textarea {
+  min-height: 96px;
+  resize: vertical;
+  padding: 10px;
+  line-height: 1.5;
+}
+
+.local-submit {
+  justify-self: end;
+  width: min(240px, 100%);
 }
 
 .toolbar {
@@ -538,6 +600,7 @@ pre {
 
   .hero,
   .demo-rail,
+  .local-frontdoor,
   .detail-header,
   .detail-grid,
   .session-row {
@@ -570,8 +633,13 @@ pre {
   }
 
   .stage-list,
-  .compact-list {
+  .compact-list,
+  .form-row {
     grid-template-columns: 1fr;
+  }
+
+  .local-submit {
+    justify-self: stretch;
   }
 
   .session-id {

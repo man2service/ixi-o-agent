@@ -220,7 +220,7 @@ Adversarial review focus:
 
 ### T4. Local Voice Capture Frontdoor
 
-Status: `planned`
+Status: `completed`
 
 Goal:
 
@@ -240,18 +240,30 @@ Required steps:
 3. whisper.cpp STT는 모델/CLI가 있을 때만 실행하고, 없으면 sample transcript/fallback으로 세션을 만든다.
 4. 이후 EXAONE/review/MISO payload는 기존 session detail을 재사용한다.
 
+Result:
+
+- Dashboard에 `Private Mode` local input form 추가.
+- `POST /api/ingest/local-voice` route 추가.
+- Transcript paste만으로 `local_voice_upload` session 생성 가능.
+- Audio/video file upload 시 `whisper-cli`와 `models/whisper/ggml-small.bin`이 있으면 local STT 시도.
+- STT가 없고 transcript도 없으면 `fallback_pending` session으로 저장해 원본 파일이 로컬에 남도록 함.
+- Local sessions reuse the existing EXAONE/review/MISO flow.
+- `pnpm smoke:local` now verifies the local voice frontdoor as well.
+
 Verification:
 
 ```bash
 pnpm typecheck
 pnpm build
+pnpm smoke:local
 whisper-cli -m models/whisper/ggml-small.bin -f <short-audio-file> -otxt -of /tmp/phone-claw-stt
 ```
 
 Completion evidence:
 
-- Channel Talk가 없어도 local voice session 생성 가능
-- 기존 EXAONE/review/MISO 흐름으로 이어짐
+- Channel Talk가 없어도 `local_voice_upload` session 생성 가능
+- Existing EXAONE/review/MISO flow reused for local sessions
+- Smoke output includes `local_voice_frontdoor_ingested`
 
 Adversarial review focus:
 
@@ -345,12 +357,12 @@ Adversarial review focus:
 
 ## Recommended Next Work Unit
 
-가장 먼저 잡을 작업 단위는 **T3. Reproducibility And Black-Box Test Pass**다.
+가장 먼저 잡을 작업 단위는 **T6. Submission Pack**이다.
 
 이유:
 
-- realtime webhook과 demo golden path가 모두 증명됐다.
-- 다음 리스크는 M1 MacBook 또는 새 clone 환경에서 문서대로 바로 재현되는지다.
-- 재현성이 정리되면 제출용 README와 발표 자료가 훨씬 안정된다.
+- realtime webhook, demo golden path, local-only input, black-box smoke가 모두 들어갔다.
+- 이제 심사위원이 GitHub와 소개 문서만 봐도 제품 가치와 sponsor track 적합성을 이해해야 한다.
+- 제출 전에는 구현보다 설명의 정확성과 재현 명령어가 더 큰 리스크다.
 
-T3가 끝나면 **T4. Local Voice Capture Frontdoor**로 넘어가 Channel Talk가 없어도 회의/음성 파일 입력을 만들 수 있게 한다.
+T6가 끝나면 **T5. MISO Custom Tool Proposal Pack**을 보강해 MISO에는 직접 push가 아니라 제안 schema/API라는 점을 더 분명히 한다.

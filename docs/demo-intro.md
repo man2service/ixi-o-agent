@@ -23,16 +23,18 @@ Phone-Claw turns calls and meetings into private local agent context, then opens
 ## 3-Minute Demo Script
 
 1. Open `http://localhost:3000` and show the four-step golden path: Voice 수집, EXAONE 후처리, Human Review, MISO 제안.
-2. Open the synthetic proof session `20260530T153141_utc_channel_talk_e7b435ae0b`.
-3. Show that the raw transcript is visible only in the local review screen.
-4. Show `EXAONE: exaone-local` and the generated agent-ready output.
-5. Show `MISO: 승인됨` and explain that the external API returns only the reviewed redacted payload.
+2. Show the `Private Mode` local input form as the non-Channel Talk meeting/voice path.
+3. Open the synthetic proof session `20260530T153141_utc_channel_talk_e7b435ae0b`.
+4. Show that the raw transcript is visible only in the local review screen.
+5. Show `EXAONE: exaone-local` and the generated agent-ready output.
+6. Show `MISO: 승인됨` and explain that the external API returns only the reviewed redacted payload.
 
 This proof session was created from a synthetic Channel Talk user chat, not a real customer conversation.
 
 ## What To Show
 
 - Dashboard: collected Channel Talk sessions
+- Private Mode form: local meeting transcript/audio input without Channel Talk
 - Session detail: raw transcript stays local
 - EXAONE output: summary and action items generated locally
 - Review controls: external handoff is blocked until approval
@@ -50,6 +52,7 @@ curl -fsS http://localhost:3000/api/sessions
 curl -fsS \
   -H "x-phone-claw-ingest-secret: $PHONE_CLAW_INGEST_SECRET" \
   http://localhost:3000/api/miso/voice-sessions/20260530T153141_utc_channel_talk_e7b435ae0b
+pnpm smoke:local
 ```
 
 When running `pnpm build`, stop the Next dev server first. Running build and dev against the same `.next` directory can make the dev server hold stale chunk references.

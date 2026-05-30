@@ -104,6 +104,8 @@ pnpm smoke:local
 
 This command starts a temporary local app on port `3210`, stores data in a temporary folder, ingests the bundled sample payload, runs fallback-local processing, confirms MISO blocks the payload before review, approves the synthetic session, and confirms the redacted payload becomes available.
 
+It also creates a `local_voice_upload` meeting session through the same local app, so you can verify the non-Channel Talk input path without any external account.
+
 If port `3210` is already in use:
 
 ```bash
@@ -219,6 +221,14 @@ These model files are ignored by git.
 - EXAONE 4.0 1.2B Q4 is the intended small local model path. It is much more realistic on M1 than 32B/33B models.
 - Whisper `small` is usable but can be slow on the base M1. For fast tests, use existing Channel Talk transcript input or switch to a smaller Whisper model manually.
 - Keep the model files local. Do not copy raw transcripts or `.env.local` through git.
+
+## Local Voice Frontdoor
+
+The dashboard includes a `Private Mode` form for local meetings, calls, and voice notes.
+
+- If you paste a transcript, Phone-Claw creates a local session immediately.
+- If you upload an audio/video file and `whisper-cli` plus `models/whisper/ggml-small.bin` are available, the server attempts local STT.
+- If local STT is not available and no transcript was pasted, the session is saved as `fallback_pending` so the audio remains local and the transcript can be added later.
 
 ## 9. Files That Must Stay Local
 

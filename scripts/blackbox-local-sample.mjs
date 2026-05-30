@@ -87,18 +87,37 @@ try {
     "MISO payload should not include raw transcript"
   );
 
+  const localVoice = await postForm("/api/ingest/local-voice", {
+    title: "Smoke local meeting",
+    mode: "meeting",
+    transcriptText:
+      "오늘 회의에서는 로컬 음성 입력을 에이전트 작업으로 바꾸는 흐름을 확인했다. 후속으로 데모 문서를 정리한다."
+  });
+  assert(localVoice.ok === true, "local voice frontdoor should create a session");
+  const localVoiceDetail = await getJson(`/api/sessions/${localVoice.sessionId}`);
+  assert(
+    localVoiceDetail.session.source === "local_voice_upload",
+    "local voice session should preserve source"
+  );
+  assert(
+    localVoiceDetail.session.mode === "meeting",
+    "local voice session should preserve meeting mode"
+  );
+
   console.log(
     JSON.stringify(
       {
         ok: true,
         sessionId,
+        localVoiceSessionId: localVoice.sessionId,
         storageDir,
         checks: [
           "server_started",
           "sample_ingested",
           "fallback_local_processed",
           "miso_blocked_before_review",
-          "miso_available_after_review"
+          "miso_available_after_review",
+          "local_voice_frontdoor_ingested"
         ]
       },
       null,
