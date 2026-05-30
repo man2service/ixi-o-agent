@@ -1,4 +1,5 @@
 import { listStoredVoiceSessions } from "@phone-claw/storage";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +54,9 @@ export default async function Home() {
               <article className="session-row" key={session.sessionId}>
                 <div>
                   <div className="row-title">
-                    <span>{formatDate(session.sourceStartedAt)}</span>
+                    <Link href={`/sessions/${session.sessionId}`}>
+                      {formatDate(session.sourceStartedAt)}
+                    </Link>
                     <code>{session.status}</code>
                   </div>
                   <p>{session.transcriptPreview || "전사문 내용 없음"}</p>
