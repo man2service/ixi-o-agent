@@ -34,8 +34,12 @@ export async function POST(request: NextRequest) {
   const accessSecret = process.env.CHANNEL_TALK_ACCESS_SECRET;
   if (!accessKey || !accessSecret) {
     return NextResponse.json(
-      { ok: false, error: "missing_channel_talk_credentials" },
-      { status: 500 }
+      {
+        ok: false,
+        error: "missing_channel_talk_credentials",
+        requiredEnv: ["CHANNEL_TALK_ACCESS_KEY", "CHANNEL_TALK_ACCESS_SECRET"]
+      },
+      { status: 503 }
     );
   }
 
@@ -51,51 +55,62 @@ export async function POST(request: NextRequest) {
   const messageLimit = clamp(body.messageLimit ?? readEnvInt("CHANNEL_TALK_MESSAGE_LIMIT", 100), 1, 5000);
 
   const results = [];
-  for (const state of states) {
-    let since: string | undefined;
-    for (let page = 0; page < chatPages; page += 1) {
-      const userChatsResponse = await channelRequest(accessKey, accessSecret, "/user-chats", {
-        state,
-        sortOrder: "desc",
-        limit: String(chatLimit),
-        ...(since ? { since } : {})
-      });
-      const userChats = getArray(userChatsResponse.userChats) ?? getArray(userChatsResponse.messages) ?? [];
-
-      for (const userChat of userChats) {
-        const userChatRecord = asRecord(userChat);
-        const userChatId = getString(userChatRecord, "id");
-        if (!userChatId) continue;
-
-        const messages = await fetchAllMessages(
-          accessKey,
-          accessSecret,
-          userChatId,
-          messageLimit
-        );
-        const payload = normalizeChannelTalkOpenApiPayload({
-          source: "channel_talk_openapi",
-          mode: "call",
-          userChat,
-          messages,
-          rawEvent: {
-            fetchedBy: "api/backfill/channel-talk",
-            state
-          }
-        });
-        const ingestResult = await ingestChannelTalkPayload(payload);
-
-        results.push({
+  try {
+    for (const state of states) {
+      let since: string | undefined;
+      for (let page = 0; page < chatPages; page += 1) {
+        const userChatsResponse = await channelRequest(accessKey, accessSecret, "/user-chats", {
           state,
-          userChatId,
-          result: ingestResult.result,
-          sessionId: ingestResult.sessionId
+          sortOrder: "desc",
+          limit: String(chatLimit),
+          ...(since ? { since } : {})
         });
-      }
+        const userChats = getArray(userChatsResponse.userChats) ?? getArray(userChatsResponse.messages) ?? [];
 
-      since = getString(asRecord(userChatsResponse), "next");
-      if (!since) break;
+        for (const userChat of userChats) {
+          const userChatRecord = asRecord(userChat);
+          const userChatId = getString(userChatRecord, "id");
+          if (!userChatId) continue;
+
+          const messages = await fetchAllMessages(
+            accessKey,
+            accessSecret,
+            userChatId,
+            messageLimit
+          );
+          const payload = normalizeChannelTalkOpenApiPayload({
+            source: "channel_talk_openapi",
+            mode: "call",
+            userChat,
+            messages,
+            rawEvent: {
+              fetchedBy: "api/backfill/channel-talk",
+              state
+            }
+          });
+          const ingestResult = await ingestChannelTalkPayload(payload);
+
+          results.push({
+            state,
+            userChatId,
+            result: ingestResult.result,
+            sessionId: ingestResult.sessionId
+          });
+        }
+
+        since = getString(asRecord(userChatsResponse), "next");
+        if (!since) break;
+      }
     }
+  } catch (error) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "channel_talk_backfill_failed",
+        reason: error instanceof Error ? error.message : "unknown_error"
+      },
+      { status: 502 }
+    );
   }
 
   return NextResponse.json({
