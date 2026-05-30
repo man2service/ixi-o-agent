@@ -16,6 +16,7 @@ The first working path is implemented:
 8. MISO-facing APIs hide the redacted payload until human review approves external workflow access.
 9. Channel Talk realtime webhook is registered through the UI and proven with a synthetic live event.
 10. The dashboard and session detail pages now show the demo golden path and review gate status directly.
+11. A credential-free local black-box smoke test verifies sample ingest, fallback-local processing, review gating, and redacted MISO payload availability.
 
 ## Local App
 
@@ -59,6 +60,7 @@ The polling and manual backfill workflows call the local backfill endpoint. Chan
 - Current Cloudflare tunnel -> n8n webhook returned HTTP `200`
 - Synthetic Channel Talk message event -> Cloudflare Tunnel -> n8n -> `POST /api/ingest/channel-talk/openapi` -> local session `20260530T153141_utc_channel_talk_e7b435ae0b`
 - Synthetic proof session `20260530T153141_utc_channel_talk_e7b435ae0b` processed with local EXAONE model path available, then approved for redacted MISO payload access
+- `pnpm smoke:local` with temp storage and no external credentials
 
 The live backfill stored Channel Talk sessions locally. Credentials were not written to source files.
 
@@ -92,8 +94,8 @@ The persistent task queue is now tracked in `current/agent-task-queue.md`.
 
 Recommended next work unit:
 
-1. `T3. Reproducibility And Black-Box Test Pass` - confirm another Mac can clone, configure, and run the sample flow without secrets committed.
-2. `T4. Local Voice Capture Frontdoor` - add a non-Channel Talk local voice input path if time remains.
+1. `T4. Local Voice Capture Frontdoor` - add a non-Channel Talk local voice input path if time remains.
+2. `T6. Submission Pack` - polish the README/demo intro for judging and final GitHub submission.
 
 ## Runtime Note
 

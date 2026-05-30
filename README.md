@@ -84,6 +84,14 @@ pnpm build
 
 Stop the Next dev server before `pnpm build`; both commands write/read `.next`, and running them at the same time can leave the dev server with stale chunk references.
 
+Run the local black-box smoke test without any external credentials:
+
+```bash
+pnpm smoke:local
+```
+
+This starts a temporary Next dev server on port `3210`, uses an isolated temp storage folder, ingests the sample payload, runs fallback-local processing with a deliberately missing model path, verifies MISO blocks before review, approves the synthetic session, then verifies the redacted payload becomes available.
+
 For M1 MacBook setup, local model downloads, and n8n instructions, see `docs/m1-macbook-setup.md`.
 
 ## Docs

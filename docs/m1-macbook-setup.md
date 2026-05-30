@@ -1,6 +1,6 @@
 # M1 MacBook Setup
 
-Updated: 2026-05-30 KST
+Updated: 2026-05-31 KST
 
 This guide is for pulling the GitHub repo on another Apple Silicon Mac and running Phone-Claw without committing any local credentials, transcripts, n8n runtime data, or model files.
 
@@ -95,6 +95,20 @@ pnpm test:ingest
 ```
 
 Then refresh the inbox and open the session detail page.
+
+For a one-command black-box check that does not need Channel Talk credentials or model files:
+
+```bash
+pnpm smoke:local
+```
+
+This command starts a temporary local app on port `3210`, stores data in a temporary folder, ingests the bundled sample payload, runs fallback-local processing, confirms MISO blocks the payload before review, approves the synthetic session, and confirms the redacted payload becomes available.
+
+If port `3210` is already in use:
+
+```bash
+PHONE_CLAW_SMOKE_PORT=3211 pnpm smoke:local
+```
 
 ## 5. Optional: Channel Talk Credentials
 
@@ -220,6 +234,18 @@ config/local.json
 ```
 
 If `git status --short` shows any of these paths, stop and check `.gitignore` before committing.
+
+## 10. Current Verification Baseline
+
+Run these before presenting or before handing the repo to another machine:
+
+```bash
+pnpm typecheck
+pnpm build
+pnpm smoke:local
+```
+
+Stop `pnpm dev` before `pnpm build`. The dev server and production build both use `.next`; running them at the same time can leave the dev server with stale chunk references.
 
 ## Sources
 

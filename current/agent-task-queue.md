@@ -165,7 +165,7 @@ Adversarial review focus:
 
 ### T3. Reproducibility And Black-Box Test Pass
 
-Status: `ready`
+Status: `completed`
 
 Goal:
 
@@ -186,6 +186,14 @@ Required steps:
 3. Channel Talk 키가 있을 때 credential check/backfill 경로가 명확한지 확인한다.
 4. 모델 미설치 상태에서도 EXAONE process 버튼이 fallback으로 성공하는지 확인한다.
 
+Result:
+
+- `.env.example` local app URLs now default to `localhost:3000`; Docker-specific `host.docker.internal` remains documented in n8n docs.
+- Channel Talk webhook scope examples updated to observed v5 scopes: `userChat.opened,message.created.userChat`.
+- Added `pnpm smoke:local` black-box test.
+- The smoke test starts a temporary Next dev server, uses an isolated temp storage dir, ingests bundled sample data, runs fallback-local processing with no model required, checks MISO blocks before review, approves the synthetic session, and checks MISO payload availability after review.
+- M1 setup doc now includes the smoke test and build/dev `.next` caveat.
+
 Verification:
 
 ```bash
@@ -195,13 +203,14 @@ pnpm typecheck
 set -a; source .env.local; set +a
 pnpm test:ingest
 curl -fsS http://localhost:3000/api/sessions
+pnpm smoke:local
 ```
 
 Completion evidence:
 
-- README와 M1 문서의 명령어 불일치 없음
-- 키 없이 가능한 경로와 키가 필요한 경로가 분리되어 있음
-- 문제가 있으면 문서/스크립트 수정
+- `pnpm smoke:local` passed locally with no Channel Talk credentials or model files required by the smoke path
+- `docs/m1-macbook-setup.md` updated
+- `.env.example` local URLs fixed for host execution
 
 Adversarial review focus:
 
