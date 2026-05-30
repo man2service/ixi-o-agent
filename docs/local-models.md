@@ -16,6 +16,23 @@ models/whisper/ggml-small.bin
 models/exaone/EXAONE-4.0-1.2B-Q4_K_M.gguf
 ```
 
+## Install On Another Mac
+
+```bash
+brew install whisper-cpp llama.cpp
+mkdir -p models/whisper models/exaone
+curl -L \
+  https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.bin \
+  -o models/whisper/ggml-small.bin
+python3 -m pip install --user -U "huggingface_hub[cli]"
+huggingface-cli download LGAI-EXAONE/EXAONE-4.0-1.2B-GGUF \
+  --include "EXAONE-4.0-1.2B-Q4_K_M.gguf" \
+  --local-dir models/exaone
+```
+
+If these files are missing, the local web app still works. The EXAONE process
+button will produce a `fallback-local` result instead of real GGUF inference.
+
 ## STT Smoke Test
 
 ```bash

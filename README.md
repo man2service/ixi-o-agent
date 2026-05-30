@@ -25,9 +25,32 @@ The first screen is the local inbox. Click any stored session to open the detail
 
 ## Local Development
 
+Fresh Apple Silicon Mac:
+
 ```bash
+git clone https://github.com/man2service/Phoneclaw.git
+cd Phoneclaw
+brew install fnm
+fnm install 20.20.2
+fnm use 20.20.2
+corepack enable
 pnpm install
-PHONE_CLAW_INGEST_SECRET=dev-secret PHONE_CLAW_STORAGE_DIR=./private-voice-inbox pnpm dev
+cp .env.example .env.local
+```
+
+Edit `.env.local` locally. Do not commit it. At minimum, set:
+
+```text
+PHONE_CLAW_STORAGE_DIR=./private-voice-inbox
+PHONE_CLAW_INGEST_SECRET=<random-local-secret>
+N8N_ENCRYPTION_KEY=<random-local-secret>
+```
+
+Run:
+
+```bash
+set -a; source .env.local; set +a
+pnpm dev
 ```
 
 Open:
@@ -36,8 +59,18 @@ Open:
 http://localhost:3000
 ```
 
+Seed a local sample session without Channel Talk credentials:
+
+```bash
+set -a; source .env.local; set +a
+pnpm test:ingest
+```
+
+For M1 MacBook setup, local model downloads, and n8n instructions, see `docs/m1-macbook-setup.md`.
+
 ## Docs
 
+- M1 MacBook setup: `docs/m1-macbook-setup.md`
 - n8n setup: `docs/n8n/local-docker.md`
 - Channel Talk realtime webhook: `docs/channel-talk-webhook.md`
 - Local models: `docs/local-models.md`
