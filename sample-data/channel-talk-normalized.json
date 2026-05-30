@@ -1,0 +1,42 @@
+{
+  "source": "channel_talk_n8n",
+  "status": "ready",
+  "mode": "call",
+  "channelId": "channel-demo",
+  "userChatId": "user-chat-demo",
+  "meetMessageId": "meet-message-demo",
+  "callDirection": "inbound",
+  "startedAt": "2026-05-30T15:30:00+09:00",
+  "endedAt": "2026-05-30T15:34:00+09:00",
+  "participants": [
+    {
+      "id": "customer",
+      "role": "counterparty",
+      "displayName": "고객"
+    },
+    {
+      "id": "manager",
+      "role": "user",
+      "displayName": "상담원"
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "customer",
+      "text": "어제 장애 때문에 주문 전환율이 떨어졌습니다.",
+      "timestampMs": 0
+    },
+    {
+      "speaker": "manager",
+      "text": "장애 시간대와 영향을 확인해서 보상 기준을 검토하겠습니다.",
+      "timestampMs": 9000
+    },
+    {
+      "speaker": "customer",
+      "text": "오늘 오후까지 확인 결과를 받을 수 있을까요?",
+      "timestampMs": 18000
+    }
+  ],
+  "recordingUrl": null
+}
+

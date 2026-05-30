@@ -1,0 +1,63 @@
+{
+  "name": "Phone-Claw Channel Talk Sample Ingest",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"source\": \"channel_talk_n8n\",\n  \"status\": \"ready\",\n  \"mode\": \"call\",\n  \"channelId\": \"channel-demo\",\n  \"userChatId\": \"user-chat-demo\",\n  \"meetMessageId\": \"meet-message-demo\",\n  \"callDirection\": \"inbound\",\n  \"startedAt\": \"2026-05-30T15:30:00+09:00\",\n  \"endedAt\": \"2026-05-30T15:34:00+09:00\",\n  \"participants\": [\n    { \"id\": \"customer\", \"role\": \"counterparty\", \"displayName\": \"고객\" },\n    { \"id\": \"manager\", \"role\": \"user\", \"displayName\": \"상담원\" }\n  ],\n  \"transcript\": [\n    { \"speaker\": \"customer\", \"text\": \"어제 장애 때문에 주문 전환율이 떨어졌습니다.\", \"timestampMs\": 0 },\n    { \"speaker\": \"manager\", \"text\": \"장애 시간대와 영향을 확인해서 보상 기준을 검토하겠습니다.\", \"timestampMs\": 9000 }\n  ],\n  \"recordingUrl\": null\n}"
+      },
+      "id": "sample-payload",
+      "name": "Sample Channel Talk Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.PHONE_CLAW_INGEST_URL || 'http://host.docker.internal:3000/api/ingest/channel-talk'}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-phone-claw-ingest-secret",
+              "value": "={{$env.PHONE_CLAW_INGEST_SECRET}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "={{$json}}"
+      },
+      "id": "post-to-phone-claw",
+      "name": "POST Phone-Claw Ingest",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [780, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [[{ "node": "Sample Channel Talk Payload", "type": "main", "index": 0 }]]
+    },
+    "Sample Channel Talk Payload": {
+      "main": [[{ "node": "POST Phone-Claw Ingest", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
+

@@ -1,0 +1,35 @@
+{
+  "source": "channel_talk_openapi",
+  "mode": "call",
+  "userChat": {
+    "id": "user-chat-openapi-demo",
+    "channelId": "channel-demo",
+    "state": "closed",
+    "userId": "customer-demo",
+    "name": "데모 고객",
+    "openedAt": 1780122600000,
+    "updatedAt": 1780122840000
+  },
+  "messages": [
+    {
+      "id": "message-1",
+      "channelId": "channel-demo",
+      "chatType": "userChat",
+      "chatId": "user-chat-openapi-demo",
+      "personType": "user",
+      "personId": "customer-demo",
+      "createdAt": 1780122600000,
+      "plainText": "통화 내용 전사문을 에이전트에게 넘기고 싶습니다."
+    },
+    {
+      "id": "message-2",
+      "channelId": "channel-demo",
+      "chatType": "userChat",
+      "chatId": "user-chat-openapi-demo",
+      "personType": "manager",
+      "personId": "manager-demo",
+      "createdAt": 1780122612000,
+      "plainText": "채널톡 전사문을 로컬 폴더에 저장하고 후처리할 수 있습니다."
+    }
+  ]
+}

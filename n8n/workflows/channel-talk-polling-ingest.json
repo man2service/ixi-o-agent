@@ -1,0 +1,66 @@
+{
+  "name": "Phone-Claw Channel Talk Polling Backup",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "minutes", "minutesInterval": 2 }]
+        }
+      },
+      "id": "schedule",
+      "name": "Every 2 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"states\": [\"opened\", \"snoozed\"],\n  \"chatLimit\": 10,\n  \"chatPages\": 1,\n  \"messageLimit\": 100\n}"
+      },
+      "id": "polling-settings",
+      "name": "Polling Settings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.PHONE_CLAW_BACKFILL_URL || 'http://host.docker.internal:3000/api/backfill/channel-talk'}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-phone-claw-ingest-secret",
+              "value": "={{$env.PHONE_CLAW_INGEST_SECRET}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "={{$json}}"
+      },
+      "id": "post-backfill",
+      "name": "Run Phone-Claw Backfill",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [780, 300]
+    }
+  ],
+  "connections": {
+    "Every 2 Minutes": {
+      "main": [[{ "node": "Polling Settings", "type": "main", "index": 0 }]]
+    },
+    "Polling Settings": {
+      "main": [[{ "node": "Run Phone-Claw Backfill", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

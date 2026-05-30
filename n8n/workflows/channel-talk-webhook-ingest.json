@@ -1,0 +1,66 @@
+{
+  "name": "Phone-Claw Channel Talk Webhook Ingest Draft",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "channel-talk-phone-claw",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook",
+      "name": "Channel Talk Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.PHONE_CLAW_OPENAPI_INGEST_URL || 'http://host.docker.internal:3000/api/ingest/channel-talk/openapi'}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-phone-claw-ingest-secret",
+              "value": "={{$env.PHONE_CLAW_INGEST_SECRET}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "={{$json}}"
+      },
+      "id": "post-to-phone-claw-openapi",
+      "name": "POST Phone-Claw OpenAPI Ingest",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"ok\": true, \"queued\": true }"
+      },
+      "id": "respond",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [800, 300]
+    }
+  ],
+  "connections": {
+    "Channel Talk Webhook": {
+      "main": [[{ "node": "POST Phone-Claw OpenAPI Ingest", "type": "main", "index": 0 }]]
+    },
+    "POST Phone-Claw OpenAPI Ingest": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

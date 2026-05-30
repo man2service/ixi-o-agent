@@ -1,0 +1,21 @@
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=none
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=24
+      - PHONE_CLAW_INGEST_URL=http://host.docker.internal:3000/api/ingest/channel-talk
+      - PHONE_CLAW_OPENAPI_INGEST_URL=http://host.docker.internal:3000/api/ingest/channel-talk/openapi
+      - PHONE_CLAW_BACKFILL_URL=http://host.docker.internal:3000/api/backfill/channel-talk
+      - PHONE_CLAW_INGEST_SECRET=${PHONE_CLAW_INGEST_SECRET}
+      - CHANNEL_TALK_ACCESS_KEY=${CHANNEL_TALK_ACCESS_KEY}
+      - CHANNEL_TALK_ACCESS_SECRET=${CHANNEL_TALK_ACCESS_SECRET}
+    volumes:
+      - ./n8n-data:/home/node/.n8n
