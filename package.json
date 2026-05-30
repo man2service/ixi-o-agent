@@ -10,7 +10,8 @@
     "typecheck": "pnpm -r typecheck",
     "test:ingest": "node scripts/test-channel-talk-ingest.mjs",
     "check:channel-talk": "node scripts/check-channel-talk-credentials.mjs",
-    "backfill:channel-talk": "node scripts/channel-talk-backfill.mjs"
+    "backfill:channel-talk": "node scripts/channel-talk-backfill.mjs",
+    "webhook:channel-talk": "node scripts/channel-talk-webhook.mjs"
   },
   "devDependencies": {
     "typescript": "^5.8.3"

@@ -14,8 +14,8 @@ export default async function Home() {
           <p className="eyebrow">Phone-Claw</p>
           <h1>일상의 모든 Voice를, 에이전트와 함께</h1>
           <p className="lede">
-            Channel Talk 통화 전사문을 n8n과 로컬 브릿지로 받아, 에이전트가
-            읽기 좋은 voice-session 파일로 저장합니다.
+            Channel Talk 통화 전사문을 n8n과 로컬 브릿지로 받아 EXAONE으로
+            후처리하고, 사람이 승인한 비식별 payload만 MISO 제안 API로 엽니다.
           </p>
         </div>
         <div className="status-strip" aria-label="ingest status">

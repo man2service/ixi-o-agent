@@ -8,10 +8,20 @@ Phone-Claw is a private local voice bridge for the OBA Weekend-thon S1 build. It
 
 - Channel Talk Open API backfill into local voice sessions
 - n8n workflows for sample ingest, webhook ingest, polling, and manual backfill
-- Local Next.js dashboard for collected sessions
+- Local Next.js dashboard and session review screen for collected sessions
 - Storage contract under `private-voice-inbox/sessions`
 - Local STT small model and EXAONE 1.2B GGUF smoke-tested on the Mac mini M4
+- Local EXAONE post-processing button for summaries, urgency, teams, and action items
 - Restricted MISO-facing API/OpenAPI draft that exposes only reviewed, redacted handoff payloads
+
+## Demo Path
+
+```text
+Channel Talk -> n8n -> Phone-Claw local inbox -> EXAONE local processing
+  -> human review -> redacted MISO handoff proposal
+```
+
+The first screen is the local inbox. Click any stored session to open the detail/review view.
 
 ## Local Development
 
@@ -29,7 +39,9 @@ http://localhost:3000
 ## Docs
 
 - n8n setup: `docs/n8n/local-docker.md`
+- Channel Talk realtime webhook: `docs/channel-talk-webhook.md`
 - Local models: `docs/local-models.md`
+- Demo intro: `docs/demo-intro.md`
 - MISO custom tool draft: `miso/README.md`
 
 ## Security

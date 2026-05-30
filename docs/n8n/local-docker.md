@@ -82,6 +82,16 @@ When exposed through Cloudflare Tunnel, use:
 https://<trycloudflare-host>/webhook/channel-talk-phone-claw
 ```
 
+Current quick-tunnel URL for the active demo session:
+
+```text
+https://survivors-medieval-stephanie-industry.trycloudflare.com/webhook/channel-talk-phone-claw
+```
+
+Quick-tunnel URLs change when the tunnel restarts. See
+`docs/channel-talk-webhook.md` for Channel Talk registration steps and the Open
+API registration helper.
+
 The workflow JSON includes a stable `webhookId`, so the URL does not depend on
 the imported workflow ID.
 

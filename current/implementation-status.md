@@ -11,11 +11,17 @@ The first working path is implemented:
 3. Each chat's messages are normalized into a local voice-session payload.
 4. The payload is written under `private-voice-inbox/sessions`.
 5. The local dashboard lists stored voice sessions.
+6. A session detail page shows the local transcript, source metadata, EXAONE output, review state, and redacted MISO handoff payload.
+7. A local EXAONE button runs GGUF inference when available and falls back to deterministic local processing when the model/CLI fails.
+8. MISO-facing APIs hide the redacted payload until human review approves external workflow access.
 
 ## Local App
 
 - Dashboard: `http://localhost:3000`
 - Sessions API: `GET /api/sessions`
+- Session detail API: `GET /api/sessions/{sessionId}`
+- EXAONE process API: `POST /api/sessions/{sessionId}/process`
+- Review API: `POST /api/sessions/{sessionId}/review`
 - Normalized ingest: `POST /api/ingest/channel-talk`
 - Raw Channel Talk ingest: `POST /api/ingest/channel-talk/openapi`
 - Backfill runner: `POST /api/backfill/channel-talk`
@@ -45,12 +51,32 @@ The polling and manual backfill workflows call the local backfill endpoint. Chan
 - `pnpm check:channel-talk`
 - `pnpm backfill:channel-talk` with a small live scope
 - `GET /api/sessions`
+- `POST /api/sessions/{sessionId}/process`
+- `POST /api/sessions/{sessionId}/review`
+- MISO detail API blocks payload before review and returns `rawTranscriptIncluded: false` payload after review
+- Current Cloudflare tunnel -> n8n webhook returned HTTP `200`
 
-The live backfill stored 2 Channel Talk sessions locally. Credentials were not written to source files.
+The live backfill stored Channel Talk sessions locally. Credentials were not written to source files.
+
+## Channel Talk Realtime Webhook
+
+Current quick tunnel:
+
+```text
+https://survivors-medieval-stephanie-industry.trycloudflare.com/webhook/channel-talk-phone-claw
+```
+
+Channel Talk webhook list API returned `0` webhooks. The documented create API returned Channel Talk HTTP `500` with the required `scopes` field, so the demo path is manual UI registration:
+
+```text
+Settings > Webhook > Create new webhook
+```
+
+See `docs/channel-talk-webhook.md`.
 
 ## Next
 
-1. Move credentials into ignored local environment files or n8n credentials.
-2. Import n8n workflows and run `Phone-Claw Channel Talk Manual Backfill`.
-3. Register the n8n webhook URL in Channel Talk for realtime events.
-4. Add the EXAONE/STT processing step that consumes `agent/voice-session-draft.json`.
+1. Register the n8n webhook URL in Channel Talk UI for realtime events.
+2. Run one live Channel Talk event through the webhook and confirm it lands in `private-voice-inbox`.
+3. Add final README screenshots or demo capture for submission.
+4. Keep polling/manual backfill active as the reliability fallback.
