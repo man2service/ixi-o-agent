@@ -15,6 +15,7 @@ The first working path is implemented:
 7. A local EXAONE button runs GGUF inference when available and falls back to deterministic local processing when the model/CLI fails.
 8. MISO-facing APIs hide the redacted payload until human review approves external workflow access.
 9. Channel Talk realtime webhook is registered through the UI and proven with a synthetic live event.
+10. The dashboard and session detail pages now show the demo golden path and review gate status directly.
 
 ## Local App
 
@@ -57,6 +58,7 @@ The polling and manual backfill workflows call the local backfill endpoint. Chan
 - MISO detail API blocks payload before review and returns `rawTranscriptIncluded: false` payload after review
 - Current Cloudflare tunnel -> n8n webhook returned HTTP `200`
 - Synthetic Channel Talk message event -> Cloudflare Tunnel -> n8n -> `POST /api/ingest/channel-talk/openapi` -> local session `20260530T153141_utc_channel_talk_e7b435ae0b`
+- Synthetic proof session `20260530T153141_utc_channel_talk_e7b435ae0b` processed with local EXAONE model path available, then approved for redacted MISO payload access
 
 The live backfill stored Channel Talk sessions locally. Credentials were not written to source files.
 
@@ -90,5 +92,9 @@ The persistent task queue is now tracked in `current/agent-task-queue.md`.
 
 Recommended next work unit:
 
-1. `T2. Demo Flow Hardening` - make the sample/backfill -> EXAONE -> review -> MISO proposal path presentation-safe.
-2. `T3. Reproducibility And Black-Box Test Pass` - confirm another Mac can clone, configure, and run the sample flow without secrets committed.
+1. `T3. Reproducibility And Black-Box Test Pass` - confirm another Mac can clone, configure, and run the sample flow without secrets committed.
+2. `T4. Local Voice Capture Frontdoor` - add a non-Channel Talk local voice input path if time remains.
+
+## Runtime Note
+
+Do not run `pnpm build` while `pnpm dev` is serving the same app. Both use `.next`; build can leave the dev server holding stale chunk references. Stop dev, run build, then restart dev.

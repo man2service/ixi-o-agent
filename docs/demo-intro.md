@@ -20,6 +20,16 @@ Phone-Claw turns calls and meetings into private local agent context, then opens
 7. Only the redacted MISO handoff payload becomes available to external workflow tools.
 ```
 
+## 3-Minute Demo Script
+
+1. Open `http://localhost:3000` and show the four-step golden path: Voice 수집, EXAONE 후처리, Human Review, MISO 제안.
+2. Open the synthetic proof session `20260530T153141_utc_channel_talk_e7b435ae0b`.
+3. Show that the raw transcript is visible only in the local review screen.
+4. Show `EXAONE: exaone-local` and the generated agent-ready output.
+5. Show `MISO: 승인됨` and explain that the external API returns only the reviewed redacted payload.
+
+This proof session was created from a synthetic Channel Talk user chat, not a real customer conversation.
+
 ## What To Show
 
 - Dashboard: collected Channel Talk sessions
@@ -28,6 +38,21 @@ Phone-Claw turns calls and meetings into private local agent context, then opens
 - Review controls: external handoff is blocked until approval
 - MISO proposal API: metadata first, payload only after review
 - n8n: realtime webhook, polling backup, and manual historical backfill
+
+## Local Verification Commands
+
+```bash
+pnpm typecheck
+pnpm build
+
+set -a; source .env.local; set +a
+curl -fsS http://localhost:3000/api/sessions
+curl -fsS \
+  -H "x-phone-claw-ingest-secret: $PHONE_CLAW_INGEST_SECRET" \
+  http://localhost:3000/api/miso/voice-sessions/20260530T153141_utc_channel_talk_e7b435ae0b
+```
+
+When running `pnpm build`, stop the Next dev server first. Running build and dev against the same `.next` directory can make the dev server hold stale chunk references.
 
 ## Why It Fits OBA
 

@@ -39,6 +39,11 @@ export type StoredVoiceSession = {
   channelId?: string;
   userChatId?: string;
   callDirection?: string;
+  exaoneProcessed: boolean;
+  review: {
+    reviewed: boolean;
+    externalAllowed: boolean;
+  };
 };
 
 export type VoiceSessionReviewState = {
@@ -478,16 +483,20 @@ async function readStoredVoiceSession(
   const sessionPath = path.join(sessionsRoot, sessionId);
 
   try {
-    const [metadata, agentDraft] = await Promise.all([
+    const [metadata, agentDraft, reviewState, exaoneOutput] = await Promise.all([
       readJson(path.join(sessionPath, "metadata.json")),
-      readJson(path.join(sessionPath, "agent", "voice-session-draft.json"))
+      readJson(path.join(sessionPath, "agent", "voice-session-draft.json")),
+      readOptionalJson(path.join(sessionPath, "review", "review-state.json")),
+      readOptionalJson(path.join(sessionPath, "agent", "exaone.local-output.json"))
     ]);
     const rawText = getString(agentDraft, ["transcript", "rawText"]) ?? "";
     const utterances = getArray(agentDraft, ["transcript", "utterances"]);
+    const review = normalizeReviewState(reviewState);
+    const exaone = normalizeExaoneResult(exaoneOutput);
 
     return {
       sessionId,
-      status: getString(metadata, ["status"]) ?? "unknown",
+      status: deriveSessionStatus(getString(metadata, ["status"]) ?? "unknown", review, exaone),
       source: getString(metadata, ["source"]) ?? "unknown",
       mode: getString(metadata, ["mode"]) ?? "unknown",
       sourceStartedAt: getString(metadata, ["sourceStartedAt"]) ?? "",
@@ -497,7 +506,12 @@ async function readStoredVoiceSession(
       utteranceCount: utterances?.length ?? 0,
       channelId: getString(agentDraft, ["metadata", "channelId"]),
       userChatId: getString(agentDraft, ["metadata", "userChatId"]),
-      callDirection: getString(agentDraft, ["metadata", "callDirection"])
+      callDirection: getString(agentDraft, ["metadata", "callDirection"]),
+      exaoneProcessed: Boolean(exaone),
+      review: {
+        reviewed: review.reviewed,
+        externalAllowed: review.externalAllowed
+      }
     };
   } catch {
     return undefined;
@@ -511,16 +525,19 @@ async function readMisoVoiceSessionSummary(
   const sessionPath = path.join(sessionsRoot, sessionId);
 
   try {
-    const [metadata, agentDraft, reviewState] = await Promise.all([
+    const [metadata, agentDraft, reviewState, exaoneOutput] = await Promise.all([
       readJson(path.join(sessionPath, "metadata.json")),
       readJson(path.join(sessionPath, "agent", "voice-session-draft.json")),
-      readOptionalJson(path.join(sessionPath, "review", "review-state.json"))
+      readOptionalJson(path.join(sessionPath, "review", "review-state.json")),
+      readOptionalJson(path.join(sessionPath, "agent", "exaone.local-output.json"))
     ]);
     const utterances = getArray(agentDraft, ["transcript", "utterances"]);
+    const review = normalizeReviewState(reviewState);
+    const exaone = normalizeExaoneResult(exaoneOutput);
 
     return {
       sessionId,
-      status: getString(metadata, ["status"]) ?? "unknown",
+      status: deriveSessionStatus(getString(metadata, ["status"]) ?? "unknown", review, exaone),
       source: getString(metadata, ["source"]) ?? "unknown",
       mode: getString(metadata, ["mode"]) ?? "unknown",
       sourceStartedAt: getString(metadata, ["sourceStartedAt"]) ?? "",
@@ -528,8 +545,8 @@ async function readMisoVoiceSessionSummary(
       createdAt: getString(metadata, ["createdAt"]) ?? "",
       utteranceCount: utterances?.length ?? 0,
       review: {
-        reviewed: getBoolean(reviewState, ["reviewed"]) ?? false,
-        externalAllowed: getBoolean(reviewState, ["externalAllowed"]) ?? false
+        reviewed: review.reviewed,
+        externalAllowed: review.externalAllowed
       },
       safety: {
         redactionApplied: true,
@@ -827,6 +844,16 @@ function normalizeReviewState(value: unknown): VoiceSessionReviewState {
     reviewer: getString(value, ["reviewer"]),
     note: getString(value, ["note"])
   };
+}
+
+function deriveSessionStatus(
+  storedStatus: string,
+  review: VoiceSessionReviewState,
+  exaone: ExaoneProcessingResult | undefined
+): string {
+  if (review.reviewed && review.externalAllowed) return "approved_for_external_workflow";
+  if (exaone) return "processed_pending_review";
+  return storedStatus;
 }
 
 function normalizeExaoneResult(value: unknown): ExaoneProcessingResult | undefined {

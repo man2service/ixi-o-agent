@@ -7,11 +7,12 @@ Phone-Claw is a private local voice bridge for the OBA Weekend-thon S1 build. It
 ## Current MVP
 
 - Channel Talk Open API backfill into local voice sessions
+- Channel Talk realtime webhook proof through Cloudflare Tunnel and n8n
 - n8n workflows for sample ingest, webhook ingest, polling, and manual backfill
-- Local Next.js dashboard and session review screen for collected sessions
+- Local Next.js dashboard with demo golden-path status and session review screen
 - Storage contract under `private-voice-inbox/sessions`
 - Local STT small model and EXAONE 1.2B GGUF smoke-tested on the Mac mini M4
-- Local EXAONE post-processing button for summaries, urgency, teams, and action items
+- Local EXAONE post-processing for summaries, urgency, teams, and action items
 - Restricted MISO-facing API/OpenAPI draft that exposes only reviewed, redacted handoff payloads
 
 ## Demo Path
@@ -22,6 +23,14 @@ Channel Talk -> n8n -> Phone-Claw local inbox -> EXAONE local processing
 ```
 
 The first screen is the local inbox. Click any stored session to open the detail/review view.
+
+Current synthetic full-path proof session:
+
+```text
+20260530T153141_utc_channel_talk_e7b435ae0b
+```
+
+That session demonstrates realtime Channel Talk ingest, EXAONE local processing, human approval, and MISO redacted payload availability without using a real customer conversation.
 
 ## Local Development
 
@@ -65,6 +74,15 @@ Seed a local sample session without Channel Talk credentials:
 set -a; source .env.local; set +a
 pnpm test:ingest
 ```
+
+Build verification:
+
+```bash
+pnpm typecheck
+pnpm build
+```
+
+Stop the Next dev server before `pnpm build`; both commands write/read `.next`, and running them at the same time can leave the dev server with stale chunk references.
 
 For M1 MacBook setup, local model downloads, and n8n instructions, see `docs/m1-macbook-setup.md`.
 

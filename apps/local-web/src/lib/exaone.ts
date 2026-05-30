@@ -156,12 +156,44 @@ async function runLlamaCli(args: {
 
 function extractJsonObject(rawOutput: string): ModelJson {
   const fenced = rawOutput.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  const candidate = fenced?.[1] ?? rawOutput;
-  const start = candidate.indexOf("{");
-  if (start === -1) {
-    throw new Error("json_start_not_found");
+  const candidates = [fenced?.[1], rawOutput].filter((value): value is string => Boolean(value));
+
+  for (const candidate of candidates) {
+    const parsed = collectJsonObjects(candidate);
+    const matching = parsed.filter(isModelJsonCandidate);
+    if (matching.length > 0) return matching.at(-1) as ModelJson;
+    if (parsed.length > 0) return parsed.at(-1) as ModelJson;
   }
 
+  throw new Error("json_object_not_found");
+}
+
+function isModelJsonCandidate(value: ModelJson): boolean {
+  return (
+    typeof value.summary === "string" ||
+    Array.isArray(value.actionItems) ||
+    Array.isArray(value.openQuestions)
+  );
+}
+
+function collectJsonObjects(candidate: string): ModelJson[] {
+  const objects: ModelJson[] = [];
+
+  for (let start = 0; start < candidate.length; start += 1) {
+    if (candidate[start] !== "{") continue;
+    const end = findJsonObjectEnd(candidate, start);
+    if (end == null) continue;
+    try {
+      objects.push(JSON.parse(candidate.slice(start, end + 1)) as ModelJson);
+    } catch {
+      // Keep scanning; llama.cpp may echo prompt fragments before the answer.
+    }
+  }
+
+  return objects;
+}
+
+function findJsonObjectEnd(candidate: string, start: number): number | undefined {
   let depth = 0;
   let inString = false;
   let escaped = false;
@@ -183,12 +215,10 @@ function extractJsonObject(rawOutput: string): ModelJson {
     if (inString) continue;
     if (char === "{") depth += 1;
     if (char === "}") depth -= 1;
-    if (depth === 0) {
-      return JSON.parse(candidate.slice(start, index + 1)) as ModelJson;
-    }
+    if (depth === 0) return index;
   }
 
-  throw new Error("json_end_not_found");
+  return undefined;
 }
 
 function normalizeModelJson(value: ModelJson): Required<ModelJson> & {

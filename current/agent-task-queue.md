@@ -107,7 +107,7 @@ Adversarial review focus:
 
 ### T2. Demo Flow Hardening
 
-Status: `ready`
+Status: `completed`
 
 Goal:
 
@@ -128,19 +128,34 @@ Required steps:
 3. 모델이 없어도 fallback-local이 데모 실패처럼 보이지 않게 문구를 다듬는다.
 4. copy/download payload 버튼이 필요한지 검토하고, 시간이 되면 추가한다.
 
+Result:
+
+- Dashboard에 `Voice 수집 -> EXAONE 후처리 -> Human Review -> MISO 제안` golden path를 추가.
+- Session detail에 동일한 단계형 workflow rail과 현재 단계 안내를 추가.
+- EXAONE 처리 여부, review 상태, MISO 승인 여부를 dashboard/session detail에서 바로 볼 수 있게 함.
+- 합성 proof session `20260530T153141_utc_channel_talk_e7b435ae0b`을 `exaone-local` 처리 후 redacted MISO payload 승인까지 완료.
+- 실제 고객 대화는 임의 승인하지 않고 합성 세션만 full-path proof로 사용.
+- EXAONE/llama.cpp 출력에서 prompt echo와 nested JSON이 섞여도 마지막 유효 모델 JSON을 추출하도록 보강.
+- `pnpm build`와 `pnpm dev`가 `.next`를 동시에 만질 때 생기는 stale chunk 문제를 문서화.
+
 Verification:
 
 ```bash
 pnpm typecheck
 pnpm build
 curl -fsS http://localhost:3000/api/sessions
+set -a; source .env.local; set +a
+curl -fsS \
+  -H "x-phone-claw-ingest-secret: $PHONE_CLAW_INGEST_SECRET" \
+  http://localhost:3000/api/miso/voice-sessions/20260530T153141_utc_channel_talk_e7b435ae0b
 ```
 
 Completion evidence:
 
-- 데모 순서 5단계 이하
-- UI에서 처리/검수/MISO 상태가 명확히 보이는 화면
-- README 또는 demo intro에 동일한 순서 반영
+- Demo script in `docs/demo-intro.md`
+- Full-path synthetic session ID: `20260530T153141_utc_channel_talk_e7b435ae0b`
+- MISO detail API returns `availableForExternalWorkflow: true` and `hasPayload: true` for the synthetic session
+- README and implementation status updated
 
 Adversarial review focus:
 
@@ -321,12 +336,12 @@ Adversarial review focus:
 
 ## Recommended Next Work Unit
 
-가장 먼저 잡을 작업 단위는 **T2. Demo Flow Hardening**이다.
+가장 먼저 잡을 작업 단위는 **T3. Reproducibility And Black-Box Test Pass**다.
 
 이유:
 
-- realtime webhook은 실제 합성 이벤트로 증명됐고, 다음 병목은 심사위원에게 보이는 golden path다.
-- Channel Talk 입력이 들어온 뒤 `EXAONE 처리 -> human review -> MISO proposal`이 한 화면에서 설득력 있게 보여야 한다.
-- live webhook이 흔들려도 sample/backfill path로 같은 제품 가치를 보여줄 수 있어야 한다.
+- realtime webhook과 demo golden path가 모두 증명됐다.
+- 다음 리스크는 M1 MacBook 또는 새 clone 환경에서 문서대로 바로 재현되는지다.
+- 재현성이 정리되면 제출용 README와 발표 자료가 훨씬 안정된다.
 
-T2가 끝나면 **T3. Reproducibility And Black-Box Test Pass**로 넘어가서 M1 MacBook에서도 문서만 보고 재현되는지 확인한다.
+T3가 끝나면 **T4. Local Voice Capture Frontdoor**로 넘어가 Channel Talk가 없어도 회의/음성 파일 입력을 만들 수 있게 한다.
