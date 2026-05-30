@@ -1,0 +1,57 @@
+{
+  "name": "phone-claw-local-voice-bridge",
+  "description": "Proposed MCP tool surface for letting MISO read user-approved voice-session handoffs from a private local Phone-Claw instance.",
+  "transport": {
+    "type": "streamable-http",
+    "url": "https://<local-tunnel-host>/mcp"
+  },
+  "tools": [
+    {
+      "name": "list_voice_sessions",
+      "description": "List local voice-session metadata only. Does not return transcript or audio.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "default": 10
+          }
+        }
+      }
+    },
+    {
+      "name": "read_voice_session_handoff",
+      "description": "Read a redacted handoff payload only after human review allows external workflow access.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["sessionId"],
+        "properties": {
+          "sessionId": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "propose_case_from_voice_session",
+      "description": "Return a proposed MISO case creation request from an approved redacted handoff payload. The tool never creates a case directly.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["sessionId"],
+        "properties": {
+          "sessionId": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "policy": {
+    "rawTranscriptIncluded": false,
+    "rawAudioIncluded": false,
+    "humanReviewRequired": true,
+    "defaultBehaviorBeforeReview": "return_blocked_reason"
+  }
+}

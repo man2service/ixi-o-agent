@@ -7,6 +7,7 @@ services:
       - N8N_HOST=localhost
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
       - EXECUTIONS_DATA_SAVE_ON_SUCCESS=none
       - EXECUTIONS_DATA_SAVE_ON_ERROR=all
       - EXECUTIONS_DATA_PRUNE=true
@@ -19,3 +20,4 @@ services:
       - CHANNEL_TALK_ACCESS_SECRET=${CHANNEL_TALK_ACCESS_SECRET}
     volumes:
       - ./n8n-data:/home/node/.n8n
+      - ./n8n/workflows:/workflows:ro

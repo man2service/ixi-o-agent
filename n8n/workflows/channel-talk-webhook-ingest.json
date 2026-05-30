@@ -1,5 +1,6 @@
 {
   "name": "Phone-Claw Channel Talk Webhook Ingest Draft",
+  "active": false,
   "nodes": [
     {
       "parameters": {
@@ -8,6 +9,7 @@
         "responseMode": "responseNode"
       },
       "id": "webhook",
+      "webhookId": "phone-claw-channel-talk",
       "name": "Channel Talk Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,

@@ -2,6 +2,92 @@
 
 Phone-Claw uses n8n as the automation hub for Channel Talk ingest.
 
+## Current Local Setup
+
+Docker Desktop could pull the n8n image, but container start stalled on this Mac.
+For the hackathon demo, the working setup is local Node-based n8n:
+
+```bash
+set -a; source .env.local; set +a
+N8N_USER_FOLDER="$PWD/n8n-data-v1" \
+N8N_HOST=localhost \
+N8N_PORT=5678 \
+N8N_PROTOCOL=http \
+N8N_SECURE_COOKIE=false \
+N8N_DIAGNOSTICS_ENABLED=false \
+N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false \
+DB_SQLITE_POOL_SIZE=2 \
+N8N_RUNNERS_ENABLED=true \
+N8N_BLOCK_ENV_ACCESS_IN_NODE=false \
+N8N_GIT_NODE_DISABLE_BARE_REPOS=true \
+EXECUTIONS_DATA_SAVE_ON_SUCCESS=none \
+EXECUTIONS_DATA_SAVE_ON_ERROR=all \
+EXECUTIONS_DATA_PRUNE=true \
+EXECUTIONS_DATA_MAX_AGE=24 \
+PHONE_CLAW_INGEST_URL=http://localhost:3000/api/ingest/channel-talk \
+PHONE_CLAW_OPENAPI_INGEST_URL=http://localhost:3000/api/ingest/channel-talk/openapi \
+PHONE_CLAW_BACKFILL_URL=http://localhost:3000/api/backfill/channel-talk \
+fnm exec --using 20.20.2 -- pnpm dlx n8n@1.118.2
+```
+
+Open:
+
+```text
+http://localhost:5678
+```
+
+The local owner account is stored only in `.env.local`:
+
+```text
+N8N_OWNER_EMAIL
+N8N_OWNER_PASSWORD
+```
+
+Imported workflows:
+
+- `Phone-Claw Channel Talk Webhook Ingest Draft`
+- `Phone-Claw Channel Talk Polling Backup`
+- `Phone-Claw Channel Talk Manual Backfill`
+- `Phone-Claw Channel Talk Sample Ingest`
+
+Import command:
+
+```bash
+set -a; source .env.local; set +a
+N8N_USER_FOLDER="$PWD/n8n-data-v1" \
+PHONE_CLAW_INGEST_URL=http://localhost:3000/api/ingest/channel-talk \
+PHONE_CLAW_OPENAPI_INGEST_URL=http://localhost:3000/api/ingest/channel-talk/openapi \
+PHONE_CLAW_BACKFILL_URL=http://localhost:3000/api/backfill/channel-talk \
+fnm exec --using 20.20.2 -- pnpm dlx n8n@1.118.2 import:workflow --separate --input=./n8n/workflows
+```
+
+Active workflows:
+
+- realtime webhook
+- polling backup
+
+The workflow files are committed with `active: false` for safe import. After
+importing, activate the realtime webhook and polling backup workflows in the n8n
+editor or with the local REST API.
+
+Realtime webhook URL:
+
+```text
+http://localhost:5678/webhook/channel-talk-phone-claw
+```
+
+When exposed through Cloudflare Tunnel, use:
+
+```text
+https://<trycloudflare-host>/webhook/channel-talk-phone-claw
+```
+
+The workflow JSON includes a stable `webhookId`, so the URL does not depend on
+the imported workflow ID.
+
+Manual historical backfill remains available inside n8n as an inactive workflow
+that can be run from the editor.
+
 ## Start
 
 ```bash
@@ -42,6 +128,12 @@ n8n/workflows/channel-talk-sample-ingest.json
 n8n/workflows/channel-talk-webhook-ingest.json
 n8n/workflows/channel-talk-polling-ingest.json
 n8n/workflows/channel-talk-manual-backfill.json
+```
+
+The Docker compose file mounts local workflow JSON files at `/workflows`, so workflows can be imported with:
+
+```bash
+docker compose -f docker-compose.n8n.yml --env-file .env.local run --rm n8n n8n import:workflow --separate --input=/workflows
 ```
 
 ## Real Channel Talk Backfill

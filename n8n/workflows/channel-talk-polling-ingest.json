@@ -1,5 +1,6 @@
 {
   "name": "Phone-Claw Channel Talk Polling Backup",
+  "active": false,
   "nodes": [
     {
       "parameters": {

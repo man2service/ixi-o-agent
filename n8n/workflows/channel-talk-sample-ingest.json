@@ -1,5 +1,6 @@
 {
   "name": "Phone-Claw Channel Talk Sample Ingest",
+  "active": false,
   "nodes": [
     {
       "parameters": {},
@@ -60,4 +61,3 @@
     "executionOrder": "v1"
   }
 }
-

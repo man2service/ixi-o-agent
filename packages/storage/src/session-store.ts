@@ -4,7 +4,8 @@ import path from "node:path";
 import {
   transcriptToMarkdown,
   type ChannelTalkN8nPayload,
-  type IngestResult
+  type IngestResult,
+  type TranscriptUtterance
 } from "@phone-claw/core";
 import { getStorageDir } from "./config";
 
@@ -38,6 +39,65 @@ export type StoredVoiceSession = {
   channelId?: string;
   userChatId?: string;
   callDirection?: string;
+};
+
+export type MisoVoiceSessionSummary = {
+  sessionId: string;
+  status: string;
+  source: string;
+  mode: string;
+  sourceStartedAt: string;
+  sourceEndedAt: string | null;
+  createdAt: string;
+  utteranceCount: number;
+  review: {
+    reviewed: boolean;
+    externalAllowed: boolean;
+  };
+  safety: {
+    redactionApplied: true;
+    rawTranscriptIncluded: false;
+    rawAudioIncluded: false;
+    humanReviewRequired: true;
+  };
+};
+
+export type MisoVoiceSessionDetail = MisoVoiceSessionSummary & {
+  handoff: {
+    availableForExternalWorkflow: boolean;
+    blockedReason?: string;
+    redactedPayload?: MisoHandoffPayload;
+  };
+};
+
+export type MisoHandoffPayload = {
+  schemaVersion: "phone-claw.miso.voice-session.v0";
+  eventType: "voice-session.created";
+  source: "phone-claw-private-local-voice-bridge";
+  sourceSystem: "channel_talk";
+  sourceMode: string;
+  sessionId: string;
+  startedAt: string;
+  endedAt: string | null;
+  summary: string;
+  urgency: "unknown" | "low" | "normal" | "high" | "critical";
+  requiredTeams: string[];
+  actionItems: Array<{
+    text: string;
+    owner: string | null;
+    status: "open" | "done" | "blocked";
+  }>;
+  redactionApplied: true;
+  humanReviewRequired: true;
+  rawTranscriptIncluded: false;
+  rawAudioIncluded: false;
+  reviewStatus: "pending_human_review" | "approved_for_external_workflow";
+  sourceRefs: {
+    channelId: string;
+    userChatId: string;
+    callLogId: string | null;
+    meetMessageId: string | null;
+  };
 };
 
 export async function ingestChannelTalkPayload(
@@ -133,6 +193,55 @@ export async function listStoredVoiceSessions(): Promise<StoredVoiceSession[]> {
     .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
 }
 
+export async function listMisoVoiceSessions(): Promise<MisoVoiceSessionSummary[]> {
+  const storageDir = getStorageDir();
+  const sessionsRoot = path.join(storageDir, "sessions");
+
+  let sessionIds: string[];
+  try {
+    sessionIds = await readdir(sessionsRoot);
+  } catch {
+    return [];
+  }
+
+  const sessions = await Promise.all(
+    sessionIds.map(async (sessionId) => readMisoVoiceSessionSummary(sessionsRoot, sessionId))
+  );
+
+  return sessions
+    .filter((session): session is MisoVoiceSessionSummary => Boolean(session))
+    .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+}
+
+export async function readMisoVoiceSession(
+  sessionId: string
+): Promise<MisoVoiceSessionDetail | undefined> {
+  if (!isSafeSessionId(sessionId)) return undefined;
+
+  const storageDir = getStorageDir();
+  const sessionsRoot = path.join(storageDir, "sessions");
+  const summary = await readMisoVoiceSessionSummary(sessionsRoot, sessionId);
+  if (!summary) return undefined;
+
+  const sessionPath = path.join(sessionsRoot, sessionId);
+  const redactedPayload = (await readOptionalJson(
+    path.join(sessionPath, "handoff", "miso-payload.redacted.json")
+  )) as MisoHandoffPayload | undefined;
+  const availableForExternalWorkflow =
+    summary.review.reviewed && summary.review.externalAllowed && Boolean(redactedPayload);
+
+  return {
+    ...summary,
+    handoff: {
+      availableForExternalWorkflow,
+      blockedReason: availableForExternalWorkflow
+        ? undefined
+        : "human_review_required_before_miso_handoff",
+      redactedPayload: availableForExternalWorkflow ? redactedPayload : undefined
+    }
+  };
+}
+
 async function readStoredVoiceSession(
   sessionsRoot: string,
   sessionId: string
@@ -160,6 +269,45 @@ async function readStoredVoiceSession(
       channelId: getString(agentDraft, ["metadata", "channelId"]),
       userChatId: getString(agentDraft, ["metadata", "userChatId"]),
       callDirection: getString(agentDraft, ["metadata", "callDirection"])
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+async function readMisoVoiceSessionSummary(
+  sessionsRoot: string,
+  sessionId: string
+): Promise<MisoVoiceSessionSummary | undefined> {
+  const sessionPath = path.join(sessionsRoot, sessionId);
+
+  try {
+    const [metadata, agentDraft, reviewState] = await Promise.all([
+      readJson(path.join(sessionPath, "metadata.json")),
+      readJson(path.join(sessionPath, "agent", "voice-session-draft.json")),
+      readOptionalJson(path.join(sessionPath, "review", "review-state.json"))
+    ]);
+    const utterances = getArray(agentDraft, ["transcript", "utterances"]);
+
+    return {
+      sessionId,
+      status: getString(metadata, ["status"]) ?? "unknown",
+      source: getString(metadata, ["source"]) ?? "unknown",
+      mode: getString(metadata, ["mode"]) ?? "unknown",
+      sourceStartedAt: getString(metadata, ["sourceStartedAt"]) ?? "",
+      sourceEndedAt: getNullableString(metadata, ["sourceEndedAt"]),
+      createdAt: getString(metadata, ["createdAt"]) ?? "",
+      utteranceCount: utterances?.length ?? 0,
+      review: {
+        reviewed: getBoolean(reviewState, ["reviewed"]) ?? false,
+        externalAllowed: getBoolean(reviewState, ["externalAllowed"]) ?? false
+      },
+      safety: {
+        redactionApplied: true,
+        rawTranscriptIncluded: false,
+        rawAudioIncluded: false,
+        humanReviewRequired: true
+      }
     };
   } catch {
     return undefined;
@@ -258,6 +406,70 @@ async function writeSessionFiles(args: {
     reviewed: false,
     externalAllowed: false
   });
+
+  const redactedPayload = buildMisoHandoffPayload({
+    payload,
+    reviewStatus: "pending_human_review",
+    sessionId: path.basename(sessionPath)
+  });
+  await writeJson(path.join(sessionPath, "handoff", "miso-payload.redacted.json"), redactedPayload);
+  await writeJson(path.join(sessionPath, "handoff", "proposed-miso-request.json"), {
+    method: "POST",
+    path: "/miso/events/voice-session.created",
+    note: "Proposed MISO inbound webhook. Current MISO guide supports outbound tools/MCP, so this is a schema proposal unless MISO opens an ingest endpoint.",
+    payload: redactedPayload
+  });
+}
+
+function buildMisoHandoffPayload(args: {
+  payload: ChannelTalkN8nPayload;
+  reviewStatus: MisoHandoffPayload["reviewStatus"];
+  sessionId: string;
+}): MisoHandoffPayload {
+  const { payload, reviewStatus, sessionId } = args;
+  const redactedPreview = redactText(toRawText(payload.transcript)).slice(0, 360);
+
+  return {
+    schemaVersion: "phone-claw.miso.voice-session.v0",
+    eventType: "voice-session.created",
+    source: "phone-claw-private-local-voice-bridge",
+    sourceSystem: "channel_talk",
+    sourceMode: payload.mode,
+    sessionId,
+    startedAt: payload.startedAt,
+    endedAt: payload.endedAt ?? null,
+    summary:
+      redactedPreview.length > 0
+        ? `Local processing pending. Redacted transcript preview: ${redactedPreview}`
+        : "Local processing pending. No transcript text is available yet.",
+    urgency: "unknown",
+    requiredTeams: [],
+    actionItems: [],
+    redactionApplied: true,
+    humanReviewRequired: true,
+    rawTranscriptIncluded: false,
+    rawAudioIncluded: false,
+    reviewStatus,
+    sourceRefs: {
+      channelId: payload.channelId,
+      userChatId: payload.userChatId,
+      callLogId: payload.callLogId ?? null,
+      meetMessageId: payload.meetMessageId ?? null
+    }
+  };
+}
+
+function toRawText(transcript: TranscriptUtterance[]): string {
+  return transcript.map((item) => item.text).join("\n");
+}
+
+function redactText(text: string): string {
+  return text
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[email]")
+    .replace(/\b01[016789]-?\d{3,4}-?\d{4}\b/g, "[phone]")
+    .replace(/\b\d{2,4}-\d{3,4}-\d{4}\b/g, "[phone]")
+    .replace(/\b\d{6}-\d{7}\b/g, "[id-number]")
+    .replace(/\b\d{13,16}\b/g, "[long-number]");
 }
 
 function createSessionId(payload: ChannelTalkN8nPayload): string {
@@ -297,6 +509,14 @@ async function readJson(filePath: string): Promise<unknown> {
   return JSON.parse(raw);
 }
 
+async function readOptionalJson(filePath: string): Promise<unknown | undefined> {
+  try {
+    return await readJson(filePath);
+  } catch {
+    return undefined;
+  }
+}
+
 function getString(value: unknown, keys: string[]): string | undefined {
   const found = getNestedValue(value, keys);
   return typeof found === "string" ? found : undefined;
@@ -312,6 +532,11 @@ function getArray(value: unknown, keys: string[]): unknown[] | undefined {
   return Array.isArray(found) ? found : undefined;
 }
 
+function getBoolean(value: unknown, keys: string[]): boolean | undefined {
+  const found = getNestedValue(value, keys);
+  return typeof found === "boolean" ? found : undefined;
+}
+
 function getNestedValue(value: unknown, keys: string[]): unknown {
   let current = value;
   for (const key of keys) {
@@ -319,4 +544,8 @@ function getNestedValue(value: unknown, keys: string[]): unknown {
     current = (current as Record<string, unknown>)[key];
   }
   return current;
+}
+
+function isSafeSessionId(sessionId: string): boolean {
+  return /^[a-zA-Z0-9_.-]+$/.test(sessionId);
 }
