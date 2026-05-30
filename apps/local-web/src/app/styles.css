@@ -128,6 +128,18 @@ a:hover {
   align-items: start;
 }
 
+.kiya-notice {
+  margin: 0 0 12px;
+  border: 1px solid #b9d8cf;
+  border-radius: 8px;
+  background: #f3fbf8;
+  color: #155e52;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
 .demo-copy h2 {
   margin-bottom: 6px;
 }

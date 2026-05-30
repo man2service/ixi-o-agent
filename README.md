@@ -15,12 +15,13 @@ Phone-Claw is a private local voice bridge for the OBA Weekend-thon S1 build. It
 - Local STT small model and EXAONE 1.2B GGUF smoke-tested on the Mac mini M4
 - Local EXAONE post-processing for summaries, urgency, teams, and action items
 - Restricted MISO-facing API/OpenAPI draft that exposes only reviewed, redacted handoff payloads
+- Kiya/Hermes outbound notification after EXAONE processing, with Telegram delivery when configured
 
 ## Demo Path
 
 ```text
 Channel Talk or Local Voice -> Phone-Claw local inbox -> EXAONE local processing
-  -> human review -> redacted MISO handoff proposal
+  -> Kiya/Hermes recommendation -> human review -> redacted MISO handoff proposal
 ```
 
 The first screen is the local inbox. Click any stored session to open the detail/review view.
@@ -96,6 +97,7 @@ pnpm smoke:local
 This starts a temporary Next dev server on port `3210`, uses an isolated temp storage folder, ingests the sample payload, runs fallback-local processing with a deliberately missing model path, verifies MISO blocks before review, approves the synthetic session, then verifies the redacted payload becomes available.
 
 The smoke test also creates one `local_voice_upload` meeting session through `POST /api/ingest/local-voice`.
+It verifies Kiya/Hermes notification dry-run behavior when Telegram credentials are absent.
 
 Check local STT with the installed Whisper small model:
 

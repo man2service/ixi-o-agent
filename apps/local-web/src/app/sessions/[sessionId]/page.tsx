@@ -8,10 +8,14 @@ type PageProps = {
   params: Promise<{
     sessionId: string;
   }>;
+  searchParams?: Promise<{
+    kiya?: string;
+  }>;
 };
 
-export default async function SessionDetailPage({ params }: PageProps) {
+export default async function SessionDetailPage({ params, searchParams }: PageProps) {
   const { sessionId } = await params;
+  const query = await searchParams;
   const session = await readStoredVoiceSessionDetail(sessionId);
   if (!session) notFound();
 
@@ -50,6 +54,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
       </section>
 
       <section className="session-flow" aria-label="session workflow">
+        {query?.kiya ? <KiyaNotice status={query.kiya} /> : null}
         <ol className="stage-list compact-list">
           <li className={hasTranscript ? "stage done" : "stage active"}>
             <span>1</span>
@@ -122,6 +127,11 @@ export default async function SessionDetailPage({ params }: PageProps) {
             <form action={`/api/sessions/${session.sessionId}/process`} method="post">
               <button className="button primary" type="submit" disabled={!hasTranscript}>
                 EXAONE 로컬 후처리 실행
+              </button>
+            </form>
+            <form action={`/api/sessions/${session.sessionId}/notify-kiya`} method="post">
+              <button className="button primary" type="submit" disabled={!hasProcessedOutput}>
+                Kiya/Hermes 추천 전송
               </button>
             </form>
             <form action={`/api/sessions/${session.sessionId}/review`} method="post">
@@ -255,6 +265,16 @@ export default async function SessionDetailPage({ params }: PageProps) {
       </section>
     </main>
   );
+}
+
+function KiyaNotice({ status }: { status: string }) {
+  const labels: Record<string, string> = {
+    sent: "Kiya Telegram으로 요약과 Hermes 추천을 전송했습니다.",
+    dry_run:
+      "Kiya/Hermes 메시지는 생성됐지만 Telegram 자격증명이 없어 dry-run으로 처리했습니다.",
+    skipped: "Kiya 자동 전송이 환경설정에서 꺼져 있어 건너뛰었습니다."
+  };
+  return <p className="kiya-notice">{labels[status] ?? "Kiya/Hermes 알림 처리가 완료되었습니다."}</p>;
 }
 
 function formatDate(value: string) {

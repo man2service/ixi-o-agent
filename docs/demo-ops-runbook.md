@@ -39,8 +39,37 @@ Expected:
 
 - `git status --short` has no uncommitted source changes.
 - `pnpm smoke:local` reports `miso_blocked_before_review`,
-  `miso_available_after_review`, and `local_voice_frontdoor_ingested`.
+  `miso_available_after_review`, `local_voice_frontdoor_ingested`, and Kiya
+  dry-run checks.
 - `pnpm check:stt` returns a non-empty transcript preview.
+
+## Kiya/Hermes Settings
+
+Kiya outbound delivery is automatic after EXAONE processing unless disabled:
+
+```text
+PHONE_CLAW_KIYA_AUTO_NOTIFY=true
+```
+
+To disable automatic delivery:
+
+```text
+PHONE_CLAW_KIYA_AUTO_NOTIFY=false
+```
+
+Optional live settings:
+
+```text
+HERMES_AGENT_WEBHOOK_URL=
+HERMES_AGENT_API_KEY=
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_KIYA_CHAT_ID=
+```
+
+If `HERMES_AGENT_WEBHOOK_URL` is empty, Phone-Claw uses a local Hermes planner
+to recommend calendar, travel, OBA OpenAPI, follow-up, and review actions. If
+Telegram credentials are empty, the route returns a dry-run result instead of
+sending a message.
 
 ## Start The Local App
 
@@ -154,7 +183,8 @@ pnpm webhook:channel-talk list
 2. Create a `meeting` session.
 3. Open the created session.
 4. Run EXAONE processing.
-5. Approve MISO handoff.
+5. Confirm the Kiya/Hermes notice says sent or dry-run.
+6. Approve MISO handoff.
 
 ### n8n Backup
 

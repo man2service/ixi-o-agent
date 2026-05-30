@@ -22,6 +22,7 @@ The first working path is implemented:
 14. The MISO proposal pack separates implemented custom-tool pull APIs from proposed inbound voice event/MCP interfaces.
 15. Demo operations and STT field validation runbooks are available for final rehearsal.
 16. Telegram Kiya integration assumptions and toy scope are documented.
+17. EXAONE processing now automatically prepares a Kiya/Hermes outbound notification unless `PHONE_CLAW_KIYA_AUTO_NOTIFY=false`.
 
 ## Local App
 
@@ -30,6 +31,7 @@ The first working path is implemented:
 - Session detail API: `GET /api/sessions/{sessionId}`
 - EXAONE process API: `POST /api/sessions/{sessionId}/process`
 - Review API: `POST /api/sessions/{sessionId}/review`
+- Kiya/Hermes notify API: `POST /api/sessions/{sessionId}/notify-kiya`
 - Normalized ingest: `POST /api/ingest/channel-talk`
 - Raw Channel Talk ingest: `POST /api/ingest/channel-talk/openapi`
 - Backfill runner: `POST /api/backfill/channel-talk`
@@ -71,6 +73,7 @@ The polling and manual backfill workflows call the local backfill endpoint. Chan
 - `docs/submission-pack.md` documents the final pitch, architecture, sponsor fit, verification, security boundary, and limitations
 - MISO JSON artifacts parse successfully, including `miso/proposed-inbound-voice-event.schema.json`
 - `pnpm check:stt` verifies the installed Whisper small model on a local sample file
+- `pnpm smoke:local` verifies Kiya/Hermes notification dry-run behavior without Telegram credentials
 
 The live backfill stored Channel Talk sessions locally. Credentials were not written to source files.
 
@@ -104,8 +107,8 @@ The persistent task queue is now tracked in `current/agent-task-queue.md`.
 
 Recommended next work unit:
 
-1. Telegram Kiya toy - implement text-only bot notification/reply loop behind local secrets.
-2. Final demo rehearsal - run `docs/demo-ops-runbook.md` from a cold start and capture failures.
+1. Configure real Kiya/Hermes secrets and run a live outbound notification rehearsal.
+2. Telegram reply loop - decide Hermes callback contract before allowing Kiya replies to mutate local session state.
 
 ## Runtime Note
 

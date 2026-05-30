@@ -28,6 +28,7 @@ Updated: 2026-05-31 KST
 - Channel Talk UI webhook 등록 및 합성 live event 기반 realtime proof
 - 데모 운영 runbook과 STT field validation 문서
 - Telegram Kiya 연동 리서치와 text-first toy 범위
+- EXAONE 처리 후 Kiya/Hermes outbound notification 자동 준비 및 dry-run 검증
 
 현재 주요 리스크:
 
@@ -35,7 +36,7 @@ Updated: 2026-05-31 KST
 - Cloudflare quick tunnel URL은 재시작 시 바뀌므로 Channel Talk UI webhook URL도 갱신해야 함
 - 제출용 화면/시연 캡처가 아직 정리되지 않음
 - MISO 쪽은 직접 push가 아니라 제안 schema/API로 설명해야 함
-- Telegram Kiya는 아직 구현 전이며, 실제 Kiya/OpenClaw runtime 형태 확인 필요
+- Telegram Kiya outbound는 구현됐지만, 실제 Hermes ingress URL과 Kiya Telegram chat ID 설정 필요
 
 ## Review Checklist For Every Task
 
@@ -407,50 +408,77 @@ Adversarial review focus:
 - 실제 고객 채팅에 테스트 메시지를 보내지 않는지
 - STT 검증이 모델 존재 확인이 아니라 실제 음성 파일 전사를 확인하는지
 
-### T8. Telegram Kiya Toy
+### T8. Telegram Kiya/Hermes Outbound
 
-Status: `planned`
+Status: `completed`
 
 Goal:
 
-Phone-Claw가 처리한 voice session을 Telegram Kiya에게 알리고, 사용자의 Telegram 답장을 통해 세션 검수/수정 루프를 시작하는 작은 toy를 만든다.
+Phone-Claw가 처리한 voice session을 Hermes가 바인딩된 Kiya에게 전달하고, 요약/액션아이템 기반 다음 행동 추천을 Telegram으로 받을 수 있게 한다.
 
 Scope:
 
 - `docs/telegram-kiya-integration-research.md`
-- new Telegram webhook route under `apps/local-web`
-- optional notify script
+- `apps/local-web/src/lib/kiya.ts`
+- `apps/local-web/src/app/api/sessions/[sessionId]/notify-kiya/route.ts`
+- `apps/local-web/src/app/api/sessions/[sessionId]/process/route.ts`
+- `apps/local-web/src/app/sessions/[sessionId]/page.tsx`
 - `.env.example`
 
-Proposed first slice:
+Result:
 
-1. BotFather에서 발급한 demo bot token을 `.env.local`에만 둔다.
-2. `TELEGRAM_ALLOWED_CHAT_ID`로 사용자 본인만 허용한다.
-3. `POST /api/telegram/kiya/webhook`에서 text message를 받는다.
-4. `POST /api/telegram/kiya/notify-session` 또는 script로 redacted session summary를 보낸다.
-5. `/sessions`, `/session <id>`, `/approve <id>` 정도만 먼저 구현한다.
+1. EXAONE 처리 후 `PHONE_CLAW_KIYA_AUTO_NOTIFY=false`가 아니면 자동으로 Kiya/Hermes 알림을 준비한다.
+2. `HERMES_AGENT_WEBHOOK_URL`이 있으면 safe summary/action payload를 Hermes로 POST한다.
+3. Hermes URL이 없거나 실패하면 local Hermes planner가 캘린더/항공권/OBA OpenAPI/후속 메시지/검수 추천을 만든다.
+4. `TELEGRAM_BOT_TOKEN`과 `TELEGRAM_KIYA_CHAT_ID`가 있으면 Kiya Telegram 메시지를 보낸다.
+5. Telegram 자격증명이 없으면 dry-run으로 message와 추천 결과를 검증한다.
+6. 세션 상세 화면에 수동 `Kiya/Hermes 추천 전송` 버튼을 추가했다.
 
 Verification:
 
 ```bash
-curl -fsS "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getMe"
-curl -fsS "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getWebhookInfo"
+pnpm smoke:local
+curl -fsS -X POST \
+  -H "accept: application/json" \
+  http://localhost:3000/api/sessions/<sessionId>/notify-kiya
 ```
 
 Adversarial review focus:
 
 - Telegram에 raw transcript/audio를 보내지 않는지
-- webhook secret header를 검증하는지
-- allowed chat ID 외 사용자가 로컬 세션을 제어할 수 없는지
+- Hermes 호출 payload가 요약/액션아이템 중심인지
+- Telegram 자격증명 없을 때도 dry-run으로 검증 가능한지
+- 자동 전송을 끌 수 있는 환경변수가 있는지
+
+### T9. Telegram Kiya Reply Loop
+
+Status: `planned`
+
+Goal:
+
+Kiya/Hermes가 보낸 추천에 사용자가 답장하면, 승인된 명령만 Phone-Claw 로컬 세션 상태에 반영한다.
+
+Scope:
+
+- Hermes/OpenClaw callback contract 확인
+- Telegram webhook 또는 Hermes callback endpoint
+- review note/action item state update 설계
+
+Required decisions:
+
+1. Hermes가 Phone-Claw local endpoint를 호출할 수 있는지
+2. Kiya 답장을 어떤 JSON command로 정규화할지
+3. 세션 수정은 바로 적용할지, review note로만 저장할지
+4. 캘린더/항공권/OBA OpenAPI 실행은 실제 실행 전 반드시 사용자 승인을 요구할지
 
 ## Recommended Next Work Unit
 
-가장 먼저 잡을 작업 단위는 **T8. Telegram Kiya Toy**이다.
+가장 먼저 잡을 작업 단위는 **Kiya/Hermes Live Credential Rehearsal**이다.
 
 이유:
 
-- 데모 운영과 STT 검증 준비는 문서/스크립트로 갖춰졌다.
-- 최종 제품의 마지막 사용자 접점은 Telegram Kiya이므로, text-only toy로 위험을 작게 나눠야 한다.
-- 음성 메시지 수신은 Telegram text loop가 안정화된 뒤 붙이는 것이 안전하다.
+- outbound 구현은 dry-run까지 끝났다.
+- 실제 Telegram 전송과 Hermes 호출은 로컬 코드보다 자격증명/ingress 설정이 리스크다.
+- reply loop는 Hermes callback 계약을 확정한 뒤 붙여야 한다.
 
-T8이 끝나면 실제 Kiya/OpenClaw runtime에 맞춰 direct Bot API toy를 이식할지, 그대로 유지할지 결정한다.
+라이브 rehearsal이 끝나면 T9 reply loop를 구현한다.

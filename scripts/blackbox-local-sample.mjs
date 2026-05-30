@@ -20,7 +20,13 @@ try {
       ...process.env,
       PHONE_CLAW_STORAGE_DIR: storageDir,
       PHONE_CLAW_INGEST_SECRET: ingestSecret,
-      PHONE_CLAW_EXAONE_MODEL_PATH: path.join(tempRoot, "missing-exaone-model.gguf")
+      PHONE_CLAW_EXAONE_MODEL_PATH: path.join(tempRoot, "missing-exaone-model.gguf"),
+      PHONE_CLAW_KIYA_AUTO_NOTIFY: "true",
+      HERMES_AGENT_WEBHOOK_URL: "",
+      HERMES_AGENT_API_KEY: "",
+      TELEGRAM_BOT_TOKEN: "",
+      TELEGRAM_KIYA_CHAT_ID: "",
+      TELEGRAM_ALLOWED_CHAT_ID: ""
     },
     stdio: ["ignore", "pipe", "pipe"]
   });
@@ -58,6 +64,14 @@ try {
   assert(processResult.ok === true, "local EXAONE process route should succeed");
   assert(processResult.result.engine === "fallback-local", "missing model should use fallback-local");
   assert(processResult.result.modelAvailable === false, "smoke test should not require model file");
+  assert(
+    processResult.kiya?.telegram?.status === "dry_run",
+    "Kiya auto notification should dry-run without Telegram credentials"
+  );
+  assert(
+    processResult.kiya?.hermes?.engine === "local-hermes-planner",
+    "Hermes recommendation should fall back to local planner without webhook"
+  );
 
   const preReviewMiso = await getJson(`/api/miso/voice-sessions/${sessionId}`, {
     "x-phone-claw-ingest-secret": ingestSecret
@@ -104,6 +118,15 @@ try {
     "local voice session should preserve meeting mode"
   );
 
+  const kiyaManual = await postJson(`/api/sessions/${sessionId}/notify-kiya`, undefined, {
+    accept: "application/json"
+  });
+  assert(kiyaManual.ok === true, "manual Kiya notification route should succeed");
+  assert(
+    kiyaManual.result.telegram.status === "dry_run",
+    "manual Kiya notification should dry-run without credentials"
+  );
+
   console.log(
     JSON.stringify(
       {
@@ -117,7 +140,9 @@ try {
           "fallback_local_processed",
           "miso_blocked_before_review",
           "miso_available_after_review",
-          "local_voice_frontdoor_ingested"
+          "local_voice_frontdoor_ingested",
+          "kiya_auto_notification_dry_run",
+          "kiya_manual_notification_dry_run"
         ]
       },
       null,

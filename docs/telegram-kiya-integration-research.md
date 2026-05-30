@@ -5,7 +5,9 @@ agent integration.
 
 ## Product Role
 
-`Kiya` is the Telegram-facing agent layer for Phone-Claw.
+`Kiya` is the Telegram-facing agent layer for Phone-Claw. The current Kiya bot
+is already bound to the Hermes agent, so Phone-Claw should not try to create a
+separate Telegram input agent for this path.
 
 The final product flow should look like:
 
@@ -13,7 +15,8 @@ The final product flow should look like:
 Voice session saved
   -> EXAONE/local processing
   -> human review or draft handoff created
-  -> Kiya sends a Telegram notification
+  -> Phone-Claw calls Hermes with the safe summary/action payload
+  -> Hermes/Kiya sends a Telegram notification
   -> user replies with a natural-language correction or command
   -> Phone-Claw updates local session memory/action state
 ```
@@ -61,24 +64,36 @@ References:
 
 ## Recommended Toy Scope
 
-Build the smallest useful loop first:
+Build the smallest useful loop first. This is outbound only; Telegram voice
+messages are not an input source in this step.
 
-1. Create a demo Telegram bot through BotFather.
-2. Store `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, and
-   `TELEGRAM_ALLOWED_CHAT_ID` in `.env.local`.
-3. Add one local webhook endpoint:
+1. Store the Kiya/Hermes integration secrets in `.env.local`.
+2. After EXAONE processing, automatically prepare the safe session payload.
+3. Call the Hermes webhook when `HERMES_AGENT_WEBHOOK_URL` is set.
+4. Send the resulting message through Kiya Telegram delivery when
+   `TELEGRAM_BOT_TOKEN` and `TELEGRAM_KIYA_CHAT_ID` are set.
+5. If secrets are absent, keep the same flow as a dry-run.
+
+Current implemented endpoint:
 
 ```text
-POST /api/telegram/kiya/webhook
+POST /api/sessions/{sessionId}/notify-kiya
 ```
 
-4. Add one local send endpoint or script:
+Environment:
 
 ```text
-POST /api/telegram/kiya/notify-session
+PHONE_CLAW_KIYA_AUTO_NOTIFY=true
+HERMES_AGENT_WEBHOOK_URL=
+HERMES_AGENT_API_KEY=
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_KIYA_CHAT_ID=
 ```
 
-5. Start with text commands only:
+`PHONE_CLAW_KIYA_AUTO_NOTIFY` is on by default. Set it to `false` to disable
+automatic delivery after EXAONE processing.
+
+Later, add inbound text commands:
 
 ```text
 /start
@@ -95,57 +110,57 @@ POST /api/telegram/kiya/notify-session
 "요약에서 고객명을 익명 처리해줘"
 ```
 
-7. Add voice-message intake only after the text loop works.
+Voice-message intake should only be added after the outbound Kiya/Hermes loop is
+stable.
 
 ## Two Integration Options
 
-### Option A: Direct Telegram Bot API
+### Option A: Hermes-first with Telegram delivery
 
-Use simple HTTP calls from the existing Next app.
-
-Pros:
-
-- Smallest toy.
-- No new runtime.
-- Easy to verify with curl and Cloudflare Tunnel.
-
-Cons:
-
-- We implement command parsing, dedupe, and state ourselves.
-- Less reusable if we later add Slack/Discord.
-
-### Option B: OpenClaw/Kiya Agent Runtime
-
-Use the existing Kiya/OpenClaw agent layer if it is already running and can
-expose Telegram + tool calls.
+Call Hermes with the redacted Phone-Claw payload, then deliver the Hermes
+message through the Kiya bot token.
 
 Pros:
 
-- Closer to the user's final agent workflow.
-- Better for natural-language edits once the runtime is known.
+- Matches the current Kiya/Hermes binding.
+- Keeps recommendation logic in Hermes when the webhook exists.
+- Phone-Claw still has a dry-run/local planner fallback.
 
 Cons:
 
-- We need the actual Kiya/OpenClaw repo, config format, credentials, and local
-  runtime behavior.
-- Riskier for the first toy unless that environment is already stable.
+- Requires the actual Hermes ingress URL and, if needed, API key.
+- A direct Telegram `sendMessage` from the bot sends a message as Kiya but does
+  not by itself make another Telegram bot process a user message.
+
+### Option B: Direct Telegram Bot API Only
+
+Use Telegram Bot API without Hermes.
+
+Pros:
+
+- Useful for delivery smoke tests.
+- Works when Hermes ingress is not available.
+
+Cons:
+
+- Does not satisfy the full agent recommendation goal by itself.
+- Telegram bots generally cannot message other bots to trigger them.
 
 ## Recommended Sequence
 
-Start with Option A as the proof toy:
+Start with Option A:
 
 ```text
-Phone-Claw -> Telegram notification -> user text reply -> local session update
+Phone-Claw -> Hermes recommendation -> Kiya Telegram notification
 ```
 
-Then adapt the same command contract into Kiya/OpenClaw once we know its runtime
-shape.
+Then add Kiya reply handling once we know the Hermes/OpenClaw callback contract.
 
 ## Data Boundary
 
 - Do not send raw transcript or raw audio to Telegram by default.
-- Telegram notification should use the reviewed/redacted handoff payload or a
-  short local-only summary.
+- Telegram notification uses the reviewed/redacted handoff payload or EXAONE
+  summary/action items.
 - Voice messages sent to the bot are stored locally, then passed through local
   STT, just like Private Mode.
 - Restrict the toy to `TELEGRAM_ALLOWED_CHAT_ID` so random users cannot control
@@ -155,8 +170,9 @@ shape.
 
 To integrate with the actual Kiya agent, we still need:
 
-1. Is Kiya already a Telegram bot, or should we create a new demo bot?
-2. Is Kiya backed by OpenClaw, a custom server, n8n, or another agent runtime?
+1. What is the Hermes ingress URL or tool contract that Kiya is bound to?
+2. Does Hermes itself deliver to Kiya, or should Phone-Claw send Telegram
+   `sendMessage` using the Kiya bot token after Hermes returns recommendations?
 3. Can Kiya call local HTTP endpoints, or does Phone-Claw need to push messages
    into Kiya?
 4. Should Telegram replies modify Phone-Claw session JSON directly, or only add
