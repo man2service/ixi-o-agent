@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://phone-claw.local/schemas/miso/proposed-inbound-voice-event.schema.json",
+  "title": "Proposed MISO inbound voice-session event",
+  "description": "Schema proposal for a future MISO inbound event endpoint. This is not claimed as a currently supported MISO push API.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "eventType",
+    "source",
+    "sourceSystem",
+    "sourceMode",
+    "sessionId",
+    "startedAt",
+    "endedAt",
+    "summary",
+    "urgency",
+    "requiredTeams",
+    "actionItems",
+    "redactionApplied",
+    "humanReviewRequired",
+    "rawTranscriptIncluded",
+    "rawAudioIncluded",
+    "reviewStatus",
+    "sourceRefs"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "phone-claw.miso.voice-session.v0"
+    },
+    "eventType": {
+      "const": "voice-session.created"
+    },
+    "source": {
+      "const": "phone-claw-private-local-voice-bridge"
+    },
+    "sourceSystem": {
+      "type": "string",
+      "enum": ["channel_talk", "local_voice"]
+    },
+    "sourceMode": {
+      "type": "string",
+      "enum": ["call", "meeting", "voice_note"]
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "startedAt": {
+      "type": "string"
+    },
+    "endedAt": {
+      "type": ["string", "null"]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "urgency": {
+      "type": "string",
+      "enum": ["unknown", "low", "normal", "high", "critical"]
+    },
+    "requiredTeams": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "actionItems": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "owner", "status"],
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "owner": {
+            "type": ["string", "null"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["open", "done", "blocked"]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "redactionApplied": {
+      "const": true
+    },
+    "humanReviewRequired": {
+      "const": true
+    },
+    "rawTranscriptIncluded": {
+      "const": false
+    },
+    "rawAudioIncluded": {
+      "const": false
+    },
+    "reviewStatus": {
+      "const": "approved_for_external_workflow"
+    },
+    "sourceRefs": {
+      "type": "object",
+      "required": ["channelId", "userChatId", "callLogId", "meetMessageId"],
+      "properties": {
+        "channelId": {
+          "type": "string"
+        },
+        "userChatId": {
+          "type": "string"
+        },
+        "callLogId": {
+          "type": ["string", "null"]
+        },
+        "meetMessageId": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

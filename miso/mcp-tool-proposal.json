@@ -1,6 +1,7 @@
 {
   "name": "phone-claw-local-voice-bridge",
   "description": "Proposed MCP tool surface for letting MISO read user-approved voice-session handoffs from a private local Phone-Claw instance.",
+  "supportedSourceSystems": ["channel_talk", "local_voice"],
   "transport": {
     "type": "streamable-http",
     "url": "https://<local-tunnel-host>/mcp"
@@ -17,6 +18,11 @@
             "minimum": 1,
             "maximum": 50,
             "default": 10
+          },
+          "sourceSystem": {
+            "type": "string",
+            "enum": ["channel_talk", "local_voice"],
+            "description": "Optional filter for Channel Talk/n8n sessions or Private Mode local voice sessions."
           }
         }
       }

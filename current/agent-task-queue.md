@@ -273,7 +273,7 @@ Adversarial review focus:
 
 ### T5. MISO Proposal Package
 
-Status: `planned`
+Status: `completed`
 
 Goal:
 
@@ -297,8 +297,15 @@ Required steps:
 Verification:
 
 ```bash
-node -e "JSON.parse(require('fs').readFileSync('miso/phone-claw-openapi.json','utf8')); JSON.parse(require('fs').readFileSync('miso/mcp-tool-proposal.json','utf8')); console.log('ok')"
+node -e "for (const f of ['miso/phone-claw-openapi.json','miso/mcp-tool-proposal.json','miso/proposed-inbound-voice-event.schema.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('ok')"
 ```
+
+Result:
+
+- `miso/README.md` now separates implemented custom-tool pull APIs from proposed inbound/MCP interfaces.
+- `miso/phone-claw-openapi.json` now documents both `channel_talk` and `local_voice` source systems.
+- Added `miso/proposed-inbound-voice-event.schema.json` as the proposed MISO voice event schema.
+- Added `miso/proposed-miso-interfaces.md` to explain current MISO feasibility, proposed interfaces, workflow automation, and verification.
 
 Completion evidence:
 
@@ -314,7 +321,7 @@ Adversarial review focus:
 
 ### T6. Submission Pack
 
-Status: `planned`
+Status: `completed`
 
 Goal:
 
@@ -334,6 +341,13 @@ Required steps:
 3. 민감정보/보안 구조를 간단한 다이어그램으로 설명한다.
 4. 제출 직전 `git status`, build, 주요 API smoke test를 실행한다.
 
+Result:
+
+- Added `docs/submission-pack.md` with tagline, one-liner, problem, solution, architecture, sponsor fit, demo script, verification commands, security boundary, and known limitations.
+- README now links to the submission pack.
+- Submission pack explicitly states that MISO direct inbound ingest is a proposal/custom tool path, not a claimed supported push integration.
+- Submission pack calls out the synthetic proof session and avoids real customer transcript exposure.
+
 Verification:
 
 ```bash
@@ -345,9 +359,9 @@ curl -fsS http://localhost:3000/api/sessions
 
 Completion evidence:
 
-- 제출용 GitHub URL
-- README만 보고 실행 가능한 상태
-- 최종 데모 순서 문서화
+- 제출용 GitHub URL: `https://github.com/man2service/Phoneclaw`
+- README links to `docs/submission-pack.md`
+- Final demo order documented in `docs/submission-pack.md` and `docs/demo-intro.md`
 
 Adversarial review focus:
 
@@ -357,12 +371,12 @@ Adversarial review focus:
 
 ## Recommended Next Work Unit
 
-가장 먼저 잡을 작업 단위는 **T6. Submission Pack**이다.
+가장 먼저 잡을 작업 단위는 **Final Verification and Submission Freeze**이다.
 
 이유:
 
-- realtime webhook, demo golden path, local-only input, black-box smoke가 모두 들어갔다.
-- 이제 심사위원이 GitHub와 소개 문서만 봐도 제품 가치와 sponsor track 적합성을 이해해야 한다.
-- 제출 전에는 구현보다 설명의 정확성과 재현 명령어가 더 큰 리스크다.
+- T5/T6 산출물이 모두 작성되었으므로 이제 설명보다 검증 리스크가 더 크다.
+- `pnpm typecheck`, `pnpm build`, `pnpm smoke:local`, JSON parse를 한 번에 돌리고 GitHub 상태를 고정해야 한다.
+- 이후 작업은 UI polish나 발표 자료 정리처럼 제출 직전 리스크가 낮은 것부터 선택한다.
 
-T6가 끝나면 **T5. MISO Custom Tool Proposal Pack**을 보강해 MISO에는 직접 push가 아니라 제안 schema/API라는 점을 더 분명히 한다.
+검증이 끝나면 제출용 커밋을 만들고 `main`에 push한다.

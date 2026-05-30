@@ -33,6 +33,8 @@ Current synthetic full-path proof session:
 
 That session demonstrates realtime Channel Talk ingest, EXAONE local processing, human approval, and MISO redacted payload availability without using a real customer conversation.
 
+For the judging-oriented summary, demo script, sponsor fit, architecture diagram, and limitations, see `docs/submission-pack.md`.
+
 ## Local Development
 
 Fresh Apple Silicon Mac:
@@ -104,7 +106,8 @@ For M1 MacBook setup, local model downloads, and n8n instructions, see `docs/m1-
 - Channel Talk realtime webhook: `docs/channel-talk-webhook.md`
 - Local models: `docs/local-models.md`
 - Demo intro: `docs/demo-intro.md`
-- MISO custom tool draft: `miso/README.md`
+- Submission pack: `docs/submission-pack.md`
+- MISO custom tool/proposal pack: `miso/README.md`
 
 ## Security
 

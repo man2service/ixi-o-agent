@@ -262,7 +262,9 @@
             "const": "phone-claw-private-local-voice-bridge"
           },
           "sourceSystem": {
-            "const": "channel_talk"
+            "type": "string",
+            "enum": ["channel_talk", "local_voice"],
+            "description": "Original input adapter. channel_talk covers Channel Talk/n8n sessions; local_voice covers the Private Mode local voice frontdoor."
           },
           "sourceMode": {
             "type": "string"
@@ -337,10 +339,12 @@
         "required": ["channelId", "userChatId", "callLogId", "meetMessageId"],
         "properties": {
           "channelId": {
-            "type": "string"
+            "type": "string",
+            "description": "Channel Talk channel ID when available; local_voice sessions may use an internal local source identifier."
           },
           "userChatId": {
-            "type": "string"
+            "type": "string",
+            "description": "Channel Talk userChat ID when available; local_voice sessions may use an internal local source identifier."
           },
           "callLogId": {
             "type": ["string", "null"]

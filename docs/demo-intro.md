@@ -39,6 +39,7 @@ This proof session was created from a synthetic Channel Talk user chat, not a re
 - EXAONE output: summary and action items generated locally
 - Review controls: external handoff is blocked until approval
 - MISO proposal API: metadata first, payload only after review
+- MISO proposal files: `miso/proposed-miso-interfaces.md` and `miso/proposed-inbound-voice-event.schema.json`
 - n8n: realtime webhook, polling backup, and manual historical backfill
 
 ## Local Verification Commands

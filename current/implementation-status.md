@@ -18,6 +18,8 @@ The first working path is implemented:
 10. The dashboard and session detail pages now show the demo golden path and review gate status directly.
 11. A credential-free local black-box smoke test verifies sample ingest, fallback-local processing, review gating, and redacted MISO payload availability.
 12. A local private voice frontdoor creates `local_voice_upload` sessions from pasted transcripts and can attempt local Whisper STT for uploaded audio files.
+13. A judging-oriented submission pack is available at `docs/submission-pack.md`.
+14. The MISO proposal pack separates implemented custom-tool pull APIs from proposed inbound voice event/MCP interfaces.
 
 ## Local App
 
@@ -63,6 +65,8 @@ The polling and manual backfill workflows call the local backfill endpoint. Chan
 - Synthetic proof session `20260530T153141_utc_channel_talk_e7b435ae0b` processed with local EXAONE model path available, then approved for redacted MISO payload access
 - `pnpm smoke:local` with temp storage and no external credentials
 - Browser check for the dashboard `Private Mode` local form
+- `docs/submission-pack.md` documents the final pitch, architecture, sponsor fit, verification, security boundary, and limitations
+- MISO JSON artifacts parse successfully, including `miso/proposed-inbound-voice-event.schema.json`
 
 The live backfill stored Channel Talk sessions locally. Credentials were not written to source files.
 
@@ -96,8 +100,8 @@ The persistent task queue is now tracked in `current/agent-task-queue.md`.
 
 Recommended next work unit:
 
-1. `T6. Submission Pack` - polish the README/demo intro for judging and final GitHub submission.
-2. `T5. MISO Custom Tool Proposal Pack` - if time remains, make the MISO proposal artifacts easier to inspect.
+1. Final verification pass - run `pnpm typecheck`, `pnpm build`, `pnpm smoke:local`, and MISO JSON parsing before submission.
+2. Submission freeze - commit and push the verified state.
 
 ## Runtime Note
 
