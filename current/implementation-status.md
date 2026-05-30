@@ -76,7 +76,9 @@ See `docs/channel-talk-webhook.md`.
 
 ## Next
 
-1. Register the n8n webhook URL in Channel Talk UI for realtime events.
-2. Run one live Channel Talk event through the webhook and confirm it lands in `private-voice-inbox`.
-3. Add final README screenshots or demo capture for submission.
-4. Keep polling/manual backfill active as the reliability fallback.
+The persistent task queue is now tracked in `current/agent-task-queue.md`.
+
+Recommended next work unit:
+
+1. `T1. Channel Talk Realtime Proof` - register the n8n webhook URL in Channel Talk UI, run one live event through the webhook, and confirm it lands in `private-voice-inbox`.
+2. If realtime registration is blocked, move to `T2. Demo Flow Hardening` so the sample/backfill -> EXAONE -> review -> MISO proposal path is presentation-safe.
