@@ -35,6 +35,20 @@ button will produce a `fallback-local` result instead of real GGUF inference.
 
 ## STT Smoke Test
 
+Preferred reusable command:
+
+```bash
+pnpm check:stt
+```
+
+With a specific local audio file:
+
+```bash
+pnpm check:stt /absolute/path/to/short-audio.wav
+```
+
+Direct `whisper-cli` command:
+
 ```bash
 whisper-cli \
   -m models/whisper/ggml-small.bin \

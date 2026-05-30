@@ -26,6 +26,8 @@ Updated: 2026-05-31 KST
 - 검수 전 MISO payload 차단, 검수 후 redacted payload 공개
 - M1 MacBook 재현 셋업 문서
 - Channel Talk UI webhook 등록 및 합성 live event 기반 realtime proof
+- 데모 운영 runbook과 STT field validation 문서
+- Telegram Kiya 연동 리서치와 text-first toy 범위
 
 현재 주요 리스크:
 
@@ -33,6 +35,7 @@ Updated: 2026-05-31 KST
 - Cloudflare quick tunnel URL은 재시작 시 바뀌므로 Channel Talk UI webhook URL도 갱신해야 함
 - 제출용 화면/시연 캡처가 아직 정리되지 않음
 - MISO 쪽은 직접 push가 아니라 제안 schema/API로 설명해야 함
+- Telegram Kiya는 아직 구현 전이며, 실제 Kiya/OpenClaw runtime 형태 확인 필요
 
 ## Review Checklist For Every Task
 
@@ -369,14 +372,85 @@ Adversarial review focus:
 - live Channel Talk가 실패해도 sample/fallback demo가 가능한지
 - sponsor track 조건이 첫 페이지에서 드러나는지
 
+### T7. Demo Ops And STT Rehearsal Prep
+
+Status: `completed`
+
+Goal:
+
+데모 직전에 외부 서비스와 로컬 모델을 안전하게 켜고 검증할 수 있는 반복 가능한 절차를 만든다.
+
+Scope:
+
+- `docs/demo-ops-runbook.md`
+- `docs/stt-field-validation.md`
+- `docs/local-models.md`
+- `scripts/check-local-stt.mjs`
+- `package.json`
+
+Result:
+
+- Added a demo operations runbook with preflight, app/n8n/tunnel startup, Channel Talk webhook update, safe demo paths, fallback paths, and shutdown.
+- Added `pnpm check:stt` to validate local Whisper STT against a default sample or a provided local audio file.
+- Added STT field validation notes for real Korean samples and Private Mode file upload testing.
+
+Verification:
+
+```bash
+pnpm check:stt
+pnpm typecheck
+```
+
+Adversarial review focus:
+
+- 외부 webhook을 실수로 켜둔 채 끝내지 않는지
+- 실제 고객 채팅에 테스트 메시지를 보내지 않는지
+- STT 검증이 모델 존재 확인이 아니라 실제 음성 파일 전사를 확인하는지
+
+### T8. Telegram Kiya Toy
+
+Status: `planned`
+
+Goal:
+
+Phone-Claw가 처리한 voice session을 Telegram Kiya에게 알리고, 사용자의 Telegram 답장을 통해 세션 검수/수정 루프를 시작하는 작은 toy를 만든다.
+
+Scope:
+
+- `docs/telegram-kiya-integration-research.md`
+- new Telegram webhook route under `apps/local-web`
+- optional notify script
+- `.env.example`
+
+Proposed first slice:
+
+1. BotFather에서 발급한 demo bot token을 `.env.local`에만 둔다.
+2. `TELEGRAM_ALLOWED_CHAT_ID`로 사용자 본인만 허용한다.
+3. `POST /api/telegram/kiya/webhook`에서 text message를 받는다.
+4. `POST /api/telegram/kiya/notify-session` 또는 script로 redacted session summary를 보낸다.
+5. `/sessions`, `/session <id>`, `/approve <id>` 정도만 먼저 구현한다.
+
+Verification:
+
+```bash
+curl -fsS "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getMe"
+curl -fsS "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getWebhookInfo"
+```
+
+Adversarial review focus:
+
+- Telegram에 raw transcript/audio를 보내지 않는지
+- webhook secret header를 검증하는지
+- allowed chat ID 외 사용자가 로컬 세션을 제어할 수 없는지
+
 ## Recommended Next Work Unit
 
-가장 먼저 잡을 작업 단위는 **Final Verification and Submission Freeze**이다.
+가장 먼저 잡을 작업 단위는 **T8. Telegram Kiya Toy**이다.
 
 이유:
 
-- T5/T6 산출물이 모두 작성되었으므로 이제 설명보다 검증 리스크가 더 크다.
-- `pnpm typecheck`, `pnpm build`, `pnpm smoke:local`, JSON parse를 한 번에 돌리고 GitHub 상태를 고정해야 한다.
-- 이후 작업은 UI polish나 발표 자료 정리처럼 제출 직전 리스크가 낮은 것부터 선택한다.
+- 데모 운영과 STT 검증 준비는 문서/스크립트로 갖춰졌다.
+- 최종 제품의 마지막 사용자 접점은 Telegram Kiya이므로, text-only toy로 위험을 작게 나눠야 한다.
+- 음성 메시지 수신은 Telegram text loop가 안정화된 뒤 붙이는 것이 안전하다.
 
-검증이 끝나면 제출용 커밋을 만들고 `main`에 push한다.
+T8이 끝나면 실제 Kiya/OpenClaw runtime에 맞춰 direct Bot API toy를 이식할지, 그대로 유지할지 결정한다.

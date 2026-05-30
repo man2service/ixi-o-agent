@@ -97,6 +97,12 @@ This starts a temporary Next dev server on port `3210`, uses an isolated temp st
 
 The smoke test also creates one `local_voice_upload` meeting session through `POST /api/ingest/local-voice`.
 
+Check local STT with the installed Whisper small model:
+
+```bash
+pnpm check:stt
+```
+
 For M1 MacBook setup, local model downloads, and n8n instructions, see `docs/m1-macbook-setup.md`.
 
 ## Docs
@@ -104,10 +110,13 @@ For M1 MacBook setup, local model downloads, and n8n instructions, see `docs/m1-
 - M1 MacBook setup: `docs/m1-macbook-setup.md`
 - n8n setup: `docs/n8n/local-docker.md`
 - Channel Talk realtime webhook: `docs/channel-talk-webhook.md`
+- Demo operations runbook: `docs/demo-ops-runbook.md`
 - Local models: `docs/local-models.md`
+- STT field validation: `docs/stt-field-validation.md`
 - Demo intro: `docs/demo-intro.md`
 - Submission pack: `docs/submission-pack.md`
 - MISO custom tool/proposal pack: `miso/README.md`
+- Telegram Kiya research: `docs/telegram-kiya-integration-research.md`
 
 ## Security
 

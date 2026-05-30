@@ -20,6 +20,8 @@ The first working path is implemented:
 12. A local private voice frontdoor creates `local_voice_upload` sessions from pasted transcripts and can attempt local Whisper STT for uploaded audio files.
 13. A judging-oriented submission pack is available at `docs/submission-pack.md`.
 14. The MISO proposal pack separates implemented custom-tool pull APIs from proposed inbound voice event/MCP interfaces.
+15. Demo operations and STT field validation runbooks are available for final rehearsal.
+16. Telegram Kiya integration assumptions and toy scope are documented.
 
 ## Local App
 
@@ -31,6 +33,7 @@ The first working path is implemented:
 - Normalized ingest: `POST /api/ingest/channel-talk`
 - Raw Channel Talk ingest: `POST /api/ingest/channel-talk/openapi`
 - Backfill runner: `POST /api/backfill/channel-talk`
+- Local STT check: `pnpm check:stt`
 
 All protected local APIs require:
 
@@ -67,6 +70,7 @@ The polling and manual backfill workflows call the local backfill endpoint. Chan
 - Browser check for the dashboard `Private Mode` local form
 - `docs/submission-pack.md` documents the final pitch, architecture, sponsor fit, verification, security boundary, and limitations
 - MISO JSON artifacts parse successfully, including `miso/proposed-inbound-voice-event.schema.json`
+- `pnpm check:stt` verifies the installed Whisper small model on a local sample file
 
 The live backfill stored Channel Talk sessions locally. Credentials were not written to source files.
 
@@ -100,8 +104,8 @@ The persistent task queue is now tracked in `current/agent-task-queue.md`.
 
 Recommended next work unit:
 
-1. Final verification pass - run `pnpm typecheck`, `pnpm build`, `pnpm smoke:local`, and MISO JSON parsing before submission.
-2. Submission freeze - commit and push the verified state.
+1. Telegram Kiya toy - implement text-only bot notification/reply loop behind local secrets.
+2. Final demo rehearsal - run `docs/demo-ops-runbook.md` from a cold start and capture failures.
 
 ## Runtime Note
 
