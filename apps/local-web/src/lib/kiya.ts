@@ -1,3 +1,5 @@
+import { appendFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
 import type { MisoHandoffPayload, StoredVoiceSessionDetail } from "@phone-claw/storage";
 
 export type HermesRecommendation = {
@@ -38,6 +40,34 @@ export type KiyaNotificationResult = {
   messages: string[];
 };
 
+export type KiyaNotificationLogEntry = KiyaNotificationResult & {
+  artifactVersion: "phone-claw.kiya.notification-log.v0";
+  createdAt: string;
+};
+
+export type KiyaCalendarResultStatus =
+  | "proposed"
+  | "confirmed"
+  | "edited"
+  | "created"
+  | "cancelled"
+  | "failed";
+
+export type KiyaCalendarResultInput = {
+  status: KiyaCalendarResultStatus;
+  title?: string;
+  startsAt?: string;
+  endsAt?: string;
+  note?: string;
+  hermesRunId?: string;
+};
+
+export type KiyaCalendarResultLogEntry = KiyaCalendarResultInput & {
+  artifactVersion: "phone-claw.kiya.calendar-result.v0";
+  sessionId: string;
+  recordedAt: string;
+};
+
 type HermesWebhookResponse = {
   message?: unknown;
   text?: unknown;
@@ -76,7 +106,7 @@ export async function notifyKiyaForSession(
     }))
   );
 
-  return {
+  const result = {
     sessionId: session.sessionId,
     hermes: {
       engine: hermes.engine,
@@ -89,6 +119,54 @@ export async function notifyKiyaForSession(
     message: summaryMessage,
     messages
   };
+
+  await persistKiyaNotification(session, result);
+  return result;
+}
+
+export async function readLatestKiyaNotification(
+  session: StoredVoiceSessionDetail
+): Promise<KiyaNotificationLogEntry | undefined> {
+  try {
+    const raw = await readFile(getLatestKiyaNotificationPath(session), "utf8");
+    return JSON.parse(raw) as KiyaNotificationLogEntry;
+  } catch {
+    return undefined;
+  }
+}
+
+export async function recordKiyaCalendarResult(
+  session: StoredVoiceSessionDetail,
+  input: KiyaCalendarResultInput
+): Promise<KiyaCalendarResultLogEntry> {
+  const entry: KiyaCalendarResultLogEntry = {
+    artifactVersion: "phone-claw.kiya.calendar-result.v0",
+    sessionId: session.sessionId,
+    recordedAt: new Date().toISOString(),
+    status: input.status,
+    title: input.title,
+    startsAt: input.startsAt,
+    endsAt: input.endsAt,
+    note: input.note,
+    hermesRunId: input.hermesRunId
+  };
+  const latestPath = getLatestKiyaCalendarResultPath(session);
+  const logPath = path.join(session.files.sessionPath, "agent", "kiya-calendar-result.log.jsonl");
+  await mkdir(path.dirname(latestPath), { recursive: true });
+  await writeFile(latestPath, `${JSON.stringify(entry, null, 2)}\n`, "utf8");
+  await appendFile(logPath, `${JSON.stringify(entry)}\n`, "utf8");
+  return entry;
+}
+
+export async function readLatestKiyaCalendarResult(
+  session: StoredVoiceSessionDetail
+): Promise<KiyaCalendarResultLogEntry | undefined> {
+  try {
+    const raw = await readFile(getLatestKiyaCalendarResultPath(session), "utf8");
+    return JSON.parse(raw) as KiyaCalendarResultLogEntry;
+  } catch {
+    return undefined;
+  }
 }
 
 function buildSafeSessionPayload(session: StoredVoiceSessionDetail) {
@@ -139,6 +217,30 @@ function buildSourceRefs(session: StoredVoiceSessionDetail, handoff: MisoHandoff
     callLogId: handoff?.sourceRefs.callLogId ?? session.metadata.callLogId ?? null,
     meetMessageId: handoff?.sourceRefs.meetMessageId ?? session.metadata.meetMessageId ?? null
   };
+}
+
+async function persistKiyaNotification(
+  session: StoredVoiceSessionDetail,
+  result: KiyaNotificationResult
+) {
+  const entry: KiyaNotificationLogEntry = {
+    artifactVersion: "phone-claw.kiya.notification-log.v0",
+    createdAt: new Date().toISOString(),
+    ...result
+  };
+  const latestPath = getLatestKiyaNotificationPath(session);
+  const logPath = path.join(session.files.sessionPath, "agent", "kiya-notification.log.jsonl");
+  await mkdir(path.dirname(latestPath), { recursive: true });
+  await writeFile(latestPath, `${JSON.stringify(entry, null, 2)}\n`, "utf8");
+  await appendFile(logPath, `${JSON.stringify(entry)}\n`, "utf8");
+}
+
+function getLatestKiyaNotificationPath(session: StoredVoiceSessionDetail): string {
+  return path.join(session.files.sessionPath, "agent", "kiya-notification.latest.json");
+}
+
+function getLatestKiyaCalendarResultPath(session: StoredVoiceSessionDetail): string {
+  return path.join(session.files.sessionPath, "agent", "kiya-calendar-result.latest.json");
 }
 
 async function planWithHermes(payload: ReturnType<typeof buildSafeSessionPayload>): Promise<{

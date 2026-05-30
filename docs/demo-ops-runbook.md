@@ -70,7 +70,27 @@ If `HERMES_AGENT_WEBHOOK_URL` is empty, Phone-Claw uses a local planner to detec
 only calendar-worthy follow-ups. Kiya receives the summary message first. A
 second calendar-confirmation prompt is sent only when the session looks
 schedulable. If Telegram credentials are empty, the route returns a dry-run
-result instead of sending messages.
+result instead of sending messages. Every notification attempt is also written
+to the session folder at:
+
+```text
+agent/kiya-notification.latest.json
+agent/kiya-notification.log.jsonl
+```
+
+The session detail page shows the latest Kiya/Hermes message preview, so the
+demo can prove the outbound payload even before live Telegram credentials are
+configured.
+
+If Kiya/Hermes later performs the calendar action, it can record the result
+without Phone-Claw owning calendar execution:
+
+```text
+POST /api/sessions/{sessionId}/kiya-calendar-result
+```
+
+The callback writes `agent/kiya-calendar-result.latest.json` and appears in the
+same Kiya/Hermes panel on the session detail page.
 
 ## Start The Local App
 
@@ -180,11 +200,14 @@ pnpm webhook:channel-talk list
 
 ### Private Mode Backup
 
-1. Paste a short Korean meeting transcript into `Private Mode`.
-2. Create a `meeting` session.
+1. Paste a short Korean meeting transcript into `Private Mode`, or press the
+   browser recording buttons and upload the captured audio.
+2. Create a `meeting` session. For a reliable live demo, include a pasted
+   transcript unless `pnpm check:stt` has already confirmed local Whisper.
 3. Open the created session.
 4. Run EXAONE processing.
-5. Confirm the Kiya/Hermes notice says sent or dry-run.
+5. Confirm the Kiya/Hermes notice says sent or dry-run and that the latest
+   Kiya/Hermes panel shows the generated messages.
 6. If the transcript includes a follow-up meeting or appointment, confirm that
    Kiya receives a second calendar prompt after the summary.
 7. Approve MISO handoff.

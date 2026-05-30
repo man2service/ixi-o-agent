@@ -75,7 +75,8 @@ messages are not an input source in this step.
 5. Send a second calendar prompt only when the session looks calendar-worthy.
 6. Send the messages through Kiya Telegram delivery when
    `TELEGRAM_BOT_TOKEN` and `TELEGRAM_KIYA_CHAT_ID` are set.
-7. If secrets are absent, keep the same flow as a dry-run.
+7. If secrets are absent, keep the same flow as a dry-run and persist the
+   generated messages under the session `agent/` folder for operator review.
 
 Current implemented endpoint:
 
@@ -176,6 +177,28 @@ Phone-Claw -> Kiya summary -> optional Hermes/Kiya calendar confirmation
 ```
 
 Then add Kiya reply handling once we know the Hermes/OpenClaw callback contract.
+Until that callback contract is available, Phone-Claw records the latest
+outbound or dry-run attempt in `agent/kiya-notification.latest.json` and appends
+the history to `agent/kiya-notification.log.jsonl`.
+
+If Kiya/Hermes completes the calendar action, it can report an audit result back
+to Phone-Claw without letting Phone-Claw own calendar execution:
+
+```http
+POST /api/sessions/{sessionId}/kiya-calendar-result
+x-phone-claw-ingest-secret: <local secret>
+content-type: application/json
+
+{
+  "status": "created",
+  "title": "Customer follow-up",
+  "startsAt": "2026-05-31T15:00:00+09:00",
+  "note": "created by Kiya/Hermes after user confirmation"
+}
+```
+
+The latest result is stored in `agent/kiya-calendar-result.latest.json` and the
+history is appended to `agent/kiya-calendar-result.log.jsonl`.
 
 ## Data Boundary
 

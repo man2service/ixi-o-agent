@@ -8,7 +8,7 @@ Phone-Claw is a private local voice bridge for the OBA Weekend-thon S1 build. It
 
 - Channel Talk Open API backfill into local voice sessions
 - Channel Talk realtime webhook proof through Cloudflare Tunnel and n8n
-- Local private voice frontdoor for pasted meeting/call transcripts and optional local audio files
+- Local private voice frontdoor for pasted meeting/call transcripts, browser microphone recording, and optional local audio files
 - n8n workflows for sample ingest, webhook ingest, polling, and manual backfill
 - Local Next.js dashboard with demo golden-path status and session review screen
 - Storage contract under `private-voice-inbox/sessions`
@@ -16,6 +16,8 @@ Phone-Claw is a private local voice bridge for the OBA Weekend-thon S1 build. It
 - Local EXAONE post-processing for summaries, urgency, teams, and action items
 - Restricted MISO-facing API/OpenAPI draft that exposes only reviewed, redacted handoff payloads
 - Kiya/Hermes outbound summary after EXAONE processing, plus a separate calendar-confirmation prompt when a calendar-worthy follow-up is detected
+- Per-session Kiya notification log under `agent/kiya-notification.latest.json` for demo review even when Telegram credentials are absent
+- Kiya/Hermes calendar result audit callback under `POST /api/sessions/{sessionId}/kiya-calendar-result`
 
 ## Demo Path
 
@@ -97,7 +99,7 @@ pnpm smoke:local
 This starts a temporary Next dev server on port `3210`, uses an isolated temp storage folder, ingests the sample payload, runs fallback-local processing with a deliberately missing model path, verifies MISO blocks before review, approves the synthetic session, then verifies the redacted payload becomes available.
 
 The smoke test also creates one `local_voice_upload` meeting session through `POST /api/ingest/local-voice`.
-It verifies Kiya/Hermes notification dry-run behavior when Telegram credentials are absent, including the separate calendar proposal message for calendar-worthy sessions.
+It verifies Kiya/Hermes notification dry-run behavior when Telegram credentials are absent, including the persisted notification log and the separate calendar proposal message for calendar-worthy sessions.
 
 Check local STT with the installed Whisper small model:
 

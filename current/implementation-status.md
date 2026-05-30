@@ -24,6 +24,9 @@ The first working path is implemented:
 16. Telegram Kiya integration assumptions and toy scope are documented.
 17. EXAONE processing now automatically prepares a Kiya summary notification unless `PHONE_CLAW_KIYA_AUTO_NOTIFY=false`.
 18. Calendar-worthy sessions produce a second Kiya calendar-confirmation prompt after the summary message.
+19. Private Mode now supports browser microphone recording in addition to pasted transcripts and file upload.
+20. Kiya/Hermes notification attempts are persisted per session for demo review, even when Telegram delivery is a dry-run.
+21. Kiya/Hermes can report calendar action results back to Phone-Claw through an audit-only callback; Phone-Claw still does not own calendar execution.
 
 ## Local App
 
@@ -33,6 +36,7 @@ The first working path is implemented:
 - EXAONE process API: `POST /api/sessions/{sessionId}/process`
 - Review API: `POST /api/sessions/{sessionId}/review`
 - Kiya/Hermes notify API: `POST /api/sessions/{sessionId}/notify-kiya`
+- Kiya/Hermes calendar audit callback: `POST /api/sessions/{sessionId}/kiya-calendar-result`
 - Normalized ingest: `POST /api/ingest/channel-talk`
 - Raw Channel Talk ingest: `POST /api/ingest/channel-talk/openapi`
 - Backfill runner: `POST /api/backfill/channel-talk`
@@ -74,7 +78,7 @@ The polling and manual backfill workflows call the local backfill endpoint. Chan
 - `docs/submission-pack.md` documents the final pitch, architecture, sponsor fit, verification, security boundary, and limitations
 - MISO JSON artifacts parse successfully, including `miso/proposed-inbound-voice-event.schema.json`
 - `pnpm check:stt` verifies the installed Whisper small model on a local sample file
-- `pnpm smoke:local` verifies Kiya/Hermes notification dry-run behavior without Telegram credentials, including the summary-first and optional calendar-prompt message split
+- `pnpm smoke:local` verifies Kiya/Hermes notification dry-run behavior without Telegram credentials, including persisted notification logs and the summary-first/optional calendar-prompt message split
 
 The live backfill stored Channel Talk sessions locally. Credentials were not written to source files.
 

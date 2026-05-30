@@ -1,5 +1,6 @@
 import { listStoredVoiceSessions } from "@phone-claw/storage";
 import Link from "next/link";
+import { LocalVoiceForm } from "./LocalVoiceForm";
 
 export const dynamic = "force-dynamic";
 
@@ -83,37 +84,7 @@ export default async function Home() {
           <p className="eyebrow">Private Mode</p>
           <h2>로컬 회의 입력</h2>
         </div>
-        <form className="local-form" action="/api/ingest/local-voice" method="post" encType="multipart/form-data">
-          <div className="form-row">
-            <label>
-              <span>제목</span>
-              <input name="title" placeholder="회의 또는 음성 메모" />
-            </label>
-            <label>
-              <span>모드</span>
-              <select name="mode" defaultValue="meeting">
-                <option value="meeting">회의</option>
-                <option value="call">통화</option>
-                <option value="voice_note">음성 메모</option>
-              </select>
-            </label>
-          </div>
-          <label>
-            <span>로컬 전사문</span>
-            <textarea
-              name="transcriptText"
-              rows={4}
-              placeholder="오늘 회의에서 논의한 내용, 후속 액션, 확인할 질문을 입력"
-            />
-          </label>
-          <label>
-            <span>오디오 파일</span>
-            <input name="audioFile" type="file" accept="audio/*,video/*" />
-          </label>
-          <button className="button primary local-submit" type="submit">
-            로컬 세션 만들기
-          </button>
-        </form>
+        <LocalVoiceForm />
       </section>
 
       <section className="workbench">

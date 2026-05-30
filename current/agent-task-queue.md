@@ -247,6 +247,7 @@ Required steps:
 Result:
 
 - Dashboard에 `Private Mode` local input form 추가.
+- Browser microphone recording control added, with audio file fallback kept.
 - `POST /api/ingest/local-voice` route 추가.
 - Transcript paste만으로 `local_voice_upload` session 생성 가능.
 - Audio/video file upload 시 `whisper-cli`와 `models/whisper/ggml-small.bin`이 있으면 local STT 시도.
@@ -456,7 +457,7 @@ Adversarial review focus:
 
 ### T9. Telegram Kiya Reply Loop
 
-Status: `planned`
+Status: `partial`
 
 Goal:
 
@@ -466,7 +467,7 @@ Scope:
 
 - Hermes/OpenClaw callback contract 확인
 - Telegram webhook 또는 Hermes callback endpoint
-- optional audit callback endpoint
+- audit callback endpoint: `POST /api/sessions/{sessionId}/kiya-calendar-result`
 
 Required decisions:
 
@@ -482,6 +483,8 @@ Required decisions:
 이유:
 
 - outbound 구현은 dry-run까지 끝났다.
+- 각 세션의 `agent/kiya-notification.latest.json`에 최신 Kiya/Hermes 발송 또는 dry-run 결과가 남는다.
+- Phone-Claw 쪽 calendar result audit callback은 추가됐다.
 - 실제 Telegram 전송과 Hermes 호출은 로컬 코드보다 자격증명/ingress 설정이 리스크다.
 - reply loop는 Hermes callback 계약을 확정한 뒤 붙여야 한다.
 

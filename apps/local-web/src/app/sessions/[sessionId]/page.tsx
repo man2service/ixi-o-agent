@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { readStoredVoiceSessionDetail } from "@phone-claw/storage";
+import { readLatestKiyaCalendarResult, readLatestKiyaNotification } from "../../../lib/kiya";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,10 @@ export default async function SessionDetailPage({ params, searchParams }: PagePr
   const query = await searchParams;
   const session = await readStoredVoiceSessionDetail(sessionId);
   if (!session) notFound();
+  const [latestKiya, latestCalendarResult] = await Promise.all([
+    readLatestKiyaNotification(session),
+    readLatestKiyaCalendarResult(session)
+  ]);
 
   const approved = session.review.reviewed && session.review.externalAllowed;
   const hasProcessedOutput = Boolean(session.exaone);
@@ -154,6 +159,46 @@ export default async function SessionDetailPage({ params, searchParams }: PagePr
             <p className="hint">먼저 EXAONE 후처리를 실행해야 전달 승인 버튼이 열립니다.</p>
           ) : null}
         </aside>
+
+        <article className="panel">
+          <div className="panel-head">
+            <div>
+              <p className="eyebrow">Kiya / Hermes</p>
+              <h2>최근 전송 기록</h2>
+            </div>
+            <code>{latestKiya?.telegram.status ?? "none"}</code>
+          </div>
+          {latestKiya ? (
+            <div className="structured-output">
+              <h3>전송</h3>
+              <p>
+                {formatDate(latestKiya.createdAt)} / {latestKiya.messages.length}개 메시지 /{" "}
+                {latestKiya.hermes.engine}
+              </p>
+              <h3>캘린더 후보</h3>
+              <p>
+                {latestKiya.hermes.calendarProposal?.detected
+                  ? latestKiya.hermes.calendarProposal.prompt
+                  : "캘린더 등록 후보 없음"}
+              </p>
+              <h3>Kiya 캘린더 실행 결과</h3>
+              <p>
+                {latestCalendarResult
+                  ? `${formatDate(latestCalendarResult.recordedAt)} / ${latestCalendarResult.status} / ${
+                      latestCalendarResult.title ?? "제목 없음"
+                    }`
+                  : "아직 Kiya/Hermes 실행 결과 콜백이 없습니다."}
+              </p>
+              <h3>Kiya 메시지 미리보기</h3>
+              <pre>{latestKiya.messages.join("\n\n---\n\n")}</pre>
+            </div>
+          ) : (
+            <p className="muted">
+              아직 Kiya/Hermes 전송 기록이 없습니다. EXAONE 후처리 또는 추천 전송을 실행하면
+              요약 메시지와 캘린더 후보 메시지가 로컬에 기록됩니다.
+            </p>
+          )}
+        </article>
 
         <article className="panel">
           <div className="panel-head">

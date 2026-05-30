@@ -76,6 +76,13 @@ try {
     processResult.kiya.messages.length === 1,
     "non-calendar sample should send only the summary message"
   );
+  const kiyaLog = await readJsonFile(
+    path.join(storageDir, "sessions", sessionId, "agent", "kiya-notification.latest.json")
+  );
+  assert(
+    kiyaLog.telegram.status === "dry_run" && kiyaLog.messages.length === 1,
+    "Kiya dry-run should be persisted for operator review"
+  );
 
   const preReviewMiso = await getJson(`/api/miso/voice-sessions/${sessionId}`, {
     "x-phone-claw-ingest-secret": ingestSecret
@@ -142,6 +149,46 @@ try {
     localVoiceProcess.kiya.telegram.deliveries.length === 2,
     "calendar-worthy dry-run should include two Telegram deliveries"
   );
+  const localVoiceKiyaLog = await readJsonFile(
+    path.join(
+      storageDir,
+      "sessions",
+      localVoice.sessionId,
+      "agent",
+      "kiya-notification.latest.json"
+    )
+  );
+  assert(
+    localVoiceKiyaLog.hermes.calendarProposal?.detected === true,
+    "calendar-worthy Kiya proposal should be persisted"
+  );
+
+  const calendarResult = await postJson(
+    `/api/sessions/${localVoice.sessionId}/kiya-calendar-result`,
+    {
+      status: "created",
+      title: "Phone-Claw smoke follow-up",
+      startsAt: "2026-05-31T15:00:00+09:00",
+      note: "smoke test calendar audit callback"
+    },
+    {
+      accept: "application/json"
+    }
+  );
+  assert(calendarResult.ok === true, "Kiya calendar result callback should succeed");
+  const calendarResultLog = await readJsonFile(
+    path.join(
+      storageDir,
+      "sessions",
+      localVoice.sessionId,
+      "agent",
+      "kiya-calendar-result.latest.json"
+    )
+  );
+  assert(
+    calendarResultLog.status === "created",
+    "Kiya calendar result callback should be persisted"
+  );
 
   const kiyaManual = await postJson(`/api/sessions/${sessionId}/notify-kiya`, undefined, {
     accept: "application/json"
@@ -166,9 +213,11 @@ try {
           "miso_blocked_before_review",
           "miso_available_after_review",
           "local_voice_frontdoor_ingested",
+          "kiya_notification_log_written",
           "kiya_auto_notification_dry_run",
           "kiya_manual_notification_dry_run",
-          "kiya_calendar_proposal_dry_run"
+          "kiya_calendar_proposal_dry_run",
+          "kiya_calendar_result_callback_logged"
         ]
       },
       null,
@@ -252,6 +301,10 @@ async function parseResponse(response) {
     throw new Error(`http_${response.status}:${JSON.stringify(body).slice(0, 500)}`);
   }
   return body;
+}
+
+async function readJsonFile(filePath) {
+  return JSON.parse(await readFile(filePath, "utf8"));
 }
 
 function assert(condition, message) {
