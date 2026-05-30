@@ -66,10 +66,11 @@ TELEGRAM_BOT_TOKEN=
 TELEGRAM_KIYA_CHAT_ID=
 ```
 
-If `HERMES_AGENT_WEBHOOK_URL` is empty, Phone-Claw uses a local Hermes planner
-to recommend calendar, travel, OBA OpenAPI, follow-up, and review actions. If
-Telegram credentials are empty, the route returns a dry-run result instead of
-sending a message.
+If `HERMES_AGENT_WEBHOOK_URL` is empty, Phone-Claw uses a local planner to detect
+only calendar-worthy follow-ups. Kiya receives the summary message first. A
+second calendar-confirmation prompt is sent only when the session looks
+schedulable. If Telegram credentials are empty, the route returns a dry-run
+result instead of sending messages.
 
 ## Start The Local App
 
@@ -184,7 +185,9 @@ pnpm webhook:channel-talk list
 3. Open the created session.
 4. Run EXAONE processing.
 5. Confirm the Kiya/Hermes notice says sent or dry-run.
-6. Approve MISO handoff.
+6. If the transcript includes a follow-up meeting or appointment, confirm that
+   Kiya receives a second calendar prompt after the summary.
+7. Approve MISO handoff.
 
 ### n8n Backup
 

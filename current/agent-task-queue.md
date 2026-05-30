@@ -28,7 +28,7 @@ Updated: 2026-05-31 KST
 - Channel Talk UI webhook 등록 및 합성 live event 기반 realtime proof
 - 데모 운영 runbook과 STT field validation 문서
 - Telegram Kiya 연동 리서치와 text-first toy 범위
-- EXAONE 처리 후 Kiya/Hermes outbound notification 자동 준비 및 dry-run 검증
+- EXAONE 처리 후 Kiya summary outbound 자동 준비 및 calendar-worthy 세션의 2차 캘린더 확인 메시지 dry-run 검증
 
 현재 주요 리스크:
 
@@ -414,7 +414,7 @@ Status: `completed`
 
 Goal:
 
-Phone-Claw가 처리한 voice session을 Hermes가 바인딩된 Kiya에게 전달하고, 요약/액션아이템 기반 다음 행동 추천을 Telegram으로 받을 수 있게 한다.
+Phone-Claw가 처리한 voice session 요약을 먼저 Kiya에게 전달하고, 캘린더 등록할 만한 사안이 있을 때만 두 번째 확인 메시지를 보내 Kiya/Hermes가 캘린더 등록 대화를 맡게 한다.
 
 Scope:
 
@@ -427,12 +427,14 @@ Scope:
 
 Result:
 
-1. EXAONE 처리 후 `PHONE_CLAW_KIYA_AUTO_NOTIFY=false`가 아니면 자동으로 Kiya/Hermes 알림을 준비한다.
-2. `HERMES_AGENT_WEBHOOK_URL`이 있으면 safe summary/action payload를 Hermes로 POST한다.
-3. Hermes URL이 없거나 실패하면 local Hermes planner가 캘린더/항공권/OBA OpenAPI/후속 메시지/검수 추천을 만든다.
-4. `TELEGRAM_BOT_TOKEN`과 `TELEGRAM_KIYA_CHAT_ID`가 있으면 Kiya Telegram 메시지를 보낸다.
-5. Telegram 자격증명이 없으면 dry-run으로 message와 추천 결과를 검증한다.
-6. 세션 상세 화면에 수동 `Kiya/Hermes 추천 전송` 버튼을 추가했다.
+1. EXAONE 처리 후 `PHONE_CLAW_KIYA_AUTO_NOTIFY=false`가 아니면 자동으로 Kiya 요약 알림을 준비한다.
+2. 요약 메시지는 항상 먼저 전송한다.
+3. `HERMES_AGENT_WEBHOOK_URL`이 있으면 safe summary/action payload로 캘린더 등록 필요 여부만 확인한다.
+4. Hermes URL이 없거나 실패하면 local planner가 캘린더 후보만 판단한다.
+5. 캘린더 등록할 만한 사안이면 두 번째 메시지로 확인/수정 prompt와 inline button payload를 보낸다.
+6. `TELEGRAM_BOT_TOKEN`과 `TELEGRAM_KIYA_CHAT_ID`가 있으면 Kiya Telegram 메시지를 보낸다.
+7. Telegram 자격증명이 없으면 dry-run으로 summary/calendar message split을 검증한다.
+8. 세션 상세 화면에 수동 `Kiya/Hermes 추천 전송` 버튼을 추가했다.
 
 Verification:
 
@@ -446,7 +448,9 @@ curl -fsS -X POST \
 Adversarial review focus:
 
 - Telegram에 raw transcript/audio를 보내지 않는지
-- Hermes 호출 payload가 요약/액션아이템 중심인지
+- Hermes 호출 payload가 요약/액션아이템 중심이고 calendar action만 요청하는지
+- 캘린더 후보가 없는 세션에는 두 번째 메시지가 가지 않는지
+- 캘린더 후보가 있는 세션에는 요약 후 두 번째 확인 메시지가 가는지
 - Telegram 자격증명 없을 때도 dry-run으로 검증 가능한지
 - 자동 전송을 끌 수 있는 환경변수가 있는지
 
@@ -456,20 +460,20 @@ Status: `planned`
 
 Goal:
 
-Kiya/Hermes가 보낸 추천에 사용자가 답장하면, 승인된 명령만 Phone-Claw 로컬 세션 상태에 반영한다.
+Kiya/Hermes가 보낸 캘린더 확인 메시지에 사용자가 확인/수정 답장을 하면, Kiya/Hermes가 캘린더 등록을 처리하고 필요 시 Phone-Claw에 감사 로그나 결과만 남긴다.
 
 Scope:
 
 - Hermes/OpenClaw callback contract 확인
 - Telegram webhook 또는 Hermes callback endpoint
-- review note/action item state update 설계
+- optional audit callback endpoint
 
 Required decisions:
 
-1. Hermes가 Phone-Claw local endpoint를 호출할 수 있는지
-2. Kiya 답장을 어떤 JSON command로 정규화할지
-3. 세션 수정은 바로 적용할지, review note로만 저장할지
-4. 캘린더/항공권/OBA OpenAPI 실행은 실제 실행 전 반드시 사용자 승인을 요구할지
+1. Kiya/Hermes가 inline button callback 또는 자연어 답장을 어떻게 처리하는지
+2. Kiya/Hermes가 실제 캘린더 등록을 어떤 도구로 수행하는지
+3. Phone-Claw가 결과 audit만 받을지, 세션 상태까지 업데이트할지
+4. 캘린더 등록 전 사용자 확인을 어디에서 강제할지
 
 ## Recommended Next Work Unit
 

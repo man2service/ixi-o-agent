@@ -22,7 +22,8 @@ The first working path is implemented:
 14. The MISO proposal pack separates implemented custom-tool pull APIs from proposed inbound voice event/MCP interfaces.
 15. Demo operations and STT field validation runbooks are available for final rehearsal.
 16. Telegram Kiya integration assumptions and toy scope are documented.
-17. EXAONE processing now automatically prepares a Kiya/Hermes outbound notification unless `PHONE_CLAW_KIYA_AUTO_NOTIFY=false`.
+17. EXAONE processing now automatically prepares a Kiya summary notification unless `PHONE_CLAW_KIYA_AUTO_NOTIFY=false`.
+18. Calendar-worthy sessions produce a second Kiya calendar-confirmation prompt after the summary message.
 
 ## Local App
 
@@ -73,7 +74,7 @@ The polling and manual backfill workflows call the local backfill endpoint. Chan
 - `docs/submission-pack.md` documents the final pitch, architecture, sponsor fit, verification, security boundary, and limitations
 - MISO JSON artifacts parse successfully, including `miso/proposed-inbound-voice-event.schema.json`
 - `pnpm check:stt` verifies the installed Whisper small model on a local sample file
-- `pnpm smoke:local` verifies Kiya/Hermes notification dry-run behavior without Telegram credentials
+- `pnpm smoke:local` verifies Kiya/Hermes notification dry-run behavior without Telegram credentials, including the summary-first and optional calendar-prompt message split
 
 The live backfill stored Channel Talk sessions locally. Credentials were not written to source files.
 
@@ -107,8 +108,8 @@ The persistent task queue is now tracked in `current/agent-task-queue.md`.
 
 Recommended next work unit:
 
-1. Configure real Kiya/Hermes secrets and run a live outbound notification rehearsal.
-2. Telegram reply loop - decide Hermes callback contract before allowing Kiya replies to mutate local session state.
+1. Configure real Kiya/Hermes secrets and run a live summary + calendar prompt rehearsal.
+2. Let Kiya/Hermes own calendar confirmation/edit/registration, then document the callback or audit trail it exposes back to Phone-Claw if needed.
 
 ## Runtime Note
 

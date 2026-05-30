@@ -72,6 +72,10 @@ try {
     processResult.kiya?.hermes?.engine === "local-hermes-planner",
     "Hermes recommendation should fall back to local planner without webhook"
   );
+  assert(
+    processResult.kiya.messages.length === 1,
+    "non-calendar sample should send only the summary message"
+  );
 
   const preReviewMiso = await getJson(`/api/miso/voice-sessions/${sessionId}`, {
     "x-phone-claw-ingest-secret": ingestSecret
@@ -105,7 +109,7 @@ try {
     title: "Smoke local meeting",
     mode: "meeting",
     transcriptText:
-      "오늘 회의에서는 로컬 음성 입력을 에이전트 작업으로 바꾸는 흐름을 확인했다. 후속으로 데모 문서를 정리한다."
+      "오늘 회의에서는 로컬 음성 입력을 에이전트 작업으로 바꾸는 흐름을 확인했다. 내일 오후 3시에 후속 미팅을 캘린더에 잡기로 했다."
   });
   assert(localVoice.ok === true, "local voice frontdoor should create a session");
   const localVoiceDetail = await getJson(`/api/sessions/${localVoice.sessionId}`);
@@ -116,6 +120,27 @@ try {
   assert(
     localVoiceDetail.session.mode === "meeting",
     "local voice session should preserve meeting mode"
+  );
+
+  const localVoiceProcess = await postJson(
+    `/api/sessions/${localVoice.sessionId}/process`,
+    undefined,
+    {
+      accept: "application/json"
+    }
+  );
+  assert(localVoiceProcess.ok === true, "calendar local voice process should succeed");
+  assert(
+    localVoiceProcess.kiya.messages.length === 2,
+    "calendar-worthy session should send summary plus calendar proposal"
+  );
+  assert(
+    localVoiceProcess.kiya.hermes.calendarProposal?.detected === true,
+    "calendar-worthy session should include a calendar proposal"
+  );
+  assert(
+    localVoiceProcess.kiya.telegram.deliveries.length === 2,
+    "calendar-worthy dry-run should include two Telegram deliveries"
   );
 
   const kiyaManual = await postJson(`/api/sessions/${sessionId}/notify-kiya`, undefined, {
@@ -142,7 +167,8 @@ try {
           "miso_available_after_review",
           "local_voice_frontdoor_ingested",
           "kiya_auto_notification_dry_run",
-          "kiya_manual_notification_dry_run"
+          "kiya_manual_notification_dry_run",
+          "kiya_calendar_proposal_dry_run"
         ]
       },
       null,

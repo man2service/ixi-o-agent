@@ -16,9 +16,10 @@ Voice session saved
   -> EXAONE/local processing
   -> human review or draft handoff created
   -> Phone-Claw calls Hermes with the safe summary/action payload
-  -> Hermes/Kiya sends a Telegram notification
+  -> Kiya receives the summary message first
+  -> if calendar-worthy, Kiya receives a separate calendar confirmation prompt
   -> user replies with a natural-language correction or command
-  -> Phone-Claw updates local session memory/action state
+  -> Kiya/Hermes handles confirmation, edits, and calendar registration
 ```
 
 In older local planning docs, this role appears as `OpenClaw 텔레그램
@@ -69,10 +70,12 @@ messages are not an input source in this step.
 
 1. Store the Kiya/Hermes integration secrets in `.env.local`.
 2. After EXAONE processing, automatically prepare the safe session payload.
-3. Call the Hermes webhook when `HERMES_AGENT_WEBHOOK_URL` is set.
-4. Send the resulting message through Kiya Telegram delivery when
+3. Send the summary message first.
+4. Call the Hermes webhook when `HERMES_AGENT_WEBHOOK_URL` is set to check only calendar action.
+5. Send a second calendar prompt only when the session looks calendar-worthy.
+6. Send the messages through Kiya Telegram delivery when
    `TELEGRAM_BOT_TOKEN` and `TELEGRAM_KIYA_CHAT_ID` are set.
-5. If secrets are absent, keep the same flow as a dry-run.
+7. If secrets are absent, keep the same flow as a dry-run.
 
 Current implemented endpoint:
 
@@ -92,6 +95,23 @@ TELEGRAM_KIYA_CHAT_ID=
 
 `PHONE_CLAW_KIYA_AUTO_NOTIFY` is on by default. Set it to `false` to disable
 automatic delivery after EXAONE processing.
+
+Calendar prompt behavior:
+
+```text
+Message 1: summary + action items
+Message 2: "캘린더 며칠에 일정을 추가해드릴까요?" or "내일 오후 3시 일정으로 캘린더에 추가할까요?"
+```
+
+The second message includes Telegram inline button payloads:
+
+```text
+pc:cal:ok:<sessionId>
+pc:cal:edit:<sessionId>
+```
+
+Kiya/Hermes should own the actual calendar registration and modification
+conversation. Phone-Claw does not write the calendar directly in this step.
 
 Later, add inbound text commands:
 
@@ -117,8 +137,9 @@ stable.
 
 ### Option A: Hermes-first with Telegram delivery
 
-Call Hermes with the redacted Phone-Claw payload, then deliver the Hermes
-message through the Kiya bot token.
+Send the summary through Kiya, ask Hermes only for calendar suitability, then
+deliver a separate calendar confirmation prompt through the Kiya bot token when
+needed.
 
 Pros:
 
@@ -151,7 +172,7 @@ Cons:
 Start with Option A:
 
 ```text
-Phone-Claw -> Hermes recommendation -> Kiya Telegram notification
+Phone-Claw -> Kiya summary -> optional Hermes/Kiya calendar confirmation
 ```
 
 Then add Kiya reply handling once we know the Hermes/OpenClaw callback contract.
@@ -161,6 +182,7 @@ Then add Kiya reply handling once we know the Hermes/OpenClaw callback contract.
 - Do not send raw transcript or raw audio to Telegram by default.
 - Telegram notification uses the reviewed/redacted handoff payload or EXAONE
   summary/action items.
+- Calendar prompt is sent only when the summary/action items appear to contain a schedulable follow-up.
 - Voice messages sent to the bot are stored locally, then passed through local
   STT, just like Private Mode.
 - Restrict the toy to `TELEGRAM_ALLOWED_CHAT_ID` so random users cannot control
