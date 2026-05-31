@@ -12,7 +12,7 @@ Prepare ixi-O Agent as a judge-ready OBA Weekend-thon S1 submission for both:
 Product message:
 
 ```text
-일상의 모든 Voice를, 에이전트와 함께
+일상의 Voice를 에이전트와 함께
 ```
 
 ## Current Position

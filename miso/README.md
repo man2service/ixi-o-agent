@@ -17,6 +17,7 @@ push integration.
 - `samples/approved-voice-session-handoff.sample.json`: safe fallback payload for judging when live tool auth/tunnel is unstable.
 - `samples/blocked-voice-session-detail.sample.json`: safe fallback payload that proves the human-review gate.
 - `mcp-tool-proposal.json`: MCP tool shape we would propose if MISO wants a local MCP bridge.
+- `miso-doc-mcp-registration.json`: official MISO Document MCP registration config from the hackathon guide.
 - `proposed-inbound-voice-event.schema.json`: JSON schema for the inbound voice event we propose MISO should support later.
 - `proposed-miso-interfaces.md`: readable explanation of implemented pull APIs vs proposed MISO interfaces.
 - `voice-session-workflow-outline.md`: visual workflow/chaining outline for turning a session into a MISO business card and next actions.

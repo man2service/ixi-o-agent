@@ -1,6 +1,6 @@
 # ixi-O Agent
 
-일상의 모든 Voice를, 에이전트와 함께.
+일상의 Voice를 에이전트와 함께.
 
 ixi-O Agent is a private local voice bridge for the OBA Weekend-thon S1 build. It turns call, meeting, and voice-note context into local agent-ready files, then prepares redacted handoff payloads for workflow tools such as MISO.
 
@@ -213,6 +213,7 @@ For M1 MacBook setup, local model downloads, and n8n instructions, see `docs/m1-
 - STT field validation: `docs/stt-field-validation.md`
 - Demo intro: `docs/demo-intro.md`
 - Submission pack: `docs/submission-pack.md`
+- MISO judge one-pager: `docs/miso-track-judge-one-pager.md`
 - TDS-inspired design system: `docs/tds-inspired-design-system.md`
 - MISO custom tool/proposal pack: `miso/README.md`
 - Telegram Kiya research: `docs/telegram-kiya-integration-research.md`

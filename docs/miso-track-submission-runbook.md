@@ -206,7 +206,7 @@ Expected behavior:
 If the imported app cannot bind the custom tool automatically, keep the prompt
 and manually add the tool in the app editor.
 
-### 3. Optional Document MCP
+### 3. Document MCP Grounding
 
 Register the official MISO Document MCP from the guide if time allows:
 
@@ -219,8 +219,16 @@ Register the official MISO Document MCP from the guide if time allows:
 }
 ```
 
-Use it to ground answers about MISO limitations and setup paths. Do not spend
-too much time here if the main demo path is not yet stable.
+Use it to ground answers about MISO limitations and setup paths.
+
+Judging-safe positioning:
+
+- If Document MCP is attached live, say: "The MISO app can search MISO docs for
+  setup and limitation questions before answering."
+- If it is not attached live, say: "The implementation was designed from the
+  MISO guide and track deck, and the Document MCP registration path is prepared;
+  the core app demo does not depend on it."
+- Do not pretend Document MCP is live if it is not visible in the app tool list.
 
 ## Demo Scenarios
 
@@ -262,6 +270,25 @@ Expected MISO output:
 - human review is required
 - no raw audio/transcript is available
 - next action is to approve/reject in the local ixi-O Agent review screen
+
+### Scenario D: Document MCP / Product Constraint Question
+
+If the official `miso-doc-mcp` tool is attached, ask:
+
+```text
+MISO에서 외부 REST API를 custom tool로 등록하려면 어떤 절차와 제약이 있나요?
+```
+
+Expected output:
+
+- use `search_docs` / `fetch_doc` first
+- explain `플레이그라운드 -> 도구 모음 -> 사용자 정의`
+- mention OpenAPI 3.x, operationId, authentication, tool test, save/share/publish
+- then connect that limitation to ixi-O Agent's custom-tool pull approach
+
+If Document MCP is not attached, skip this live demo and use
+`miso/miso-doc-mcp-registration.json` plus the local guide source as proof of
+the prepared grounding path.
 
 ## Judging Script
 

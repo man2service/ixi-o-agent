@@ -2,7 +2,7 @@
 
 ## Tagline
 
-일상의 모든 Voice를, 에이전트와 함께
+일상의 Voice를 에이전트와 함께
 
 ## One-Liner
 
@@ -82,6 +82,16 @@ GS Neotek / MISO Track:
   redacted voice-session handoffs and turn them into business cards, next
   actions, and human-review prompts.
 
+MISO judging criteria map:
+
+| MISO track criterion | ixi-O Agent answer |
+| --- | --- |
+| Runnable MISO app | `ixi-O Agent VoiceOps Copilot` live app plus importable YAML draft |
+| Grounded | Built from MISO guide/deck; Document MCP registration path is documented |
+| Enterprise-real | Handles review, approval, exception, owner team, and responsibility |
+| Agentic | Produces business card, urgency, next actions, and human-review prompts |
+| Interface insight | Proposes inbound `voice-session.created` event and local MCP resource ingest |
+
 ## Demo Script
 
 1. Open `https://ixi-o-agent.vercel.app` for the public overview.
@@ -150,6 +160,7 @@ judges can distinguish "works without model files" from "real EXAONE ran".
 - Live MISO runtime app: `https://console.miso.gs/chatList/T4JZ5CTOJpifUz3L`
 - Live MISO app config: `https://console.miso.gs/app-config/chat/a61da945-3cf7-466a-b8fe-c59a48ea07e9`
 - Live MISO evidence: `docs/miso-submit-evidence.md`
+- MISO judge one-pager: `docs/miso-track-judge-one-pager.md`
 - Long-run goal plan: `docs/agent-goal-plan.md`
 - MISO judging runbook: `docs/miso-track-submission-runbook.md`
 - User-owned final actions: `TODO_USER_ACTIONS.md`

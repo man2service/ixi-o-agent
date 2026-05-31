@@ -1,0 +1,6 @@
+{
+  "miso-doc-mcp": {
+    "url": "https://3.36.78.231.sslip.io/mcp",
+    "transport": "streamable-http"
+  }
+}

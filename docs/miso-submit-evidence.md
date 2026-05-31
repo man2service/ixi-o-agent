@@ -24,6 +24,7 @@ secrets or raw customer content.
 | Fallback blocked payload | Ready | `miso/samples/blocked-voice-session-detail.sample.json` |
 | Proposed inbound interface | Ready | `miso/proposed-inbound-voice-event.schema.json` |
 | Proposed MCP shape | Ready | `miso/mcp-tool-proposal.json` |
+| Document MCP grounding path | Ready / not live-verified | `miso/miso-doc-mcp-registration.json`; source guide reviewed in `docs/miso-track-submission-runbook.md` |
 
 ## Live Workspace Evidence
 
@@ -72,6 +73,10 @@ Do not capture or paste:
 The MISO app YAML currently contains `tools: []`. This is expected for the
 export/import draft because the app prompt and model configuration are portable,
 but the custom-tool credential binding is workspace-specific.
+
+The official MISO Document MCP is also workspace-specific. It is prepared as a
+registration artifact but not claimed as live evidence unless it is visibly
+attached and tested in the MISO workspace.
 
 Final live setup still requires:
 
