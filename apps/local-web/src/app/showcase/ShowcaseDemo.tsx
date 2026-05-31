@@ -119,10 +119,28 @@ const flows: Record<ModeId, FlowMode> = {
   }
 };
 
-const proofPoints = [
-  { title: "Voice AI", detail: "통화/회의 입력" },
-  { title: "EXAONE", detail: "요약과 액션" },
-  { title: "Local-first", detail: "원문 로컬 보관" }
+const problemBeats = [
+  { title: "통화는 흩어지고", detail: "상담, 회의, 음성 메모가 각자 다른 곳에 남습니다." },
+  { title: "회의는 잊히고", detail: "결정과 할 일이 사람 기억에만 의존합니다." },
+  { title: "에이전트는 맥락을 모릅니다", detail: "업무 에이전트는 음성 원문보다 안전한 업무 맥락이 필요합니다." }
+];
+
+const coreStages = [
+  { number: "01", title: "Voice", detail: "통화/음성 입력" },
+  { number: "02", title: "Local AI", detail: "로컬 STT & 요약" },
+  { number: "03", title: "Agent", detail: "다음 행동 제안" }
+];
+
+const trackProof = [
+  { title: "LG U+", detail: "Voice AI + EXAONE" },
+  { title: "GS네오텍 / MISO", detail: "안전한 inbound voice context" },
+  { title: "Local-first", detail: "Mac mini 로컬 처리" }
+];
+
+const maskPreview = [
+  { label: "전화번호", value: "010-****-8100" },
+  { label: "이름", value: "김**" },
+  { label: "주소", value: "서울 **구" }
 ];
 
 export function ShowcaseDemo() {
@@ -166,103 +184,80 @@ export function ShowcaseDemo() {
 
   return (
     <>
-      <section className="showcase-hero" id="experience" aria-label="ixi-O Agent demo">
-        <div className="showcase-hero-copy">
-          {modeSwitch("showcase-mode-switch showcase-mode-switch-hero")}
+      <section className="showcase-hero showcase-hero-stage" id="experience" aria-label="ixi-O Agent demo">
+        <div className="showcase-hero-copy showcase-hero-centered">
           <h1>
             일상의 Voice를
             <span>에이전트와 함께</span>
           </h1>
-          <p>Voice를 에이전트가 바로 쓸 수 있는 안전한 업무 맥락으로 바꿉니다.</p>
+          <p>
+            사용자는 통화만 하세요.
+            <span>ixi-O-agent가 다음을 책임질게요</span>
+          </p>
 
-          <div className="showcase-security-callout">
-            <strong>{flow.boundaryTitle}</strong>
-            <span>{flow.boundaryCopy}</span>
-          </div>
-
-          <div className="showcase-actions">
-            <a className="showcase-primary showcase-tds-button fill" href="#guided-flow">
-              시연 시작
-            </a>
-            <a
-              className="showcase-secondary showcase-tds-button weak"
-              href="https://github.com/man2service/ixi-o-agent"
-            >
-              GitHub
-            </a>
-          </div>
-
-          <div className="showcase-proof-strip" aria-label="proof points">
-            {proofPoints.map((point) => (
-              <div key={point.title}>
-                <span>{point.title}</span>
-                <strong>{point.detail}</strong>
-              </div>
-            ))}
-          </div>
+          {modeSwitch("showcase-mode-switch showcase-mode-switch-hero")}
         </div>
 
-        <aside className="showcase-live-board" aria-label={`${flow.label} demo board`}>
-          <div className="showcase-live-board-header">
-            <div>
-              <span className="showcase-label">{flow.source}</span>
-              <h2>{flow.headline}</h2>
-            </div>
-            <strong>{activeStep.status}</strong>
-          </div>
-
-          <p>{flow.summary}</p>
-
-          <div className="showcase-pipeline" aria-label="voice to agent pipeline">
-            {flow.steps.map((stage, index) => {
-              const state =
-                index < activeStepIndex ? "completed" : index === activeStepIndex ? "selected" : "upcoming";
-              return (
-                <button
-                  key={`hero-${flow.id}-${stage.number}`}
-                  type="button"
-                  className={`showcase-pipeline-step ${state}`}
-                  onClick={() => setActiveStepIndex(index)}
-                >
-                  <span>{stage.number}</span>
-                  <strong>{stage.eventLabel}</strong>
-                  <em>{stage.title}</em>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="showcase-boundary" aria-label="privacy boundary">
-            <div>
-              <span>Local</span>
-              <ul>
-                {flow.localOnly.map((item) => (
-                  <li key={item}>{item}</li>
+        <div className="showcase-stage-frame" aria-label={`${flow.label} voice to agent stage`}>
+          <aside className="showcase-frame-sidebar">
+            <span className="showcase-label">{flow.label}</span>
+            <strong>{flow.source}</strong>
+            <p>{flow.summary}</p>
+            <ul>
+              <li>{flow.boundaryTitle}</li>
+              <li>{activeStep.result}</li>
+            </ul>
+            {activeMode === "enterprise" ? (
+              <div className="showcase-mask-preview" aria-label="masked enterprise fields">
+                {maskPreview.map((item) => (
+                  <span key={item.label}>
+                    <em>{item.label}</em>
+                    {item.value}
+                  </span>
                 ))}
-              </ul>
-            </div>
-            <div className="showcase-boundary-arrow">review</div>
-            <div>
-              <span>Agent</span>
-              <ul>
-                {flow.agentHandoff.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
+              </div>
+            ) : null}
+          </aside>
+
+          <div className="showcase-frame-path">
+            {coreStages.map((stage) => (
+              <article key={stage.number} className="showcase-frame-node">
+                <span>{stage.number}</span>
+                <strong>{stage.title}</strong>
+                <p>{stage.detail}</p>
+              </article>
+            ))}
           </div>
 
-          <div className="showcase-simulated-output">
-            <span className="showcase-label">{activeStep.result}</span>
+          <aside className="showcase-frame-output">
+            <span className="showcase-label">Agent proposal</span>
+            <strong>{flow.agentHandoff[0]}</strong>
             <p>{activeStep.detail}</p>
-          </div>
-        </aside>
+            <button type="button" onClick={nextStep}>
+              다음 단계 보기
+            </button>
+          </aside>
+        </div>
+
+        <a className="showcase-scroll-hint" href="#problem">
+          통화가 들어오면
+        </a>
+      </section>
+
+      <section className="showcase-problem" id="problem" aria-label="problem">
+        {problemBeats.map((beat) => (
+          <article key={beat.title}>
+            <h2>{beat.title}</h2>
+            <p>{beat.detail}</p>
+          </article>
+        ))}
       </section>
 
       <section className="showcase-demo" id="guided-flow" aria-label="guided flow">
-        <div className="showcase-section-head">
+        <div className="showcase-section-head showcase-flow-head">
           <div>
-            <h2>흐름 보기</h2>
+            <h2>Voice 수집에서 액션 제안까지</h2>
+            <p>발표자는 아래 단계만 넘기면 전체 흐름을 보여줄 수 있습니다.</p>
           </div>
           {modeSwitch()}
         </div>
@@ -349,6 +344,61 @@ export function ShowcaseDemo() {
             </article>
           </div>
         </div>
+      </section>
+
+      <section className="showcase-mode-split" aria-label="enterprise and personal modes">
+        {Object.values(flows).map((mode) => (
+          <article key={mode.id}>
+            <span>{mode.label}</span>
+            <h2>{mode.boundaryTitle}</h2>
+            <p>{mode.boundaryCopy}</p>
+            {mode.id === "enterprise" ? (
+              <div className="showcase-mask-flow" aria-label="enterprise masking example">
+                <strong>010-1234-5678</strong>
+                <em>mask</em>
+                <strong>010-****-8100</strong>
+              </div>
+            ) : null}
+          </article>
+        ))}
+      </section>
+
+      <section className="showcase-security-section" id="security" aria-label="security boundary">
+        <div className="showcase-section-head">
+          <div>
+            <h2>보안 경계</h2>
+            <p>기업용은 원문을 로컬에 두고, 검수된 payload만 MISO와 Kiya로 보냅니다.</p>
+          </div>
+        </div>
+
+        <div className="showcase-boundary showcase-boundary-large" aria-label="privacy boundary">
+          <div>
+            <span>Local only</span>
+            <ul>
+              {flows.enterprise.localOnly.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="showcase-boundary-arrow">review</div>
+          <div>
+            <span>Agent handoff</span>
+            <ul>
+              {flows.enterprise.agentHandoff.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="showcase-track-proof" aria-label="track proof">
+        {trackProof.map((item) => (
+          <article key={item.title}>
+            <span>{item.title}</span>
+            <strong>{item.detail}</strong>
+          </article>
+        ))}
       </section>
     </>
   );

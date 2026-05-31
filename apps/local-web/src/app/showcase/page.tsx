@@ -16,7 +16,9 @@ export default function ShowcasePage() {
         </Link>
         <div>
           <a href="#experience">Experience</a>
+          <a href="#problem">Problem</a>
           <a href="#guided-flow">Flow</a>
+          <a href="#security">Security</a>
           <a href="https://github.com/man2service/ixi-o-agent">GitHub</a>
         </div>
       </nav>
