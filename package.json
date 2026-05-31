@@ -1,11 +1,11 @@
 {
-  "name": "phone-claw",
+  "name": "ixi-o-agent",
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "dev": "pnpm --filter @phone-claw/local-web dev",
-    "build": "pnpm --filter @phone-claw/local-web build",
+    "dev": "pnpm --filter @ixi-o-agent/local-web dev",
+    "build": "pnpm --filter @ixi-o-agent/local-web build",
     "lint": "pnpm typecheck",
     "typecheck": "pnpm -r typecheck",
     "test:ingest": "node scripts/test-channel-talk-ingest.mjs",

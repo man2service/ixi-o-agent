@@ -5,10 +5,13 @@ import { spawn } from "node:child_process";
 
 const workspaceRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const appRoot = path.join(workspaceRoot, "apps", "local-web");
-const port = Number.parseInt(process.env.PHONE_CLAW_SMOKE_PORT ?? "3210", 10);
+const port = Number.parseInt(
+  process.env.IXI_O_AGENT_SMOKE_PORT ?? process.env.PHONE_CLAW_SMOKE_PORT ?? "3210",
+  10
+);
 const baseUrl = `http://localhost:${port}`;
-const ingestSecret = "phone-claw-blackbox-local-secret";
-const tempRoot = await mkdtemp(path.join(tmpdir(), "phone-claw-smoke-"));
+const ingestSecret = "ixi-o-agent-blackbox-local-secret";
+const tempRoot = await mkdtemp(path.join(tmpdir(), "ixi-o-agent-smoke-"));
 const storageDir = path.join(tempRoot, "private-voice-inbox");
 
 let server;
@@ -18,9 +21,13 @@ try {
     cwd: appRoot,
     env: {
       ...process.env,
+      IXI_O_AGENT_STORAGE_DIR: storageDir,
       PHONE_CLAW_STORAGE_DIR: storageDir,
+      IXI_O_AGENT_INGEST_SECRET: ingestSecret,
       PHONE_CLAW_INGEST_SECRET: ingestSecret,
+      IXI_O_AGENT_EXAONE_MODEL_PATH: path.join(tempRoot, "missing-exaone-model.gguf"),
       PHONE_CLAW_EXAONE_MODEL_PATH: path.join(tempRoot, "missing-exaone-model.gguf"),
+      IXI_O_AGENT_KIYA_AUTO_NOTIFY: "true",
       PHONE_CLAW_KIYA_AUTO_NOTIFY: "true",
       HERMES_AGENT_WEBHOOK_URL: "",
       HERMES_AGENT_API_KEY: "",
@@ -85,6 +92,7 @@ try {
   );
 
   const preReviewMiso = await getJson(`/api/miso/voice-sessions/${sessionId}`, {
+    "x-ixi-o-agent-ingest-secret": ingestSecret,
     "x-phone-claw-ingest-secret": ingestSecret
   });
   assert(
@@ -101,6 +109,7 @@ try {
   assert(review.session.review.externalAllowed === true, "review state should allow external handoff");
 
   const postReviewMiso = await getJson(`/api/miso/voice-sessions/${sessionId}`, {
+    "x-ixi-o-agent-ingest-secret": ingestSecret,
     "x-phone-claw-ingest-secret": ingestSecret
   });
   assert(
@@ -167,7 +176,7 @@ try {
     `/api/sessions/${localVoice.sessionId}/kiya-calendar-result`,
     {
       status: "created",
-      title: "Phone-Claw smoke follow-up",
+      title: "ixi-O Agent smoke follow-up",
       startsAt: "2026-05-31T15:00:00+09:00",
       note: "smoke test calendar audit callback"
     },
@@ -228,7 +237,7 @@ try {
   if (server && !server.killed) {
     server.kill("SIGTERM");
   }
-  if (process.env.PHONE_CLAW_SMOKE_KEEP_TMP !== "1") {
+  if ((process.env.IXI_O_AGENT_SMOKE_KEEP_TMP ?? process.env.PHONE_CLAW_SMOKE_KEEP_TMP) !== "1") {
     await rm(tempRoot, { recursive: true, force: true });
   }
 }
@@ -268,6 +277,7 @@ async function postJson(pathname, body, headers = {}) {
     headers: {
       accept: "application/json",
       "content-type": "application/json",
+      "x-ixi-o-agent-ingest-secret": ingestSecret,
       "x-phone-claw-ingest-secret": ingestSecret,
       ...headers
     },

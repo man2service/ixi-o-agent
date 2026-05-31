@@ -1,13 +1,13 @@
 # Proposed MISO Interfaces
 
-Phone-Claw treats MISO as the enterprise workflow runtime, not as raw voice
+ixi-O Agent treats MISO as the enterprise workflow runtime, not as raw voice
 storage. The current hackathon build therefore separates what already works
 from what we propose MISO should expose next.
 
-## Implemented Now: MISO Calls Phone-Claw
+## Implemented Now: MISO Calls ixi-O Agent
 
-MISO can register Phone-Claw as a custom REST tool with
-`phone-claw-openapi.json`.
+MISO can register ixi-O Agent as a custom REST tool with
+`ixi-o-agent-openapi.json`.
 
 Available operations:
 
@@ -15,7 +15,7 @@ Available operations:
 - `readVoiceSessionHandoff`: read a redacted handoff payload only after human
   review allows external workflow access.
 
-This path is pull-based: MISO calls the local Phone-Claw tool. Phone-Claw does
+This path is pull-based: MISO calls the local ixi-O Agent tool. ixi-O Agent does
 not push raw audio, raw transcripts, or unreviewed customer content into MISO.
 
 ## Proposed Next: Inbound Voice Event
@@ -52,14 +52,14 @@ first, payload only after review.
 
 ## Workflow MISO Could Automate
 
-Given an approved Phone-Claw payload, a MISO app could:
+Given an approved ixi-O Agent payload, a MISO app could:
 
 1. Classify the customer or meeting request.
 2. Pick an SOP or owner team.
 3. Draft a ticket, follow-up message, or internal task.
 4. Ask a human to approve the next action.
 
-Phone-Claw's job is to make voice context safe and structured enough for that
+ixi-O Agent's job is to make voice context safe and structured enough for that
 workflow. MISO's job is to execute the enterprise action.
 
 ## Verification
@@ -67,14 +67,14 @@ workflow. MISO's job is to execute the enterprise action.
 Validate the proposal files:
 
 ```bash
-node -e "for (const f of ['miso/phone-claw-openapi.json','miso/mcp-tool-proposal.json','miso/proposed-inbound-voice-event.schema.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('ok')"
+node -e "for (const f of ['miso/ixi-o-agent-openapi.json','miso/mcp-tool-proposal.json','miso/proposed-inbound-voice-event.schema.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('ok')"
 ```
 
 Inspect the implemented pull API locally:
 
 ```bash
 curl -fsS \
-  -H "Authorization: Bearer $PHONE_CLAW_INGEST_SECRET" \
+  -H "Authorization: Bearer $IXI_O_AGENT_INGEST_SECRET" \
   http://localhost:3000/api/miso/voice-sessions
 ```
 

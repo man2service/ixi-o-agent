@@ -1,7 +1,7 @@
 # MISO Handoff Feasibility And Proposal
 
 > 작성일: 2026-05-30 KST
-> 목적: Phone-Claw 결과물을 MISO에 어떻게 넘길지, 문서상 가능한 범위와 제안할 인터페이스를 정리
+> 목적: ixi-O Agent 결과물을 MISO에 어떻게 넘길지, 문서상 가능한 범위와 제안할 인터페이스를 정리
 > 기준:
 > - MISO builders guide
 > - GS네오텍 MISO track 발표자료
@@ -22,7 +22,7 @@
 따라서 제출 MVP handoff는 아래가 맞다.
 
 ```text
-Phone-Claw local pipeline
+ixi-O Agent local pipeline
   -> miso-payload.redacted.json 생성
   -> 사용자 Review
   -> 복사 버튼 / 파일 다운로드
@@ -51,7 +51,7 @@ Source: `contest-source-pack/raw/google-drive/MISO_OBA_HACKATHON_BUILDERS_GUIDE.
 
 해석:
 
-- Phone-Claw가 MCP server를 열면 MISO가 그 MCP tool/resource를 읽는 구조는 가능하다.
+- ixi-O Agent가 MCP server를 열면 MISO가 그 MCP tool/resource를 읽는 구조는 가능하다.
 - 그러나 "외부 voice event를 MISO workflow 시작 이벤트로 push"하는 표준 interface는 아니다.
 
 ### Published apps can be called by API
@@ -104,7 +104,7 @@ handoff/
 
 ## 4. Proposed MISO Interface
 
-Phone-Claw가 제안할 interface:
+ixi-O Agent가 제안할 interface:
 
 ```http
 POST /miso/events/voice-session.created
@@ -117,7 +117,7 @@ Payload:
 ```json
 {
   "eventType": "voice-session.created",
-  "source": "phone-claw-private-local-voice-bridge",
+  "source": "ixi-o-agent-private-local-voice-bridge",
   "sourceMode": "private_local",
   "sessionId": "2026-05-30_173012_meeting_demo",
   "mode": "meeting",
@@ -142,19 +142,19 @@ Payload:
 MCP 대안:
 
 ```text
-MISO calls Phone-Claw MCP
+MISO calls ixi-O Agent MCP
   -> list_voice_sessions
   -> read_voice_session
   -> create_case_from_voice_session
 ```
 
-이 방식은 MISO의 기존 MCP 도구 방향과 더 잘 맞는다. 단, MISO가 주도적으로 Phone-Claw local MCP에 접근해야 하므로 네트워크/인증/로컬 접근 문제가 남는다.
+이 방식은 MISO의 기존 MCP 도구 방향과 더 잘 맞는다. 단, MISO가 주도적으로 ixi-O Agent local MCP에 접근해야 하므로 네트워크/인증/로컬 접근 문제가 남는다.
 
 ## 5. How To Phrase
 
 GitHub/소개 페이지:
 
-> Phone-Claw turns everyday voice into agent-ready work context. Raw audio and transcripts stay local; only user-approved, redacted payloads are prepared for external workflow tools.
+> ixi-O Agent turns everyday voice into agent-ready work context. Raw audio and transcripts stay local; only user-approved, redacted payloads are prepared for external workflow tools.
 
 MISO track:
 

@@ -14,10 +14,10 @@ importers:
 
   apps/local-web:
     dependencies:
-      '@phone-claw/core':
+      '@ixi-o-agent/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@phone-claw/storage':
+      '@ixi-o-agent/storage':
         specifier: workspace:*
         version: link:../../packages/storage
       next:
@@ -58,7 +58,7 @@ importers:
 
   packages/storage:
     dependencies:
-      '@phone-claw/core':
+      '@ixi-o-agent/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

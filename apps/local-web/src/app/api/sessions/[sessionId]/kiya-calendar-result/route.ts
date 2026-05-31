@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { readStoredVoiceSessionDetail } from "@phone-claw/storage";
+import { readStoredVoiceSessionDetail } from "@ixi-o-agent/storage";
+import { isAuthorizedByIngestSecret } from "../../../../../lib/runtime-config";
 import {
   recordKiyaCalendarResult,
   type KiyaCalendarResultInput,
@@ -58,9 +59,7 @@ export async function POST(
 }
 
 function isAuthorized(request: Request): boolean {
-  const expected = process.env.PHONE_CLAW_INGEST_SECRET;
-  if (!expected) return true;
-  return request.headers.get("x-phone-claw-ingest-secret") === expected;
+  return isAuthorizedByIngestSecret(request);
 }
 
 function isKiyaCalendarResultStatus(value: string | undefined): value is KiyaCalendarResultStatus {

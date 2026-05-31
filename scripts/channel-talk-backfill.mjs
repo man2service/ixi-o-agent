@@ -1,7 +1,8 @@
 const accessKey = process.env.CHANNEL_TALK_ACCESS_KEY;
 const accessSecret = process.env.CHANNEL_TALK_ACCESS_SECRET;
-const ingestSecret = process.env.PHONE_CLAW_INGEST_SECRET;
+const ingestSecret = process.env.IXI_O_AGENT_INGEST_SECRET ?? process.env.PHONE_CLAW_INGEST_SECRET;
 const ingestUrl =
+  process.env.IXI_O_AGENT_INGEST_URL ??
   process.env.PHONE_CLAW_INGEST_URL ??
   "http://localhost:3000/api/ingest/channel-talk/openapi";
 const states = (process.env.CHANNEL_TALK_BACKFILL_STATES ?? process.env.CHANNEL_TALK_BACKFILL_STATE ?? "closed")
@@ -14,7 +15,7 @@ const messageLimit = readPositiveInt(process.env.CHANNEL_TALK_MESSAGE_LIMIT, 100
 
 if (!accessKey || !accessSecret || !ingestSecret) {
   console.error(
-    "CHANNEL_TALK_ACCESS_KEY, CHANNEL_TALK_ACCESS_SECRET, and PHONE_CLAW_INGEST_SECRET are required."
+    "CHANNEL_TALK_ACCESS_KEY, CHANNEL_TALK_ACCESS_SECRET, and IXI_O_AGENT_INGEST_SECRET are required."
   );
   process.exit(1);
 }
@@ -48,6 +49,7 @@ for (const { state, userChat } of userChats) {
     method: "POST",
     headers: {
       "content-type": "application/json",
+      "x-ixi-o-agent-ingest-secret": ingestSecret,
       "x-phone-claw-ingest-secret": ingestSecret
     },
     body: JSON.stringify({

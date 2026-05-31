@@ -1,4 +1,4 @@
-# Phone-Claw Agent Task Queue
+# ixi-O Agent Agent Task Queue
 
 Updated: 2026-05-31 KST
 
@@ -57,7 +57,7 @@ Status: `completed`
 
 Goal:
 
-Channel Talk UI에서 webhook을 수동 등록하고, 실제 user chat 또는 전화/Meet 이벤트가 n8n으로 들어와 Phone-Claw 세션으로 저장되는 것을 증명한다.
+Channel Talk UI에서 webhook을 수동 등록하고, 실제 user chat 또는 전화/Meet 이벤트가 n8n으로 들어와 ixi-O Agent 세션으로 저장되는 것을 증명한다.
 
 Scope:
 
@@ -72,12 +72,12 @@ Required steps:
 1. 현재 Cloudflare quick tunnel URL이 살아 있는지 확인한다.
 2. Channel Talk UI에서 `Settings > Webhook > Create new webhook`으로 등록한다.
 3. 테스트 user chat/message/call 이벤트를 발생시킨다.
-4. n8n execution 또는 Phone-Claw `/api/sessions`에서 신규 세션 여부를 확인한다.
+4. n8n execution 또는 ixi-O Agent `/api/sessions`에서 신규 세션 여부를 확인한다.
 5. webhook event만으로 전사문이 부족하면 polling/manual backfill로 보강되는 흐름을 확인한다.
 
 Result:
 
-- Channel Talk UI에서 `Phone-Claw n8n realtime` webhook 생성 완료.
+- Channel Talk UI에서 `ixi-O Agent n8n realtime` webhook 생성 완료.
 - `GET /open/v5/webhooks`에서 channel `218885`, scopes `userChat.opened`, `message.created.userChat`, `blocked: false` 확인.
 - 합성 Channel Talk member/userChat/message를 Open API로 만들고 실제 webhook 수신 확인.
 - 실제 v5 이벤트는 `{ event, type, entity, refers }` 최상위 shape로 도착함을 확인.
@@ -87,10 +87,10 @@ Result:
 Verification:
 
 ```bash
-curl -sS -o /tmp/phone-claw-webhook-check.txt -w '%{http_code}\n' \
+curl -sS -o /tmp/ixi-o-agent-webhook-check.txt -w '%{http_code}\n' \
   -X POST -H 'Content-Type: application/json' \
   "$CHANNEL_TALK_WEBHOOK_URL" \
-  -d '{"event":"healthcheck","source":"phone-claw"}'
+  -d '{"event":"healthcheck","source":"ixi-o-agent"}'
 
 set -a; source .env.local; set +a
 pnpm backfill:channel-talk
@@ -150,7 +150,7 @@ pnpm build
 curl -fsS http://localhost:3000/api/sessions
 set -a; source .env.local; set +a
 curl -fsS \
-  -H "x-phone-claw-ingest-secret: $PHONE_CLAW_INGEST_SECRET" \
+  -H "x-ixi-o-agent-ingest-secret: $IXI_O_AGENT_INGEST_SECRET" \
   http://localhost:3000/api/miso/voice-sessions/20260530T153141_utc_channel_talk_e7b435ae0b
 ```
 
@@ -219,7 +219,7 @@ Completion evidence:
 Adversarial review focus:
 
 - `.env.local` 예시가 실제 실행에 충분한지
-- `PHONE_CLAW_STORAGE_DIR` 상대 경로가 monorepo 실행 위치에서 안전한지
+- `IXI_O_AGENT_STORAGE_DIR` 상대 경로가 monorepo 실행 위치에서 안전한지
 - model download가 선택 사항으로 설명되어 있는지
 
 ### T4. Local Voice Capture Frontdoor
@@ -261,7 +261,7 @@ Verification:
 pnpm typecheck
 pnpm build
 pnpm smoke:local
-whisper-cli -m models/whisper/ggml-small.bin -f <short-audio-file> -otxt -of /tmp/phone-claw-stt
+whisper-cli -m models/whisper/ggml-small.bin -f <short-audio-file> -otxt -of /tmp/ixi-o-agent-stt
 ```
 
 Completion evidence:
@@ -287,7 +287,7 @@ MISO 직접 push가 아니라 "MISO에 추가되면 좋은 inbound voice event i
 Scope:
 
 - `miso/README.md`
-- `miso/phone-claw-openapi.json`
+- `miso/ixi-o-agent-openapi.json`
 - `miso/mcp-tool-proposal.json`
 - `docs/demo-intro.md`
 - 필요 시 local UI의 payload preview/download
@@ -295,20 +295,20 @@ Scope:
 Required steps:
 
 1. 현재 MISO guide 기준 가능한 것과 불가능한 것을 한 문단으로 정리한다.
-2. Phone-Claw redacted payload schema를 심사위원이 바로 이해할 수 있게 예시화한다.
+2. ixi-O Agent redacted payload schema를 심사위원이 바로 이해할 수 있게 예시화한다.
 3. MISO 앱/워크플로우가 이 payload를 받으면 어떤 업무가 자동화되는지 보여준다.
 4. 발표 문구를 "우리는 직접 MISO에 몰래 넣었다"가 아니라 "필요한 인터페이스를 검증 가능한 payload와 함께 제안한다"로 통일한다.
 
 Verification:
 
 ```bash
-node -e "for (const f of ['miso/phone-claw-openapi.json','miso/mcp-tool-proposal.json','miso/proposed-inbound-voice-event.schema.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('ok')"
+node -e "for (const f of ['miso/ixi-o-agent-openapi.json','miso/mcp-tool-proposal.json','miso/proposed-inbound-voice-event.schema.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('ok')"
 ```
 
 Result:
 
 - `miso/README.md` now separates implemented custom-tool pull APIs from proposed inbound/MCP interfaces.
-- `miso/phone-claw-openapi.json` now documents both `channel_talk` and `local_voice` source systems.
+- `miso/ixi-o-agent-openapi.json` now documents both `channel_talk` and `local_voice` source systems.
 - Added `miso/proposed-inbound-voice-event.schema.json` as the proposed MISO voice event schema.
 - Added `miso/proposed-miso-interfaces.md` to explain current MISO feasibility, proposed interfaces, workflow automation, and verification.
 
@@ -330,7 +330,7 @@ Status: `completed`
 
 Goal:
 
-GitHub 링크와 소개 페이지/발표 자료만 보고도 Phone-Claw의 가치와 데모 방법을 이해할 수 있게 정리한다.
+GitHub 링크와 소개 페이지/발표 자료만 보고도 ixi-O Agent의 가치와 데모 방법을 이해할 수 있게 정리한다.
 
 Scope:
 
@@ -364,7 +364,7 @@ curl -fsS http://localhost:3000/api/sessions
 
 Completion evidence:
 
-- 제출용 GitHub URL: `https://github.com/man2service/Phoneclaw`
+- 제출용 GitHub URL: `https://github.com/man2service/ixi-o-agent`
 - README links to `docs/submission-pack.md`
 - Final demo order documented in `docs/submission-pack.md` and `docs/demo-intro.md`
 
@@ -415,7 +415,7 @@ Status: `completed`
 
 Goal:
 
-Phone-Claw가 처리한 voice session 요약을 먼저 Kiya에게 전달하고, 캘린더 등록할 만한 사안이 있을 때만 두 번째 확인 메시지를 보내 Kiya/Hermes가 캘린더 등록 대화를 맡게 한다.
+ixi-O Agent가 처리한 voice session 요약을 먼저 Kiya에게 전달하고, 캘린더 등록할 만한 사안이 있을 때만 두 번째 확인 메시지를 보내 Kiya/Hermes가 캘린더 등록 대화를 맡게 한다.
 
 Scope:
 
@@ -428,7 +428,7 @@ Scope:
 
 Result:
 
-1. EXAONE 처리 후 `PHONE_CLAW_KIYA_AUTO_NOTIFY=false`가 아니면 자동으로 Kiya 요약 알림을 준비한다.
+1. EXAONE 처리 후 `IXI_O_AGENT_KIYA_AUTO_NOTIFY=false`가 아니면 자동으로 Kiya 요약 알림을 준비한다.
 2. 요약 메시지는 항상 먼저 전송한다.
 3. `HERMES_AGENT_WEBHOOK_URL`이 있으면 safe summary/action payload로 캘린더 등록 필요 여부만 확인한다.
 4. Hermes URL이 없거나 실패하면 local planner가 캘린더 후보만 판단한다.
@@ -461,7 +461,7 @@ Status: `partial`
 
 Goal:
 
-Kiya/Hermes가 보낸 캘린더 확인 메시지에 사용자가 확인/수정 답장을 하면, Kiya/Hermes가 캘린더 등록을 처리하고 필요 시 Phone-Claw에 감사 로그나 결과만 남긴다.
+Kiya/Hermes가 보낸 캘린더 확인 메시지에 사용자가 확인/수정 답장을 하면, Kiya/Hermes가 캘린더 등록을 처리하고 필요 시 ixi-O Agent에 감사 로그나 결과만 남긴다.
 
 Scope:
 
@@ -473,7 +473,7 @@ Required decisions:
 
 1. Kiya/Hermes가 inline button callback 또는 자연어 답장을 어떻게 처리하는지
 2. Kiya/Hermes가 실제 캘린더 등록을 어떤 도구로 수행하는지
-3. Phone-Claw가 결과 audit만 받을지, 세션 상태까지 업데이트할지
+3. ixi-O Agent가 결과 audit만 받을지, 세션 상태까지 업데이트할지
 4. 캘린더 등록 전 사용자 확인을 어디에서 강제할지
 
 ## Recommended Next Work Unit
@@ -484,7 +484,7 @@ Required decisions:
 
 - outbound 구현은 dry-run까지 끝났다.
 - 각 세션의 `agent/kiya-notification.latest.json`에 최신 Kiya/Hermes 발송 또는 dry-run 결과가 남는다.
-- Phone-Claw 쪽 calendar result audit callback은 추가됐다.
+- ixi-O Agent 쪽 calendar result audit callback은 추가됐다.
 - 실제 Telegram 전송과 Hermes 호출은 로컬 코드보다 자격증명/ingress 설정이 리스크다.
 - reply loop는 Hermes callback 계약을 확정한 뒤 붙여야 한다.
 

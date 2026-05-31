@@ -1,8 +1,9 @@
 import { spawn } from "node:child_process";
 import { access } from "node:fs/promises";
 import path from "node:path";
-import type { ExaoneProcessingResult, MisoHandoffPayload } from "@phone-claw/storage";
-import { getWorkspaceRoot, type StoredVoiceSessionDetail } from "@phone-claw/storage";
+import type { ExaoneProcessingResult, MisoHandoffPayload } from "@ixi-o-agent/storage";
+import { getWorkspaceRoot, type StoredVoiceSessionDetail } from "@ixi-o-agent/storage";
+import { getIxiOAgentEnv } from "./runtime-config";
 
 type ModelJson = {
   summary?: unknown;
@@ -25,7 +26,7 @@ const DEFAULT_MODEL_PATH = path.join(
 export async function processSessionWithLocalExaone(
   session: StoredVoiceSessionDetail
 ): Promise<ExaoneProcessingResult> {
-  const modelPath = process.env.PHONE_CLAW_EXAONE_MODEL_PATH ?? DEFAULT_MODEL_PATH;
+  const modelPath = getIxiOAgentEnv("EXAONE_MODEL_PATH") ?? DEFAULT_MODEL_PATH;
   const transcript = session.transcript.rawText.trim();
 
   if (!transcript) {
@@ -51,12 +52,12 @@ export async function processSessionWithLocalExaone(
     const rawOutput = await runLlamaCli({
       modelPath,
       prompt: buildPrompt(session),
-      timeoutMs: Number(process.env.PHONE_CLAW_EXAONE_TIMEOUT_MS ?? DEFAULT_TIMEOUT_MS)
+      timeoutMs: Number(getIxiOAgentEnv("EXAONE_TIMEOUT_MS") ?? DEFAULT_TIMEOUT_MS)
     });
     const parsed = normalizeModelJson(extractJsonObject(rawOutput));
 
     return {
-      schemaVersion: "phone-claw.exaone.local-output.v0",
+      schemaVersion: "ixi-o-agent.exaone.local-output.v0",
       processedAt: new Date().toISOString(),
       engine: "exaone-local",
       modelPath,
@@ -104,7 +105,7 @@ async function runLlamaCli(args: {
 }): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = spawn(
-      process.env.PHONE_CLAW_LLAMA_CLI ?? "llama-cli",
+      getIxiOAgentEnv("LLAMA_CLI") ?? "llama-cli",
       [
         "-m",
         args.modelPath,
@@ -268,7 +269,7 @@ function buildFallbackResult(args: {
   );
 
   return {
-    schemaVersion: "phone-claw.exaone.local-output.v0",
+    schemaVersion: "ixi-o-agent.exaone.local-output.v0",
     processedAt: new Date().toISOString(),
     engine: "fallback-local",
     modelPath: args.modelPath,

@@ -1,6 +1,6 @@
 {
-  "name": "phone-claw-local-voice-bridge",
-  "description": "Proposed MCP tool surface for letting MISO read user-approved voice-session handoffs from a private local Phone-Claw instance.",
+  "name": "ixi-o-agent-local-voice-bridge",
+  "description": "Proposed MCP tool surface for letting MISO read user-approved voice-session handoffs from a private local ixi-O Agent instance.",
   "supportedSourceSystems": ["channel_talk", "local_voice"],
   "transport": {
     "type": "streamable-http",

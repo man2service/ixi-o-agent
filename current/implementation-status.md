@@ -1,4 +1,4 @@
-# Phone-Claw Implementation Status
+# ixi-O Agent Implementation Status
 
 Updated: 2026-05-31
 
@@ -9,7 +9,7 @@ The first working path is implemented:
 1. Channel Talk Open API credentials are checked locally.
 2. Existing Channel Talk `UserChat` records are fetched by backfill.
 3. Each chat's messages are normalized into a local voice-session payload.
-4. The payload is written under `PHONE_CLAW_STORAGE_DIR/sessions`; the current local target is the `call-context` workspace folder.
+4. The payload is written under `IXI_O_AGENT_STORAGE_DIR/sessions`; the current local target is the `call-context` workspace folder.
 5. The local dashboard lists stored voice sessions.
 6. A session detail page shows the local transcript, source metadata, EXAONE output, review state, and redacted MISO handoff payload.
 7. A local EXAONE button runs GGUF inference when available and falls back to deterministic local processing when the model/CLI fails.
@@ -22,11 +22,11 @@ The first working path is implemented:
 14. The MISO proposal pack separates implemented custom-tool pull APIs from proposed inbound voice event/MCP interfaces.
 15. Demo operations and STT field validation runbooks are available for final rehearsal.
 16. Telegram Kiya integration assumptions and toy scope are documented.
-17. EXAONE processing now automatically prepares a Kiya summary notification unless `PHONE_CLAW_KIYA_AUTO_NOTIFY=false`.
+17. EXAONE processing now automatically prepares a Kiya summary notification unless `IXI_O_AGENT_KIYA_AUTO_NOTIFY=false`.
 18. Calendar-worthy sessions produce a second Kiya calendar-confirmation prompt after the summary message.
 19. Private Mode now supports browser microphone recording in addition to pasted transcripts and file upload.
 20. Kiya/Hermes notification attempts are persisted per session for demo review, even when Telegram delivery is a dry-run.
-21. Kiya/Hermes can report calendar action results back to Phone-Claw through an audit-only callback; Phone-Claw still does not own calendar execution.
+21. Kiya/Hermes can report calendar action results back to ixi-O Agent through an audit-only callback; ixi-O Agent still does not own calendar execution.
 22. A toy Kiya calendar command endpoint records confirm/edit/cancel commands from Telegram callback data such as `pc:cal:ok:{sessionId}`.
 
 ## Local App
@@ -46,7 +46,7 @@ The first working path is implemented:
 All protected local APIs require:
 
 ```text
-x-phone-claw-ingest-secret: ${PHONE_CLAW_INGEST_SECRET}
+x-ixi-o-agent-ingest-secret: ${IXI_O_AGENT_INGEST_SECRET}
 ```
 
 ## n8n Workflows
@@ -88,16 +88,16 @@ The live backfill stored Channel Talk sessions locally. Credentials were not wri
 Current quick tunnel:
 
 ```text
-https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-phone-claw
+https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-ixi-o-agent
 ```
 
 Channel Talk webhook list API now returns one active webhook:
 
 ```text
-Name: Phone-Claw n8n realtime
+Name: ixi-O Agent n8n realtime
 Channel: 218885
 Scopes: userChat.opened, message.created.userChat
-URL: https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-phone-claw
+URL: https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-ixi-o-agent
 Blocked: false
 ```
 
@@ -114,7 +114,7 @@ The persistent task queue is now tracked in `current/agent-task-queue.md`.
 Recommended next work unit:
 
 1. Configure real Kiya/Hermes secrets and run a live summary + calendar prompt rehearsal.
-2. Let Kiya/Hermes own calendar confirmation/edit/registration, then document the callback or audit trail it exposes back to Phone-Claw if needed.
+2. Let Kiya/Hermes own calendar confirmation/edit/registration, then document the callback or audit trail it exposes back to ixi-O Agent if needed.
 
 ## Runtime Note
 

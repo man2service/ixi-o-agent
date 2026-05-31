@@ -5,8 +5,8 @@ agent integration.
 
 ## Product Role
 
-`Kiya` is the Telegram-facing agent layer for Phone-Claw. The current Kiya bot
-is already bound to the Hermes agent, so Phone-Claw should not try to create a
+`Kiya` is the Telegram-facing agent layer for ixi-O Agent. The current Kiya bot
+is already bound to the Hermes agent, so ixi-O Agent should not try to create a
 separate Telegram input agent for this path.
 
 The final product flow should look like:
@@ -15,7 +15,7 @@ The final product flow should look like:
 Voice session saved
   -> EXAONE/local processing
   -> human review or draft handoff created
-  -> Phone-Claw calls Hermes with the safe summary/action payload
+  -> ixi-O Agent calls Hermes with the safe summary/action payload
   -> Kiya receives the summary message first
   -> if calendar-worthy, Kiya receives a separate calendar confirmation prompt
   -> user replies with a natural-language correction or command
@@ -39,7 +39,7 @@ From `current/ixi-o-mvp-implementation-plan.md` and
   - "세 번째 액션 완료 처리해줘"
 - The agent should update the local Markdown/session memory and indexes.
 - A demo bot can be created through BotFather.
-- Prior plan assumed OpenClaw + ChatGPT backend, but Phone-Claw can also start
+- Prior plan assumed OpenClaw + ChatGPT backend, but ixi-O Agent can also start
   with a direct Telegram Bot API toy.
 
 ## Telegram Bot API Facts To Rely On
@@ -87,14 +87,14 @@ POST /api/sessions/{sessionId}/notify-kiya
 Environment:
 
 ```text
-PHONE_CLAW_KIYA_AUTO_NOTIFY=true
+IXI_O_AGENT_KIYA_AUTO_NOTIFY=true
 HERMES_AGENT_WEBHOOK_URL=
 HERMES_AGENT_API_KEY=
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_KIYA_CHAT_ID=
 ```
 
-`PHONE_CLAW_KIYA_AUTO_NOTIFY` is on by default. Set it to `false` to disable
+`IXI_O_AGENT_KIYA_AUTO_NOTIFY` is on by default. Set it to `false` to disable
 automatic delivery after EXAONE processing.
 
 Calendar prompt behavior:
@@ -112,7 +112,7 @@ pc:cal:edit:<sessionId>
 ```
 
 Kiya/Hermes should own the actual calendar registration and modification
-conversation. Phone-Claw does not write the calendar directly in this step.
+conversation. ixi-O Agent does not write the calendar directly in this step.
 
 Later, add inbound text commands:
 
@@ -146,7 +146,7 @@ Pros:
 
 - Matches the current Kiya/Hermes binding.
 - Keeps recommendation logic in Hermes when the webhook exists.
-- Phone-Claw still has a dry-run/local planner fallback.
+- ixi-O Agent still has a dry-run/local planner fallback.
 
 Cons:
 
@@ -173,20 +173,20 @@ Cons:
 Start with Option A:
 
 ```text
-Phone-Claw -> Kiya summary -> optional Hermes/Kiya calendar confirmation
+ixi-O Agent -> Kiya summary -> optional Hermes/Kiya calendar confirmation
 ```
 
 Then add Kiya reply handling once we know the Hermes/OpenClaw callback contract.
-Until that callback contract is available, Phone-Claw records the latest
+Until that callback contract is available, ixi-O Agent records the latest
 outbound or dry-run attempt in `agent/kiya-notification.latest.json` and appends
 the history to `agent/kiya-notification.log.jsonl`.
 
 If Kiya/Hermes completes the calendar action, it can report an audit result back
-to Phone-Claw without letting Phone-Claw own calendar execution:
+to ixi-O Agent without letting ixi-O Agent own calendar execution:
 
 ```http
 POST /api/sessions/{sessionId}/kiya-calendar-result
-x-phone-claw-ingest-secret: <local secret>
+x-ixi-o-agent-ingest-secret: <local secret>
 content-type: application/json
 
 {
@@ -216,11 +216,11 @@ history is appended to `agent/kiya-calendar-result.log.jsonl`.
 To integrate with the actual Kiya agent, we still need:
 
 1. What is the Hermes ingress URL or tool contract that Kiya is bound to?
-2. Does Hermes itself deliver to Kiya, or should Phone-Claw send Telegram
+2. Does Hermes itself deliver to Kiya, or should ixi-O Agent send Telegram
    `sendMessage` using the Kiya bot token after Hermes returns recommendations?
-3. Can Kiya call local HTTP endpoints, or does Phone-Claw need to push messages
+3. Can Kiya call local HTTP endpoints, or does ixi-O Agent need to push messages
    into Kiya?
-4. Should Telegram replies modify Phone-Claw session JSON directly, or only add
+4. Should Telegram replies modify ixi-O Agent session JSON directly, or only add
    review notes until a human approves?
 5. Should Kiya ever receive raw transcript text, or only redacted summaries and
    action items?

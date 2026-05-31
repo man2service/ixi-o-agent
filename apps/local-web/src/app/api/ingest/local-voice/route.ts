@@ -4,8 +4,9 @@ import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { NextResponse } from "next/server";
-import { type ChannelTalkN8nPayload } from "@phone-claw/core";
-import { getWorkspaceRoot, ingestChannelTalkPayload } from "@phone-claw/storage";
+import { type ChannelTalkN8nPayload } from "@ixi-o-agent/core";
+import { getWorkspaceRoot, ingestChannelTalkPayload } from "@ixi-o-agent/storage";
+import { getIxiOAgentEnv } from "../../../../lib/runtime-config";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
   const manualTranscript = getFormString(formData, "transcriptText") ?? "";
   const audioFile = getAudioFile(formData);
   const startedAt = new Date();
-  const tempDir = path.join(tmpdir(), `phone-claw-local-${randomUUID()}`);
+  const tempDir = path.join(tmpdir(), `ixi-o-agent-local-${randomUUID()}`);
 
   let tempAudioPath: string | undefined;
   let transcriptText = manualTranscript.trim();
@@ -110,7 +111,7 @@ export async function POST(request: Request) {
 }
 
 async function transcribeWithLocalWhisper(audioPath: string, tempDir: string) {
-  const modelPath = process.env.PHONE_CLAW_WHISPER_MODEL_PATH ?? DEFAULT_WHISPER_MODEL;
+  const modelPath = getIxiOAgentEnv("WHISPER_MODEL_PATH") ?? DEFAULT_WHISPER_MODEL;
   if (!(await fileExists(modelPath))) {
     return {
       text: "",
@@ -119,7 +120,7 @@ async function transcribeWithLocalWhisper(audioPath: string, tempDir: string) {
   }
 
   const outputBase = path.join(tempDir, "whisper-output");
-  const command = process.env.PHONE_CLAW_WHISPER_CLI ?? "whisper-cli";
+  const command = getIxiOAgentEnv("WHISPER_CLI") ?? "whisper-cli";
   const result = await runCommand(command, [
     "-m",
     modelPath,

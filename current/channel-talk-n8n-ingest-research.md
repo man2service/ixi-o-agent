@@ -1,12 +1,12 @@
 # Channel Talk + n8n Ingest Research
 
 > 작성일: 2026-05-30 KST
-> 목적: 채널톡 전화/Meet 기능의 전사문 또는 녹음 파일을 n8n으로 가져와 Phone-Claw 데모 앱 입력으로 사용할 수 있는지 정리
+> 목적: 채널톡 전화/Meet 기능의 전사문 또는 녹음 파일을 n8n으로 가져와 ixi-O Agent 데모 앱 입력으로 사용할 수 있는지 정리
 > 기준 문서: `contest-source-pack/research/CHANNEL_TALK_N8N_INGEST.md`
 
 ## 결론
 
-채널톡의 전화/Meet 기능은 Phone-Claw / Voice-to-AgentOps 데모의 입력 소스로 쓸 수 있다.
+채널톡의 전화/Meet 기능은 ixi-O Agent / Voice-to-AgentOps 데모의 입력 소스로 쓸 수 있다.
 
 권장 흐름:
 
@@ -14,7 +14,7 @@
 Channel Talk phone/meet
   -> call record + transcript/STT chat in Channel Talk
   -> n8n Channel Talk node or HTTP Request
-  -> Phone-Claw /api/ingest/channel-talk
+  -> ixi-O Agent /api/ingest/channel-talk
   -> session 저장 / pending_processing
   -> later EXAONE post-processing
   -> later agent-input.json / MISO payload
@@ -87,7 +87,7 @@ Channel Talk Webhook
   -> Wait/Poll until meet.state == transcribed
   -> Channel Talk: Get Meets Messages
   -> Normalize transcript
-  -> HTTP Request: POST Phone-Claw /api/ingest/channel-talk
+  -> HTTP Request: POST ixi-O Agent /api/ingest/channel-talk
 ```
 
 후속 Phase Fallback:
@@ -96,7 +96,7 @@ Channel Talk Webhook
 If no transcript or meet.state == transcribeFailed
   -> Channel Talk: Get Meets Recording
   -> Download audio/mp4
-  -> POST audio URL/file to Phone-Claw local bridge
+  -> POST audio URL/file to ixi-O Agent local bridge
   -> local STT
 ```
 
@@ -109,7 +109,7 @@ Schedule Trigger every 2 minutes
   -> Get user chat messages
   -> Find meet root message
   -> Get Meets Messages
-  -> POST transcript to Phone-Claw /api/ingest/channel-talk
+  -> POST transcript to ixi-O Agent /api/ingest/channel-talk
 ```
 
 Webhook event coverage가 message 중심일 수 있으므로, webhook-first로 가더라도 polling backup을 반드시 둔다.
@@ -124,10 +124,10 @@ Manual Trigger
   -> Get user chat messages
   -> Find meet root message
   -> Get Meets Messages
-  -> POST transcript to Phone-Claw /api/ingest/channel-talk
+  -> POST transcript to ixi-O Agent /api/ingest/channel-talk
 ```
 
-Manual backfill은 개발/테스트 중 과거 내역을 다시 불러오기 위한 경로다. polling cursor는 수정하지 않고, 중복 방지는 Phone-Claw dedupe에 맡긴다.
+Manual backfill은 개발/테스트 중 과거 내역을 다시 불러오기 위한 경로다. polling cursor는 수정하지 않고, 중복 방지는 ixi-O Agent dedupe에 맡긴다.
 
 ## 우리 데모 앱 입력 형태
 

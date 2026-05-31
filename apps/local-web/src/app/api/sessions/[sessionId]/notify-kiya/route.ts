@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readStoredVoiceSessionDetail } from "@phone-claw/storage";
+import { readStoredVoiceSessionDetail } from "@ixi-o-agent/storage";
 import { notifyKiyaForSession } from "../../../../../lib/kiya";
 
 export const runtime = "nodejs";

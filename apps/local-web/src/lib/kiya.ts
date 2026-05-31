@@ -1,6 +1,6 @@
 import { appendFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { MisoHandoffPayload, StoredVoiceSessionDetail } from "@phone-claw/storage";
+import type { MisoHandoffPayload, StoredVoiceSessionDetail } from "@ixi-o-agent/storage";
 
 export type HermesRecommendation = {
   type: "calendar" | "follow_up" | "review";
@@ -41,7 +41,7 @@ export type KiyaNotificationResult = {
 };
 
 export type KiyaNotificationLogEntry = KiyaNotificationResult & {
-  artifactVersion: "phone-claw.kiya.notification-log.v0";
+  artifactVersion: "ixi-o-agent.kiya.notification-log.v0";
   createdAt: string;
 };
 
@@ -63,7 +63,7 @@ export type KiyaCalendarResultInput = {
 };
 
 export type KiyaCalendarResultLogEntry = KiyaCalendarResultInput & {
-  artifactVersion: "phone-claw.kiya.calendar-result.v0";
+  artifactVersion: "ixi-o-agent.kiya.calendar-result.v0";
   sessionId: string;
   recordedAt: string;
 };
@@ -140,7 +140,7 @@ export async function recordKiyaCalendarResult(
   input: KiyaCalendarResultInput
 ): Promise<KiyaCalendarResultLogEntry> {
   const entry: KiyaCalendarResultLogEntry = {
-    artifactVersion: "phone-claw.kiya.calendar-result.v0",
+    artifactVersion: "ixi-o-agent.kiya.calendar-result.v0",
     sessionId: session.sessionId,
     recordedAt: new Date().toISOString(),
     status: input.status,
@@ -174,7 +174,7 @@ function buildSafeSessionPayload(session: StoredVoiceSessionDetail) {
   const actionItems = session.exaone?.actionItems ?? handoff?.actionItems ?? [];
 
   return {
-    schemaVersion: "phone-claw.kiya.hermes-input.v0",
+    schemaVersion: "ixi-o-agent.kiya.hermes-input.v0",
     sessionId: session.sessionId,
     source: session.source,
     mode: session.mode,
@@ -224,7 +224,7 @@ async function persistKiyaNotification(
   result: KiyaNotificationResult
 ) {
   const entry: KiyaNotificationLogEntry = {
-    artifactVersion: "phone-claw.kiya.notification-log.v0",
+    artifactVersion: "ixi-o-agent.kiya.notification-log.v0",
     createdAt: new Date().toISOString(),
     ...result
   };
@@ -277,7 +277,7 @@ async function planWithHermes(payload: ReturnType<typeof buildSafeSessionPayload
       body: JSON.stringify({
         event: "phone_claw.voice_session.calendar_check",
         instruction:
-          "요약과 액션아이템만 보고 캘린더 등록이 필요한지 판단하세요. 필요하면 사용자가 확인하거나 수정할 수 있는 일정 후보만 제안하세요. 원문 전사문이나 raw audio는 요청하지 마세요. 실제 캘린더 등록은 사용자가 Kiya에서 확인한 뒤 Kiya/Hermes가 처리합니다. 확인/수정/취소 결과는 Phone-Claw의 /api/kiya/calendar-command 또는 /api/sessions/{sessionId}/kiya-calendar-result로 기록할 수 있습니다.",
+          "요약과 액션아이템만 보고 캘린더 등록이 필요한지 판단하세요. 필요하면 사용자가 확인하거나 수정할 수 있는 일정 후보만 제안하세요. 원문 전사문이나 raw audio는 요청하지 마세요. 실제 캘린더 등록은 사용자가 Kiya에서 확인한 뒤 Kiya/Hermes가 처리합니다. 확인/수정/취소 결과는 ixi-O Agent의 /api/kiya/calendar-command 또는 /api/sessions/{sessionId}/kiya-calendar-result로 기록할 수 있습니다.",
         payload,
         availableActions: ["calendar.create_event_draft", "phone_claw.record_calendar_command"]
       }),
@@ -448,7 +448,7 @@ function formatSummaryMessage(payload: ReturnType<typeof buildSafeSessionPayload
       : payload.actionItems.slice(0, 6).map((item) => `- ${item.text}`);
 
   return [
-    "Phone-Claw 요약",
+    "ixi-O Agent 요약",
     "",
     `세션: ${payload.sessionId}`,
     `입력: ${payload.sourceRefs.sourceSystem} / ${payload.sourceRefs.sourceMode}`,
@@ -583,7 +583,7 @@ function buildCalendarTitle(payload: ReturnType<typeof buildSafeSessionPayload>)
       .replace(/\s+/g, " ")
       .slice(0, 48)
       .trim();
-  return source ? `Phone-Claw: ${source}` : "Phone-Claw 후속 일정";
+  return source ? `ixi-O Agent: ${source}` : "ixi-O Agent 후속 일정";
 }
 
 function extractFirstMatch(text: string, patterns: RegExp[]): string | null {

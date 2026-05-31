@@ -1,5 +1,5 @@
 {
-  "name": "Phone-Claw Channel Talk Sample Ingest",
+  "name": "ixi-O Agent Channel Talk Sample Ingest",
   "active": false,
   "nodes": [
     {
@@ -24,7 +24,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{$env.PHONE_CLAW_INGEST_URL || 'http://host.docker.internal:3000/api/ingest/channel-talk'}}",
+        "url": "={{$env.IXI_O_AGENT_INGEST_URL || $env.PHONE_CLAW_INGEST_URL || 'http://host.docker.internal:3000/api/ingest/channel-talk'}}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -33,8 +33,8 @@
               "value": "application/json"
             },
             {
-              "name": "x-phone-claw-ingest-secret",
-              "value": "={{$env.PHONE_CLAW_INGEST_SECRET}}"
+              "name": "x-ixi-o-agent-ingest-secret",
+              "value": "={{$env.IXI_O_AGENT_INGEST_SECRET || $env.PHONE_CLAW_INGEST_SECRET}}"
             }
           ]
         },
@@ -43,8 +43,8 @@
         "specifyBody": "json",
         "jsonBody": "={{$json}}"
       },
-      "id": "post-to-phone-claw",
-      "name": "POST Phone-Claw Ingest",
+      "id": "post-to-ixi-o-agent",
+      "name": "POST ixi-O Agent Ingest",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [780, 300]
@@ -55,7 +55,7 @@
       "main": [[{ "node": "Sample Channel Talk Payload", "type": "main", "index": 0 }]]
     },
     "Sample Channel Talk Payload": {
-      "main": [[{ "node": "POST Phone-Claw Ingest", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "POST ixi-O Agent Ingest", "type": "main", "index": 0 }]]
     }
   },
   "settings": {

@@ -1,4 +1,4 @@
-# Phone-Claw Demo Intro
+# ixi-O Agent Demo Intro
 
 ## Tagline
 
@@ -6,14 +6,14 @@
 
 ## One-liner
 
-Phone-Claw turns calls and meetings into private local agent context, then opens only reviewed, redacted task payloads to workflow tools.
+ixi-O Agent turns calls and meetings into private local agent context, then opens only reviewed, redacted task payloads to workflow tools.
 
 ## Demo Flow
 
 ```text
 1. Channel Talk phone/user-chat history enters n8n.
-2. n8n sends the event or backfilled messages into the local Phone-Claw bridge.
-3. Phone-Claw stores raw source, transcript, and agent draft files under private-voice-inbox.
+2. n8n sends the event or backfilled messages into the local ixi-O Agent bridge.
+3. ixi-O Agent stores raw source, transcript, and agent draft files under private-voice-inbox.
 4. The local web UI opens a session detail page.
 5. EXAONE local processing creates a summary, urgency, teams, and action items.
 6. A human reviews the output.
@@ -51,7 +51,7 @@ pnpm build
 set -a; source .env.local; set +a
 curl -fsS http://localhost:3000/api/sessions
 curl -fsS \
-  -H "x-phone-claw-ingest-secret: $PHONE_CLAW_INGEST_SECRET" \
+  -H "x-ixi-o-agent-ingest-secret: $IXI_O_AGENT_INGEST_SECRET" \
   http://localhost:3000/api/miso/voice-sessions/20260530T153141_utc_channel_talk_e7b435ae0b
 pnpm smoke:local
 ```

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readMisoVoiceSession } from "@phone-claw/storage";
+import { readMisoVoiceSession } from "@ixi-o-agent/storage";
 import { rejectUnauthorized } from "../auth";
 
 export const runtime = "nodejs";

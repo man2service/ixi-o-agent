@@ -12,9 +12,13 @@ services:
       - EXECUTIONS_DATA_SAVE_ON_ERROR=all
       - EXECUTIONS_DATA_PRUNE=true
       - EXECUTIONS_DATA_MAX_AGE=24
-      - PHONE_CLAW_INGEST_URL=http://host.docker.internal:3000/api/ingest/channel-talk
-      - PHONE_CLAW_OPENAPI_INGEST_URL=http://host.docker.internal:3000/api/ingest/channel-talk/openapi
-      - PHONE_CLAW_BACKFILL_URL=http://host.docker.internal:3000/api/backfill/channel-talk
+      - IXI_O_AGENT_INGEST_URL=http://host.docker.internal:3000/api/ingest/channel-talk
+      - IXI_O_AGENT_OPENAPI_INGEST_URL=http://host.docker.internal:3000/api/ingest/channel-talk/openapi
+      - IXI_O_AGENT_BACKFILL_URL=http://host.docker.internal:3000/api/backfill/channel-talk
+      - IXI_O_AGENT_INGEST_SECRET=${IXI_O_AGENT_INGEST_SECRET}
+      - PHONE_CLAW_INGEST_URL=${PHONE_CLAW_INGEST_URL}
+      - PHONE_CLAW_OPENAPI_INGEST_URL=${PHONE_CLAW_OPENAPI_INGEST_URL}
+      - PHONE_CLAW_BACKFILL_URL=${PHONE_CLAW_BACKFILL_URL}
       - PHONE_CLAW_INGEST_SECRET=${PHONE_CLAW_INGEST_SECRET}
       - CHANNEL_TALK_ACCESS_KEY=${CHANNEL_TALK_ACCESS_KEY}
       - CHANNEL_TALK_ACCESS_SECRET=${CHANNEL_TALK_ACCESS_SECRET}

@@ -1,7 +1,7 @@
 # Three Input MVP Scope
 
 > 작성일: 2026-05-30 KST
-> 목적: Phone-Claw Private Voice Bridge의 입력 후보 3개를 정의하되, MVP에서는 1개 핵심 입력으로 전체 플로우를 완성하고 Channel Talk+n8n 입력을 데모에 노출
+> 목적: ixi-O Agent Private Voice Bridge의 입력 후보 3개를 정의하되, MVP에서는 1개 핵심 입력으로 전체 플로우를 완성하고 Channel Talk+n8n 입력을 데모에 노출
 > 기준:
 > - `current/private-local-voice-agent-architecture.md`
 > - LG U+ Track: Voice AI + EXAONE 필수
@@ -52,7 +52,7 @@ Channel Talk phone/meet
 
 제품 메시지는 이렇게 정리한다.
 
-> Phone-Claw는 개발 초기에 n8n ingest를 먼저 붙여 실제 업무 통화 전사문이 쌓이게 합니다. 발표에서는 Mac 로컬 입력으로 보안형 Voice AI 흐름을 증명하고, Channel Talk 전화 내용을 n8n으로 가져오는 입력을 함께 보여주어 같은 파이프라인이 실제 업무 통화 시스템에도 붙을 수 있음을 보여줍니다.
+> ixi-O Agent는 개발 초기에 n8n ingest를 먼저 붙여 실제 업무 통화 전사문이 쌓이게 합니다. 발표에서는 Mac 로컬 입력으로 보안형 Voice AI 흐름을 증명하고, Channel Talk 전화 내용을 n8n으로 가져오는 입력을 함께 보여주어 같은 파이프라인이 실제 업무 통화 시스템에도 붙을 수 있음을 보여줍니다.
 
 ## 2. 공통 입력 계약
 
@@ -171,14 +171,14 @@ Channel Talk phone/meet
 1. **Live path**
    - Channel Talk 토큰/플랜/통화 데이터가 준비된 경우
    - n8n이 Channel Talk call log 또는 meet STT messages를 가져온다.
-   - n8n HTTP Request node가 Phone-Claw local bridge의 `/api/ingest/channel-talk`로 payload를 보낸다.
+   - n8n HTTP Request node가 ixi-O Agent local bridge의 `/api/ingest/channel-talk`로 payload를 보낸다.
 
 2. **Demo-safe path**
    - live 권한이나 통화 데이터가 불안정한 경우
    - n8n에서 같은 schema의 sample payload를 만들어 `/api/ingest/channel-talk`로 보낸다.
    - 발표에서는 "실서비스에서는 Channel Talk node가 이 payload를 만든다"고 설명한다.
 
-두 경우 모두 Phone-Claw 내부에서는 `channel_talk_n8n` source의 `VoiceSessionDraft`로 정규화된다.
+두 경우 모두 ixi-O Agent 내부에서는 `channel_talk_n8n` source의 `VoiceSessionDraft`로 정규화된다.
 
 ### 장점
 
@@ -211,7 +211,7 @@ Channel Talk phone/meet
 2. meet message id를 찾는다.
 3. STT messages를 가져온다.
 4. transcript가 없으면 recording signed URL을 가져와 fallback STT를 실행한다.
-5. Phone-Claw `/api/ingest/channel-talk`가 `VoiceSessionDraft`로 정규화한다.
+5. ixi-O Agent `/api/ingest/channel-talk`가 `VoiceSessionDraft`로 정규화한다.
 
 ## 5. Phase 3: iPhone Safari/PWA 버튼 녹음
 
@@ -285,7 +285,7 @@ ixiO가 전사문을 제공하지 못하는 경우에도 같은 방식으로 녹
    - 가장 안정적인 발표 경로
    - 제출 MVP의 core end-to-end 입력
 
-2. **Channel Talk phone -> n8n -> Phone-Claw**
+2. **Channel Talk phone -> n8n -> ixi-O Agent**
    - B2B/콜센터 확장 시나리오
    - MISO workflow와 연결
    - Private Mode와는 별도 연동 모드로 설명

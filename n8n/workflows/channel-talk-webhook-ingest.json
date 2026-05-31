@@ -1,15 +1,15 @@
 {
-  "name": "Phone-Claw Channel Talk Webhook Ingest Draft",
+  "name": "ixi-O Agent Channel Talk Webhook Ingest Draft",
   "active": false,
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "channel-talk-phone-claw",
+        "path": "channel-talk-ixi-o-agent",
         "responseMode": "responseNode"
       },
       "id": "webhook",
-      "webhookId": "phone-claw-channel-talk",
+      "webhookId": "ixi-o-agent-channel-talk",
       "name": "Channel Talk Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
@@ -18,7 +18,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{$env.PHONE_CLAW_OPENAPI_INGEST_URL || 'http://host.docker.internal:3000/api/ingest/channel-talk/openapi'}}",
+        "url": "={{$env.IXI_O_AGENT_OPENAPI_INGEST_URL || $env.PHONE_CLAW_OPENAPI_INGEST_URL || 'http://host.docker.internal:3000/api/ingest/channel-talk/openapi'}}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -27,8 +27,8 @@
               "value": "application/json"
             },
             {
-              "name": "x-phone-claw-ingest-secret",
-              "value": "={{$env.PHONE_CLAW_INGEST_SECRET}}"
+              "name": "x-ixi-o-agent-ingest-secret",
+              "value": "={{$env.IXI_O_AGENT_INGEST_SECRET || $env.PHONE_CLAW_INGEST_SECRET}}"
             }
           ]
         },
@@ -37,8 +37,8 @@
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify($json.body || $json) }}"
       },
-      "id": "post-to-phone-claw-openapi",
-      "name": "POST Phone-Claw OpenAPI Ingest",
+      "id": "post-to-ixi-o-agent-openapi",
+      "name": "POST ixi-O Agent OpenAPI Ingest",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [520, 300]
@@ -57,9 +57,9 @@
   ],
   "connections": {
     "Channel Talk Webhook": {
-      "main": [[{ "node": "POST Phone-Claw OpenAPI Ingest", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "POST ixi-O Agent OpenAPI Ingest", "type": "main", "index": 0 }]]
     },
-    "POST Phone-Claw OpenAPI Ingest": {
+    "POST ixi-O Agent OpenAPI Ingest": {
       "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
     }
   },

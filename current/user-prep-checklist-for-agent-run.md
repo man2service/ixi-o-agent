@@ -22,8 +22,8 @@ Not currently on `PATH`:
 Use the full path:
 
 ```bash
-cd /Users/bot_mandu/Documents/Phone-Claw
-/Users/bot_mandu/.opencode/bin/opencode run 'ultrawork 현재 폴더의 문서를 읽고 Phone-Claw MVP를 구현해줘. 기존 변경은 되돌리지 말고, 테스트 가능한 작은 단계로 진행해줘.'
+cd /Users/bot_mandu/Documents/ixi-O Agent
+/Users/bot_mandu/.opencode/bin/opencode run 'ultrawork 현재 폴더의 문서를 읽고 ixi-O Agent MVP를 구현해줘. 기존 변경은 되돌리지 말고, 테스트 가능한 작은 단계로 진행해줘.'
 ```
 
 Or add this to the shell session before running:
@@ -71,16 +71,16 @@ CHANNEL_TALK_BACKFILL_PAGES=1
 CHANNEL_TALK_MESSAGE_LIMIT=100
 ```
 
-### 2. Phone-Claw Local Secret
+### 2. ixi-O Agent Local Secret
 
 Required:
 
-- One random shared secret for n8n -> Phone-Claw calls.
+- One random shared secret for n8n -> ixi-O Agent calls.
 
 Example variable:
 
 ```text
-PHONE_CLAW_INGEST_SECRET=<random-long-string>
+IXI_O_AGENT_INGEST_SECRET=<random-long-string>
 ```
 
 Do not put this in prompts, screenshots, GitHub, or docs.
@@ -221,7 +221,7 @@ pnpm build
 If the run touches ingest behavior, also verify:
 
 ```bash
-PHONE_CLAW_INGEST_SECRET=dev-secret pnpm test:ingest
+IXI_O_AGENT_INGEST_SECRET=dev-secret pnpm test:ingest
 ```
 
 For live Channel Talk checks, use temporary environment variables or ignored `.env.local`, never checked-in files.

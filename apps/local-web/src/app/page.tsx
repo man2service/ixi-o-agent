@@ -1,12 +1,13 @@
-import { getStorageDir, listStoredVoiceSessions } from "@phone-claw/storage";
+import { getStorageDir, listStoredVoiceSessions } from "@ixi-o-agent/storage";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LocalVoiceForm } from "./LocalVoiceForm";
+import { getIxiOAgentEnv } from "../lib/runtime-config";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  if (process.env.VERCEL === "1" || process.env.PHONE_CLAW_SHOWCASE_HOME === "true") {
+  if (process.env.VERCEL === "1" || getIxiOAgentEnv("SHOWCASE_HOME") === "true") {
     redirect("/showcase");
   }
 
@@ -25,7 +26,7 @@ export default async function Home() {
     <main className="shell">
       <section className="hero">
         <div>
-          <p className="eyebrow">Phone-Claw</p>
+          <p className="eyebrow">ixi-O Agent</p>
           <h1>일상의 모든 Voice를, 에이전트와 함께</h1>
           <p className="lede">
             Channel Talk 통화 전사문을 n8n과 로컬 브릿지로 받아 EXAONE으로

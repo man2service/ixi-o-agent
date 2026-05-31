@@ -61,7 +61,7 @@ export function ShowcaseDemo() {
   );
 
   return (
-    <section className="showcase-demo" id="demo-flow" aria-label="Phone-Claw demo flow">
+    <section className="showcase-demo" id="demo-flow" aria-label="ixi-O Agent demo flow">
       <div className="showcase-section-head">
         <div>
           <h2>제출 데모 플로우</h2>

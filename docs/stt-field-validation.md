@@ -1,6 +1,6 @@
 # STT Field Validation
 
-This document prepares the real-use STT checks for Phone-Claw Private Mode.
+This document prepares the real-use STT checks for ixi-O Agent Private Mode.
 
 ## Goal
 
@@ -46,7 +46,7 @@ Expected output:
 Keep the temporary transcript file for inspection:
 
 ```bash
-PHONE_CLAW_STT_KEEP_TMP=1 pnpm check:stt /absolute/path/to/sample.wav
+IXI_O_AGENT_STT_KEEP_TMP=1 pnpm check:stt /absolute/path/to/sample.wav
 ```
 
 ## Private Mode File Upload Check

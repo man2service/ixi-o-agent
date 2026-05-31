@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readStoredVoiceSessionDetail } from "@phone-claw/storage";
+import { readStoredVoiceSessionDetail } from "@ixi-o-agent/storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

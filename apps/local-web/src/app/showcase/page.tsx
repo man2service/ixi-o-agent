@@ -30,8 +30,8 @@ const checklist = [
 ];
 
 export const metadata = {
-  title: "Phone-Claw Showcase",
-  description: "Submission-ready Phone-Claw demo mockup"
+  title: "ixi-O Agent Showcase",
+  description: "Submission-ready ixi-O Agent demo mockup"
 };
 
 export default function ShowcasePage() {
@@ -39,14 +39,14 @@ export default function ShowcasePage() {
     <main className="showcase-shell">
       <nav className="showcase-nav" aria-label="showcase navigation">
         <Link href="/showcase" className="showcase-brand">
-          <span>PC</span>
-          Phone-Claw
+          <span>IA</span>
+          ixi-O Agent
         </Link>
         <div>
           <a href="#demo-flow">Demo</a>
           <a href="#architecture">Architecture</a>
           <a href="#submission">Submission</a>
-          <a href="https://github.com/man2service/Phoneclaw">GitHub</a>
+          <a href="https://github.com/man2service/ixi-o-agent">GitHub</a>
         </div>
       </nav>
 
@@ -54,28 +54,28 @@ export default function ShowcasePage() {
         <div className="showcase-hero-copy">
           <h1>일상의 모든 Voice를, 에이전트와 함께</h1>
           <p>
-            Phone-Claw는 통화와 회의에서 생긴 음성 맥락을 로컬에서 전사/요약하고,
+            ixi-O Agent는 통화와 회의에서 생긴 음성 맥락을 로컬에서 전사/요약하고,
             Kiya와 MISO 같은 업무 에이전트가 안전하게 읽을 수 있는 작업 단위로 바꿉니다.
           </p>
           <div className="showcase-actions">
             <a className="showcase-primary" href="#demo-flow">
               데모 플로우 보기
             </a>
-            <a className="showcase-secondary" href="https://github.com/man2service/Phoneclaw">
+            <a className="showcase-secondary" href="https://github.com/man2service/ixi-o-agent">
               GitHub 보기
             </a>
           </div>
         </div>
 
-        <div className="showcase-product" aria-label="Phone-Claw product preview">
+        <div className="showcase-product" aria-label="ixi-O Agent product preview">
           <div className="showcase-product-header">
             <span>Live mock session</span>
             <strong>approved_for_external_workflow</strong>
           </div>
           <figure className="showcase-product-visual">
             <img
-              src="/assets/phone-claw-voice-bridge.png"
-              alt="Phone-Claw voice bridge concept dashboard"
+              src="/assets/ixi-o-agent-voice-bridge.png"
+              alt="ixi-O Agent voice bridge concept dashboard"
             />
           </figure>
           <div className="showcase-product-grid">
@@ -115,7 +115,7 @@ export default function ShowcasePage() {
           </div>
           <div>
             <span>Local Bridge</span>
-            <strong>n8n + Phone-Claw storage</strong>
+            <strong>n8n + ixi-O Agent storage</strong>
           </div>
           <div>
             <span>Local AI</span>

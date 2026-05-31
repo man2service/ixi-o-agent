@@ -1,4 +1,4 @@
-# Phone-Claw Overnight Run Policy - 2026-05-31
+# ixi-O Agent Overnight Run Policy - 2026-05-31
 
 ## Master Plan
 

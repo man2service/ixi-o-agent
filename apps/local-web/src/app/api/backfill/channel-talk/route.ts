@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { normalizeChannelTalkOpenApiPayload } from "@phone-claw/core";
-import { ingestChannelTalkPayload } from "@phone-claw/storage";
+import { normalizeChannelTalkOpenApiPayload } from "@ixi-o-agent/core";
+import { ingestChannelTalkPayload } from "@ixi-o-agent/storage";
+import { getIngestSecret, getIngestSecretFromRequest } from "../../../../lib/runtime-config";
 
 type BackfillRequest = {
   states?: string[];
@@ -13,8 +14,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
-  const expectedSecret = process.env.PHONE_CLAW_INGEST_SECRET;
-  const actualSecret = request.headers.get("x-phone-claw-ingest-secret");
+  const expectedSecret = getIngestSecret();
+  const actualSecret = getIngestSecretFromRequest(request);
 
   if (!expectedSecret) {
     return NextResponse.json(

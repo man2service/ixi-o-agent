@@ -3,7 +3,7 @@
 
 > 작성일: 2026-05-29
 > 행사: OBA WEEKENDTHON, 2026-05-30(토) ~ 2026-05-31(일), 카카오 AI 캠퍼스
-> 기준 문서: `Phone-Claw/current/ixi-o-agent-memory-mvp.md`
+> 기준 문서: `ixi-O Agent/current/ixi-o-agent-memory-mvp.md`
 > 상태: v2 — 질문 기반 보강 반영
 
 ---

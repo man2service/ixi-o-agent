@@ -1,8 +1,8 @@
-# Phone-Claw
+# ixi-O Agent
 
 일상의 모든 Voice를, 에이전트와 함께.
 
-Phone-Claw is a private local voice bridge for the OBA Weekend-thon S1 build. It turns call, meeting, and voice-note context into local agent-ready files, then prepares redacted handoff payloads for workflow tools such as MISO.
+ixi-O Agent is a private local voice bridge for the OBA Weekend-thon S1 build. It turns call, meeting, and voice-note context into local agent-ready files, then prepares redacted handoff payloads for workflow tools such as MISO.
 
 ## Current MVP
 
@@ -11,7 +11,7 @@ Phone-Claw is a private local voice bridge for the OBA Weekend-thon S1 build. It
 - Local private voice frontdoor for pasted meeting/call transcripts, browser microphone recording, and optional local audio files
 - n8n workflows for sample ingest, webhook ingest, polling, and manual backfill
 - Local Next.js dashboard with demo golden-path status and session review screen
-- Storage contract under `PHONE_CLAW_STORAGE_DIR/sessions`
+- Storage contract under `IXI_O_AGENT_STORAGE_DIR/sessions`
 - Local STT small model and EXAONE 1.2B GGUF smoke-tested on the Mac mini M4
 - Local EXAONE post-processing for summaries, urgency, teams, and action items
 - Restricted MISO-facing API/OpenAPI draft that exposes only reviewed, redacted handoff payloads
@@ -22,14 +22,14 @@ Phone-Claw is a private local voice bridge for the OBA Weekend-thon S1 build. It
 ## Demo Path
 
 ```text
-Channel Talk or Local Voice -> Phone-Claw local inbox -> EXAONE local processing
+Channel Talk or Local Voice -> ixi-O Agent local inbox -> EXAONE local processing
   -> Kiya summary -> optional Kiya calendar confirmation -> human review -> redacted MISO handoff proposal
 ```
 
 Public Vercel showcase:
 
 ```text
-https://phoneclaw-showcase.vercel.app
+https://ixi-o-agent.vercel.app
 ```
 
 The Vercel page is a safe submission mockup. It does not include raw
@@ -52,8 +52,8 @@ For the judging-oriented summary, demo script, sponsor fit, architecture diagram
 Fresh Apple Silicon Mac:
 
 ```bash
-git clone https://github.com/man2service/Phoneclaw.git
-cd Phoneclaw
+git clone https://github.com/man2service/ixi-o-agent.git
+cd ixi-o-agent
 brew install fnm
 fnm install 20.20.2
 fnm use 20.20.2
@@ -65,10 +65,14 @@ cp .env.example .env.local
 Edit `.env.local` locally. Do not commit it. At minimum, set:
 
 ```text
-PHONE_CLAW_STORAGE_DIR=./private-voice-inbox
-PHONE_CLAW_INGEST_SECRET=<random-local-secret>
+IXI_O_AGENT_STORAGE_DIR=./private-voice-inbox
+IXI_O_AGENT_INGEST_SECRET=<random-local-secret>
 N8N_ENCRYPTION_KEY=<random-local-secret>
 ```
+
+Existing `PHONE_CLAW_*` environment variables and `x-phone-claw-ingest-secret`
+headers are still accepted as legacy aliases, but new setups should use
+`IXI_O_AGENT_*` and `x-ixi-o-agent-ingest-secret`.
 
 Run:
 

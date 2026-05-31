@@ -6,7 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   outputFileTracingRoot: path.join(__dirname, "../.."),
-  transpilePackages: ["@phone-claw/core", "@phone-claw/storage"]
+  transpilePackages: ["@ixi-o-agent/core", "@ixi-o-agent/storage"]
 };
 
 export default nextConfig;

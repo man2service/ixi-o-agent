@@ -4,14 +4,14 @@ Updated: 2026-05-31 KST
 
 ## Goal
 
-Channel Talk should push realtime user-chat events into local n8n, then n8n normalizes or backfills the full chat history into Phone-Claw.
+Channel Talk should push realtime user-chat events into local n8n, then n8n normalizes or backfills the full chat history into ixi-O Agent.
 
 ```text
 Channel Talk Webhook
   -> Cloudflare Tunnel
   -> local n8n Webhook Trigger
-  -> Phone-Claw ingest/openapi endpoint
-  -> PHONE_CLAW_STORAGE_DIR/sessions
+  -> ixi-O Agent ingest/openapi endpoint
+  -> IXI_O_AGENT_STORAGE_DIR/sessions
   -> EXAONE local processing
   -> human review
   -> MISO redacted handoff proposal
@@ -22,15 +22,15 @@ Channel Talk Webhook
 The current quick tunnel is:
 
 ```text
-https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-phone-claw
+https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-ixi-o-agent
 ```
 
 This URL is ephemeral. If `cloudflared tunnel --url http://localhost:5678` is restarted, replace it with the new `trycloudflare.com` URL.
 
 The endpoint was checked on 2026-05-31 KST:
 
-- `POST {"event":"healthcheck","source":"phone-claw-tunnel-check"}` -> tunnel -> n8n returned HTTP `200`.
-- Local n8n webhook route `http://localhost:5678/webhook/channel-talk-phone-claw` also returned HTTP `200`.
+- `POST {"event":"healthcheck","source":"ixi-o-agent-tunnel-check"}` -> tunnel -> n8n returned HTTP `200`.
+- Local n8n webhook route `http://localhost:5678/webhook/channel-talk-ixi-o-agent` also returned HTTP `200`.
 
 ## Manual Registration
 
@@ -43,8 +43,8 @@ Settings > Webhook > Create new webhook
 Use:
 
 ```text
-Name: Phone-Claw n8n realtime
-URL:  https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-phone-claw
+Name: ixi-O Agent n8n realtime
+URL:  https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-ixi-o-agent
 Event: User chat / event notification
 ```
 
@@ -54,8 +54,8 @@ Keep the polling backup active even after realtime webhook registration. Channel
 
 - A persistent webhook was created from the Channel Talk UI.
 - Channel ID: `218885`
-- Webhook name: `Phone-Claw n8n realtime`
-- URL: `https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-phone-claw`
+- Webhook name: `ixi-O Agent n8n realtime`
+- URL: `https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-ixi-o-agent`
 - Scopes: `userChat.opened`, `message.created.userChat`
 - `GET /open/v5/webhooks` verifies it is present and not blocked.
 - The webhook secret/token is intentionally not committed or documented.
@@ -72,7 +72,7 @@ If the webhook event does not contain the full transcript, run the manual backfi
 ```bash
 curl -fsS -X POST \
   -H "content-type: application/json" \
-  -H "x-phone-claw-ingest-secret: $PHONE_CLAW_INGEST_SECRET" \
+  -H "x-ixi-o-agent-ingest-secret: $IXI_O_AGENT_INGEST_SECRET" \
   http://localhost:3000/api/backfill/channel-talk \
   -d '{"states":["closed","opened","snoozed"],"chatLimit":3,"chatPages":1,"messageLimit":100}'
 ```
@@ -87,7 +87,7 @@ The app process must be started with `CHANNEL_TALK_ACCESS_KEY` and `CHANNEL_TALK
 - Sent a synthetic bot message to that test chat.
 - Channel Talk delivered the event to the Cloudflare tunnel.
 - n8n forwarded it to `POST /api/ingest/channel-talk/openapi`.
-- Phone-Claw stored a local session with one transcript utterance.
+- ixi-O Agent stored a local session with one transcript utterance.
 
 Proof session:
 
@@ -96,7 +96,7 @@ Session ID: 20260530T153141_utc_channel_talk_e7b435ae0b
 UserChat ID: 6a1b02ddd976f0c7e692
 Status: pending_processing
 Utterances: 1
-Preview: Phone-Claw realtime parser-fixed proof 20260530153320: n8n 실시간 웹훅 경로가 전사문을 저장하는지 검증합니다.
+Preview: ixi-O Agent realtime parser-fixed proof 20260530153320: n8n 실시간 웹훅 경로가 전사문을 저장하는지 검증합니다.
 ```
 
 Observed actual Channel Talk v5 webhook body shape:
@@ -137,7 +137,7 @@ The first realtime proof failed before Channel Talk registration because n8n's W
 }
 ```
 
-The Phone-Claw OpenAPI ingest now unwraps that `body`, accepts JSON string bodies, and defends against n8n's empty-key wrapper shape. The n8n HTTP Request nodes must also set:
+The ixi-O Agent OpenAPI ingest now unwraps that `body`, accepts JSON string bodies, and defends against n8n's empty-key wrapper shape. The n8n HTTP Request nodes must also set:
 
 ```json
 {
@@ -161,13 +161,13 @@ The local helper is:
 
 ```bash
 set -a; source .env.local; set +a
-CHANNEL_TALK_WEBHOOK_URL=https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-phone-claw \
+CHANNEL_TALK_WEBHOOK_URL=https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-ixi-o-agent \
 pnpm webhook:channel-talk upsert
 ```
 
 Current observed result:
 
-- `GET /open/v5/webhooks` succeeds and returns the active `Phone-Claw n8n realtime` webhook.
+- `GET /open/v5/webhooks` succeeds and returns the active `ixi-O Agent n8n realtime` webhook.
 - `PATCH /open/v5/webhooks/{id}` succeeds and updates the current quick tunnel URL.
 - `POST /open/v5/webhooks` with the documented `scopes: ["userChatOpened"]` shape returned Channel Talk HTTP `500`.
 - v5 variants with `apiVersion`, `blocked`, and `keywords` also returned HTTP `500`.

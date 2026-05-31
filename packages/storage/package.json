@@ -1,5 +1,5 @@
 {
-  "name": "@phone-claw/storage",
+  "name": "@ixi-o-agent/storage",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -7,7 +7,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@phone-claw/core": "workspace:*"
+    "@ixi-o-agent/core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.15.24",

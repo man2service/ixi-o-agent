@@ -1,4 +1,4 @@
-# Phone-Claw Submission Pack
+# ixi-O Agent Submission Pack
 
 ## Tagline
 
@@ -6,7 +6,7 @@
 
 ## One-Liner
 
-Phone-Claw turns calls, meetings, and voice notes into private local agent context, then exposes only reviewed, redacted handoff payloads to workflow tools such as MISO.
+ixi-O Agent turns calls, meetings, and voice notes into private local agent context, then exposes only reviewed, redacted handoff payloads to workflow tools such as MISO.
 
 ## Problem
 
@@ -14,17 +14,17 @@ Phone-Claw turns calls, meetings, and voice notes into private local agent conte
 
 ## Solution
 
-Phone-Claw is a local voice bridge:
+ixi-O Agent is a local voice bridge:
 
 1. Collect voice-derived text from Channel Talk/n8n or the local Private Mode form.
-2. Store source material and transcripts only under the local `PHONE_CLAW_STORAGE_DIR`.
+2. Store source material and transcripts only under the local `IXI_O_AGENT_STORAGE_DIR`.
 3. Use local EXAONE post-processing to create summary, urgency, teams, action items, and review reasons.
 4. Require human review before any external workflow handoff.
 5. Expose only redacted payloads through the restricted MISO-facing API.
 
 ## Public Showcase
 
-- Vercel showcase: `https://phoneclaw-showcase.vercel.app`
+- Vercel showcase: `https://ixi-o-agent.vercel.app`
 - Static source: `apps/showcase-static/`
 - Local Next.js version: `http://localhost:3000/showcase`
 
@@ -36,9 +36,9 @@ model execution, Channel Talk credentials, or any customer data.
 ```mermaid
 flowchart LR
   A["Channel Talk call/user chat"] --> B["n8n realtime webhook"]
-  C["Private Mode local meeting input"] --> D["Phone-Claw local app"]
+  C["Private Mode local meeting input"] --> D["ixi-O Agent local app"]
   B --> D
-  D --> E["PHONE_CLAW_STORAGE_DIR/sessions"]
+  D --> E["IXI_O_AGENT_STORAGE_DIR/sessions"]
   E --> F["Local EXAONE processing"]
   F --> G["Human review gate"]
   G --> H["Restricted MISO-facing API"]
@@ -55,13 +55,13 @@ LG U+ Track:
 
 GS Neotek / MISO Track:
 
-- Phone-Claw proposes a practical inbound handoff pattern for MISO workflows.
+- ixi-O Agent proposes a practical inbound handoff pattern for MISO workflows.
 - Current MISO path is a restricted custom tool/OpenAPI and MCP proposal, not an unsupported direct push.
 - The API blocks payload access until human review approves external workflow use.
 
 ## Demo Script
 
-1. Open `https://phoneclaw-showcase.vercel.app` for the public overview.
+1. Open `https://ixi-o-agent.vercel.app` for the public overview.
 2. Show the interactive mock flow: Voice 수집, EXAONE 후처리, Kiya 전달, MISO 제안.
 3. Open `http://localhost:3000` for the real local demo.
 4. Show `Private Mode` as the local meeting/voice input path.
@@ -89,7 +89,7 @@ pnpm smoke:local
 ## Demo Evidence
 
 - Realtime Channel Talk webhook proof session: `20260530T153141_utc_channel_talk_e7b435ae0b`
-- Current GitHub repo: `https://github.com/man2service/Phoneclaw`
+- Current GitHub repo: `https://github.com/man2service/ixi-o-agent`
 - Main docs:
   - `README.md`
   - `docs/demo-intro.md`
@@ -102,12 +102,14 @@ pnpm smoke:local
 
 - Do not commit `.env.local`, `private-voice-inbox/`, `n8n-data*/`, `models/`, raw transcripts, or audio files.
 - MISO-facing responses never include raw audio or raw transcript text.
-- `PHONE_CLAW_INGEST_SECRET` protects local ingest/MISO tool endpoints.
+- `IXI_O_AGENT_INGEST_SECRET` protects local ingest/MISO tool endpoints.
+- Legacy `PHONE_CLAW_*` env vars and `x-phone-claw-ingest-secret` headers remain
+  readable only to keep existing local demos from breaking during the rename.
 - Human review is required before external workflow access.
 
 ## Known Limitations
 
 - Channel Talk webhook creation through Open API returned server-side `500`; the working registration path is Channel Talk UI.
 - Cloudflare quick tunnel URLs are ephemeral and must be updated after restart.
-- MISO direct inbound voice event ingest is not documented; Phone-Claw provides a custom tool/OpenAPI and MCP proposal instead.
+- MISO direct inbound voice event ingest is not documented; ixi-O Agent provides a custom tool/OpenAPI and MCP proposal instead.
 - ixi-O direct integration is a planned extension: “ixi-O 통화와 연동하여 더 강력해져요”.

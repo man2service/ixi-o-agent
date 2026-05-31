@@ -1,9 +1,9 @@
 # Channel Talk + n8n Implementation Prerequisites
 
 > 작성일: 2026-05-30 KST
-> 목적: Channel Talk 전화/Meet 전사문을 n8n으로 먼저 끌어와 Phone-Claw 입력으로 쌓기 위해 사용자가 미리 처리하거나 결정해야 할 항목 정리
+> 목적: Channel Talk 전화/Meet 전사문을 n8n으로 먼저 끌어와 ixi-O Agent 입력으로 쌓기 위해 사용자가 미리 처리하거나 결정해야 할 항목 정리
 > 결정: n8n을 기본 자동화 허브로 사용
-> 구현 우선순위: `Phone-Claw ingest endpoint` -> `n8n sample workflow` -> `Channel Talk webhook realtime ingest` -> `n8n HTTP Request polling backup` -> `manual historical backfill` -> `fallback status only`
+> 구현 우선순위: `ixi-O Agent ingest endpoint` -> `n8n sample workflow` -> `Channel Talk webhook realtime ingest` -> `n8n HTTP Request polling backup` -> `manual historical backfill` -> `fallback status only`
 > 최신 결정: 다른 기능을 붙이기 전에 n8n을 먼저 연결한다. STT/EXAONE 처리는 뒤에 붙더라도 transcript session은 먼저 누적한다.
 
 ---
@@ -12,14 +12,14 @@
 
 채널톡 전사문 수집은 n8n을 기본 경유 레이어로 둔다. 이유는 단순히 채널톡 하나를 붙이기 위해서가 아니라, 이후 Slack/Email/MISO 실험/ixiO adapter 같은 추가 작업도 n8n workflow로 이어 붙이기 위해서다.
 
-처음부터 live 통화를 완전 자동 수집하려고 하지는 않는다. 다만 sample payload도 **n8n workflow를 통해** Phone-Claw로 보낸다.
+처음부터 live 통화를 완전 자동 수집하려고 하지는 않는다. 다만 sample payload도 **n8n workflow를 통해** ixi-O Agent로 보낸다.
 
 가장 안전한 순서:
 
 ```text
-1. Phone-Claw /api/ingest/channel-talk endpoint 구현
+1. ixi-O Agent /api/ingest/channel-talk endpoint 구현
 2. n8n sample workflow에서 `sample-data/channel-talk-normalized.json` 형태 payload POST
-3. Phone-Claw 세션 저장/중복 방지/전사문 누적 확인
+3. ixi-O Agent 세션 저장/중복 방지/전사문 누적 확인
 4. Channel Talk webhook을 n8n으로 받아 realtime ingest 구성
 5. webhook 누락에 대비해 2분 polling backup 구성
 6. 빌딩/테스트용 manual historical backfill 구성
@@ -95,28 +95,28 @@ Fallback B: 로컬 n8n npm/desktop
 Fallback C: n8n Cloud
 
 - 장점: webhook URL이 외부에서 접근 가능하다.
-- 단점: n8n Cloud에서 내 Mac의 `localhost`는 접근할 수 없다. Phone-Claw endpoint를 tunnel로 열거나, 중간 public endpoint가 필요하다.
+- 단점: n8n Cloud에서 내 Mac의 `localhost`는 접근할 수 없다. ixi-O Agent endpoint를 tunnel로 열거나, 중간 public endpoint가 필요하다.
 
 이번 구현 결정:
 
 ```text
-초기 구현: n8n sample workflow -> Phone-Claw /api/ingest/channel-talk
-실시간 연결: Channel Talk webhook -> n8n Webhook Trigger -> Phone-Claw
-백업 연결: n8n Schedule Trigger -> Channel Talk Open API polling -> Phone-Claw
-수동 테스트: n8n Manual Trigger -> date range backfill -> Phone-Claw
+초기 구현: n8n sample workflow -> ixi-O Agent /api/ingest/channel-talk
+실시간 연결: Channel Talk webhook -> n8n Webhook Trigger -> ixi-O Agent
+백업 연결: n8n Schedule Trigger -> Channel Talk Open API polling -> ixi-O Agent
+수동 테스트: n8n Manual Trigger -> date range backfill -> ixi-O Agent
 ```
 
-실제 Phone-Claw endpoint 주소는 n8n 실행 방식에 따라 다르게 둔다.
+실제 ixi-O Agent endpoint 주소는 n8n 실행 방식에 따라 다르게 둔다.
 
 ```text
 # n8n이 Docker container일 때
-PHONE_CLAW_INGEST_URL=http://host.docker.internal:3000/api/ingest/channel-talk
+IXI_O_AGENT_INGEST_URL=http://host.docker.internal:3000/api/ingest/channel-talk
 
 # n8n이 같은 Mac의 npm/desktop process일 때
-PHONE_CLAW_INGEST_URL=http://localhost:3000/api/ingest/channel-talk
+IXI_O_AGENT_INGEST_URL=http://localhost:3000/api/ingest/channel-talk
 
 # n8n Cloud일 때
-PHONE_CLAW_INGEST_URL=https://<tunnel-or-public-url>/api/ingest/channel-talk
+IXI_O_AGENT_INGEST_URL=https://<tunnel-or-public-url>/api/ingest/channel-talk
 ```
 
 Source:
@@ -194,7 +194,7 @@ Channel Talk Webhook
   -> Wait or retry until transcript is ready
   -> Get Meets Messages
   -> Normalize
-  -> POST Phone-Claw /api/ingest/channel-talk
+  -> POST ixi-O Agent /api/ingest/channel-talk
 ```
 
 Backup polling:
@@ -205,7 +205,7 @@ Schedule Trigger every 2 minutes
   -> userChatId / meetMessageId 추출
   -> Get Meets Messages
   -> Normalize
-  -> POST Phone-Claw /api/ingest/channel-talk
+  -> POST ixi-O Agent /api/ingest/channel-talk
 ```
 
 Manual historical backfill:
@@ -217,7 +217,7 @@ Manual Trigger
   -> Split in batches
   -> Get Meets Messages
   -> Normalize
-  -> POST Phone-Claw /api/ingest/channel-talk
+  -> POST ixi-O Agent /api/ingest/channel-talk
 ```
 
 Manual backfill은 `lastSuccessfulPollAt`을 바꾸지 않는다.
@@ -239,7 +239,7 @@ Manual backfill은 `lastSuccessfulPollAt`을 바꾸지 않는다.
 ```text
 POST /api/ingest/channel-talk
 Content-Type: application/json
-x-phone-claw-ingest-secret: <PHONE_CLAW_INGEST_SECRET>
+x-ixi-o-agent-ingest-secret: <IXI_O_AGENT_INGEST_SECRET>
 ```
 
 ### 4.2 Request payload
@@ -357,36 +357,36 @@ secret 오류: 401 unauthorized
 CHANNEL_TALK_ACCESS_KEY=...
 CHANNEL_TALK_ACCESS_SECRET=...
 CHANNEL_TALK_CHANNEL_ID=...          # 알 수 있으면 저장. API 응답에서 가져와도 됨
-PHONE_CLAW_INGEST_SECRET=...         # n8n -> Phone-Claw 호출 보호용 shared secret
+IXI_O_AGENT_INGEST_SECRET=...         # n8n -> ixi-O Agent 호출 보호용 shared secret
 ```
 
-`PHONE_CLAW_INGEST_URL`은 실행 방식별로 나눈다.
+`IXI_O_AGENT_INGEST_URL`은 실행 방식별로 나눈다.
 
 ```text
 # n8n Docker
-PHONE_CLAW_INGEST_URL=http://host.docker.internal:3000/api/ingest/channel-talk
+IXI_O_AGENT_INGEST_URL=http://host.docker.internal:3000/api/ingest/channel-talk
 
 # n8n npm/desktop
-PHONE_CLAW_INGEST_URL=http://localhost:3000/api/ingest/channel-talk
+IXI_O_AGENT_INGEST_URL=http://localhost:3000/api/ingest/channel-talk
 
 # n8n Cloud
-PHONE_CLAW_INGEST_URL=https://<tunnel-or-public-url>/api/ingest/channel-talk
+IXI_O_AGENT_INGEST_URL=https://<tunnel-or-public-url>/api/ingest/channel-talk
 ```
 
 로컬 n8n 예시:
 
 ```text
 N8N_URL=http://localhost:5678
-PHONE_CLAW_INGEST_URL=http://host.docker.internal:3000/api/ingest/channel-talk  # n8n이 Docker일 때
-PHONE_CLAW_INGEST_URL=http://localhost:3000/api/ingest/channel-talk             # n8n이 같은 host process일 때
+IXI_O_AGENT_INGEST_URL=http://host.docker.internal:3000/api/ingest/channel-talk  # n8n이 Docker일 때
+IXI_O_AGENT_INGEST_URL=http://localhost:3000/api/ingest/channel-talk             # n8n이 같은 host process일 때
 ```
 
 주의:
 
 - n8n을 Docker로 띄우면 컨테이너 안의 `localhost`는 Mac host가 아니라 n8n 컨테이너 자신이다.
-- 이 경우 Mac host의 Phone-Claw dev server는 보통 `host.docker.internal`로 접근한다.
+- 이 경우 Mac host의 ixi-O Agent dev server는 보통 `host.docker.internal`로 접근한다.
 - Channel Talk webhook이 로컬 n8n에 도달하려면 tunnel 또는 public endpoint가 필요하다.
-- n8n Cloud를 쓰면 `localhost` 접근이 불가능하므로 Phone-Claw 호출에도 tunnel 또는 public endpoint가 필요하다.
+- n8n Cloud를 쓰면 `localhost` 접근이 불가능하므로 ixi-O Agent 호출에도 tunnel 또는 public endpoint가 필요하다.
 - n8n execution data에는 전사문 payload가 남을 수 있다. 실제 데이터 수집 전에는 성공 실행 저장을 끄거나 보관 기간을 짧게 둔다.
 
 권장 n8n 실행 데이터 설정:
@@ -408,7 +408,7 @@ EXECUTIONS_DATA_MAX_AGE=24
 lastSuccessfulPollAt
 ```
 
-Phone-Claw의 dedupe 처리가 최종 방어선이다. n8n cursor가 흔들려 같은 payload가 다시 들어와도 endpoint는 `duplicate`로 응답하고 기존 세션을 보존해야 한다.
+ixi-O Agent의 dedupe 처리가 최종 방어선이다. n8n cursor가 흔들려 같은 payload가 다시 들어와도 endpoint는 `duplicate`로 응답하고 기존 세션을 보존해야 한다.
 
 Manual historical backfill은 `lastSuccessfulPollAt`을 수정하지 않는다.
 
@@ -422,20 +422,20 @@ Manual historical backfill은 `lastSuccessfulPollAt`을 수정하지 않는다.
 6. 통화 종료 후 채널톡 화면에 전사/요약/녹음이 남는지 확인한다.
 7. 로컬 n8n을 실행할 방법을 정한다: Docker / npm / desktop 중 하나.
 8. Channel Talk webhook URL을 n8n Webhook Trigger에 연결한다.
-9. Phone-Claw endpoint 보호용 shared secret을 하나 정한다.
+9. ixi-O Agent endpoint 보호용 shared secret을 하나 정한다.
 10. n8n execution data 보관 설정을 위 권장값에 맞춘다.
 
 ## 7. 구현 순서
 
 1. 저장 폴더 설정과 session folder 생성 로직 작성
-2. `x-phone-claw-ingest-secret` 검증 추가
+2. `x-ixi-o-agent-ingest-secret` 검증 추가
 3. payload validation 추가
 4. session store와 dedupe 처리 추가
 5. `/api/ingest/channel-talk` 구현
 6. transcript markdown 변환
 7. `sample-data/channel-talk-normalized.json` 작성
 8. 로컬 n8n sample workflow 작성
-9. n8n HTTP Request node에서 Phone-Claw endpoint POST
+9. n8n HTTP Request node에서 ixi-O Agent endpoint POST
 10. Channel Talk webhook realtime workflow 작성
 11. Channel Talk API credential 연결
 12. 2분 polling backup workflow 작성

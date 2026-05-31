@@ -1,6 +1,6 @@
 # Local n8n Docker
 
-Phone-Claw uses n8n as the automation hub for Channel Talk ingest.
+ixi-O Agent uses n8n as the automation hub for Channel Talk ingest.
 
 ## Current Local Setup
 
@@ -24,9 +24,9 @@ EXECUTIONS_DATA_SAVE_ON_SUCCESS=none \
 EXECUTIONS_DATA_SAVE_ON_ERROR=all \
 EXECUTIONS_DATA_PRUNE=true \
 EXECUTIONS_DATA_MAX_AGE=24 \
-PHONE_CLAW_INGEST_URL=http://localhost:3000/api/ingest/channel-talk \
-PHONE_CLAW_OPENAPI_INGEST_URL=http://localhost:3000/api/ingest/channel-talk/openapi \
-PHONE_CLAW_BACKFILL_URL=http://localhost:3000/api/backfill/channel-talk \
+IXI_O_AGENT_INGEST_URL=http://localhost:3000/api/ingest/channel-talk \
+IXI_O_AGENT_OPENAPI_INGEST_URL=http://localhost:3000/api/ingest/channel-talk/openapi \
+IXI_O_AGENT_BACKFILL_URL=http://localhost:3000/api/backfill/channel-talk \
 fnm exec --using 20.20.2 -- pnpm dlx n8n@1.118.2
 ```
 
@@ -45,19 +45,19 @@ N8N_OWNER_PASSWORD
 
 Imported workflows:
 
-- `Phone-Claw Channel Talk Webhook Ingest Draft`
-- `Phone-Claw Channel Talk Polling Backup`
-- `Phone-Claw Channel Talk Manual Backfill`
-- `Phone-Claw Channel Talk Sample Ingest`
+- `ixi-O Agent Channel Talk Webhook Ingest Draft`
+- `ixi-O Agent Channel Talk Polling Backup`
+- `ixi-O Agent Channel Talk Manual Backfill`
+- `ixi-O Agent Channel Talk Sample Ingest`
 
 Import command:
 
 ```bash
 set -a; source .env.local; set +a
 N8N_USER_FOLDER="$PWD/n8n-data-v1" \
-PHONE_CLAW_INGEST_URL=http://localhost:3000/api/ingest/channel-talk \
-PHONE_CLAW_OPENAPI_INGEST_URL=http://localhost:3000/api/ingest/channel-talk/openapi \
-PHONE_CLAW_BACKFILL_URL=http://localhost:3000/api/backfill/channel-talk \
+IXI_O_AGENT_INGEST_URL=http://localhost:3000/api/ingest/channel-talk \
+IXI_O_AGENT_OPENAPI_INGEST_URL=http://localhost:3000/api/ingest/channel-talk/openapi \
+IXI_O_AGENT_BACKFILL_URL=http://localhost:3000/api/backfill/channel-talk \
 fnm exec --using 20.20.2 -- pnpm dlx n8n@1.118.2 import:workflow --separate --input=./n8n/workflows
 ```
 
@@ -73,19 +73,19 @@ editor or with the local REST API.
 Realtime webhook URL:
 
 ```text
-http://localhost:5678/webhook/channel-talk-phone-claw
+http://localhost:5678/webhook/channel-talk-ixi-o-agent
 ```
 
 When exposed through Cloudflare Tunnel, use:
 
 ```text
-https://<trycloudflare-host>/webhook/channel-talk-phone-claw
+https://<trycloudflare-host>/webhook/channel-talk-ixi-o-agent
 ```
 
 Current quick-tunnel URL for the active demo session:
 
 ```text
-https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-phone-claw
+https://chamber-institutes-improvement-birth.trycloudflare.com/webhook/channel-talk-ixi-o-agent
 ```
 
 Quick-tunnel URLs change when the tunnel restarts. See
@@ -110,7 +110,7 @@ Open:
 http://localhost:5678
 ```
 
-## Phone-Claw URL From Docker
+## ixi-O Agent URL From Docker
 
 When n8n runs in Docker, `localhost` points to the n8n container. Use:
 
@@ -159,7 +159,7 @@ n8n/workflows/channel-talk-manual-backfill.json
 Or run it directly from the terminal:
 
 ```bash
-PHONE_CLAW_INGEST_SECRET=replace-with-local-random-secret \
+IXI_O_AGENT_INGEST_SECRET=replace-with-local-random-secret \
 CHANNEL_TALK_ACCESS_KEY=... \
 CHANNEL_TALK_ACCESS_SECRET=... \
 pnpm backfill:channel-talk

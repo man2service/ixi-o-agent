@@ -1,7 +1,7 @@
 # n8n Automation Hub Plan
 
 > 작성일: 2026-05-30 KST
-> 결정: Phone-Claw는 Channel Talk 입력부터 n8n을 기본 자동화 허브로 붙인다.
+> 결정: ixi-O Agent는 Channel Talk 입력부터 n8n을 기본 자동화 허브로 붙인다.
 > 최신 업데이트: 개발 착수 순서는 `n8n ingest/storage`를 먼저 만들고, 수집 방식은 `webhook-first + polling backup + manual backfill`로 둔다.
 > 목적: 이후 다른 입력/후속 작업도 같은 방식으로 확장할 수 있게 n8n의 역할과 경계를 고정한다.
 
@@ -9,12 +9,12 @@
 
 ## 1. 결론
 
-n8n은 이번 프로젝트에서 단순 데모 도구가 아니다. Phone-Claw 주변의 자동화 허브로 둔다.
+n8n은 이번 프로젝트에서 단순 데모 도구가 아니다. ixi-O Agent 주변의 자동화 허브로 둔다.
 
 ```text
 External systems / SaaS / scheduled jobs
   -> n8n workflows
-  -> Phone-Claw ingest endpoints
+  -> ixi-O Agent ingest endpoints
   -> local session storage
   -> STT/EXAONE/review/handoff pipeline
 ```
@@ -31,14 +31,14 @@ Channel Talk phone/meet transcript
   -> {storageDir}/sessions/{sessionId}
 ```
 
-여기서 "n8n-first"는 Phone-Claw의 핵심 처리 철학을 바꾸는 뜻이 아니다. 원본 음성의 로컬 STT/EXAONE 골든패스는 그대로 두되, 실제 개발은 외부 전사문을 쌓아두는 ingest 레이어부터 만든다는 뜻이다.
+여기서 "n8n-first"는 ixi-O Agent의 핵심 처리 철학을 바꾸는 뜻이 아니다. 원본 음성의 로컬 STT/EXAONE 골든패스는 그대로 두되, 실제 개발은 외부 전사문을 쌓아두는 ingest 레이어부터 만든다는 뜻이다.
 
 ## 2. 왜 n8n을 먼저 붙이는가
 
 - 사용자가 다른 기능을 구현하는 동안에도 전사문/상담 payload를 자동으로 쌓을 수 있다.
 - Channel Talk 이후에도 Slack, Email, MISO 실험, ixiO adapter, scheduled cleanup 같은 후속 작업을 같은 방식으로 붙일 수 있다.
 - 해커톤 데모에서 "Voice input -> workflow automation -> agent-ready output" 그림이 더 선명해진다.
-- MISO에 직접 push할 표준 ingest API가 아직 불확실하므로, n8n이 외부 시스템과 Phone-Claw 사이의 완충 레이어가 된다.
+- MISO에 직접 push할 표준 ingest API가 아직 불확실하므로, n8n이 외부 시스템과 ixi-O Agent 사이의 완충 레이어가 된다.
 
 ## 3. n8n의 책임
 
@@ -49,10 +49,10 @@ n8n이 담당한다:
 - Channel Talk API 호출
 - sample payload 주입
 - API 응답 normalize
-- Phone-Claw ingest endpoint 호출
+- ixi-O Agent ingest endpoint 호출
 - 실패 시 재시도 또는 execution log 확인
 
-Phone-Claw가 담당한다:
+ixi-O Agent가 담당한다:
 
 - payload schema validation
 - session folder 생성
@@ -71,14 +71,14 @@ Phone-Claw가 담당한다:
 ```text
 Manual Trigger
   -> Set node: channel-talk-normalized payload
-  -> HTTP Request: POST Phone-Claw /api/ingest/channel-talk
+  -> HTTP Request: POST ixi-O Agent /api/ingest/channel-talk
   -> optional: execution result display
 ```
 
 목적:
 
-- n8n이 실제로 Phone-Claw endpoint를 호출할 수 있는지 확인
-- Phone-Claw 세션 저장 구조 확인
+- n8n이 실제로 ixi-O Agent endpoint를 호출할 수 있는지 확인
+- ixi-O Agent 세션 저장 구조 확인
 - 이후 live Channel Talk API 응답을 같은 schema로 바꿔 끼울 준비
 
 ### 4.2 Polling Ingest Workflow
@@ -91,7 +91,7 @@ Schedule Trigger every 2 minutes
   -> Get userChatId / meetMessageId
   -> Get Meets Messages
   -> Normalize transcript
-  -> HTTP Request: POST Phone-Claw /api/ingest/channel-talk
+  -> HTTP Request: POST ixi-O Agent /api/ingest/channel-talk
 ```
 
 목적:
@@ -111,7 +111,7 @@ Channel Talk Webhook
   -> Wait or retry until transcript is ready
   -> Get Meets Messages
   -> Normalize transcript
-  -> HTTP Request: POST Phone-Claw /api/ingest/channel-talk
+  -> HTTP Request: POST ixi-O Agent /api/ingest/channel-talk
 ```
 
 주의:
@@ -133,13 +133,13 @@ Manual Trigger
   -> Find meet message
   -> Get Meets Messages
   -> Normalize transcript
-  -> HTTP Request: POST Phone-Claw /api/ingest/channel-talk
+  -> HTTP Request: POST ixi-O Agent /api/ingest/channel-talk
 ```
 
 원칙:
 
 - manual backfill은 `lastSuccessfulPollAt`을 바꾸지 않는다.
-- 중복 방지는 Phone-Claw dedupe가 담당한다.
+- 중복 방지는 ixi-O Agent dedupe가 담당한다.
 - 기본 조회 범위는 최근 24시간, 필요하면 사용자가 date range를 넣는다.
 - 오래된 내역 import는 데모/개발용이며, 개인정보가 포함될 수 있으므로 실행 결과 저장 정책을 지킨다.
 
@@ -151,7 +151,7 @@ Manual Trigger
 If transcript missing or transcribe failed in a later phase
   -> Get Meets Recording
   -> pass recordingUrl or downloaded file reference
-  -> Phone-Claw local STT fallback
+  -> ixi-O Agent local STT fallback
 ```
 
 이번 1차 구현에서는 transcript-only로 시작한다. transcript가 없거나 `transcribeFailed`인 통화는 `skipped_no_transcript` 또는 `fallback_pending` 상태로 저장하고, 실제 recording 다운로드/STT fallback은 후속 작업으로 미룬다.
@@ -166,28 +166,28 @@ If transcript missing or transcribe failed in a later phase
 
 이유:
 
-- Phone-Claw local bridge와 같은 Mac에서 통신하기 쉽다.
+- ixi-O Agent local bridge와 같은 Mac에서 통신하기 쉽다.
 - 원본/전사문을 최대한 로컬 쪽에 두는 제품 메시지와 맞다.
 - n8n Cloud는 Mac의 `localhost`에 접근할 수 없어 tunnel/public endpoint가 필요하다.
 
 주의:
 
 - n8n을 Docker로 띄우면 컨테이너 안의 `localhost`는 Mac host가 아니다.
-- Docker n8n에서 Mac host의 Phone-Claw를 부를 때는 보통 `host.docker.internal`을 사용한다.
+- Docker n8n에서 Mac host의 ixi-O Agent를 부를 때는 보통 `host.docker.internal`을 사용한다.
 - Channel Talk webhook을 직접 받으려면 tunnel 또는 public endpoint가 필요하다.
 
 로컬 Docker 기준 endpoint:
 
 ```text
 N8N_URL=http://localhost:5678
-PHONE_CLAW_INGEST_URL=http://host.docker.internal:3000/api/ingest/channel-talk
+IXI_O_AGENT_INGEST_URL=http://host.docker.internal:3000/api/ingest/channel-talk
 ```
 
 ## 6. 보안 원칙
 
 - Channel Talk API key는 n8n credential 또는 `.env`에만 둔다.
 - `Access Key`, `Access Secret`은 GitHub, 문서, 스크린샷에 노출하지 않는다.
-- n8n -> Phone-Claw 호출에는 `PHONE_CLAW_INGEST_SECRET` shared secret을 둔다.
+- n8n -> ixi-O Agent 호출에는 `IXI_O_AGENT_INGEST_SECRET` shared secret을 둔다.
 - Channel Talk 입력은 Private Mode가 아니라 Integration Mode로 표시한다.
 - MISO에는 원본 음성/원문 전사문을 보내지 않고 redacted payload만 준비한다.
 
@@ -200,7 +200,7 @@ EXECUTIONS_DATA_PRUNE=true
 EXECUTIONS_DATA_MAX_AGE=24
 ```
 
-n8n은 장기 저장소가 아니다. 성공 payload 장기 보관은 Phone-Claw session folder만 신뢰한다.
+n8n은 장기 저장소가 아니다. 성공 payload 장기 보관은 ixi-O Agent session folder만 신뢰한다.
 
 ## 7. 저장 산출물
 
@@ -251,7 +251,7 @@ packages/core/
 
 ```text
 1. config/local.json 또는 env에서 storageDir 읽기
-2. `x-phone-claw-ingest-secret` header로 PHONE_CLAW_INGEST_SECRET 검증
+2. `x-ixi-o-agent-ingest-secret` header로 IXI_O_AGENT_INGEST_SECRET 검증
 3. channel_talk_n8n payload schema 검증
 4. session store + dedupe index 생성
 5. POST /api/ingest/channel-talk 구현
@@ -272,7 +272,7 @@ packages/core/
 | 항목 | 결정 |
 |---|---|
 | n8n 실행 위치 | 로컬 n8n Docker 우선, npm/desktop은 fallback |
-| Phone-Claw 호출 방식 | 로컬 n8n이면 `http://host.docker.internal:3000` 또는 Mac host URL 사용 |
+| ixi-O Agent 호출 방식 | 로컬 n8n이면 `http://host.docker.internal:3000` 또는 Mac host URL 사용 |
 | 첫 workflow | Manual Trigger + Set node + HTTP Request |
 | live 수집 | Webhook-first |
 | backup 수집 | HTTP Request node 기반 polling |
@@ -281,7 +281,7 @@ packages/core/
 | transcript 없는 통화 | 1차는 `skipped_no_transcript` 또는 `fallback_pending`, recording fallback은 후속 |
 | polling 주기 | 2분 기본, 데모 중에는 manual 실행 |
 | polling cursor | n8n static data에 `lastSuccessfulPollAt` 저장 |
-| 인증 | `x-phone-claw-ingest-secret: <PHONE_CLAW_INGEST_SECRET>` header |
+| 인증 | `x-ixi-o-agent-ingest-secret: <IXI_O_AGENT_INGEST_SECRET>` header |
 | n8n execution data | success 저장 off, error 저장 on, max age 24h |
 | sample ingest acceptance | endpoint 호출, 세션/파일 생성, duplicate 재호출 무해성까지 확인 |
 | transcript 없는 통화 상태 | 빈 transcript는 `skipped_no_transcript`, `transcribeFailed`는 `fallback_pending` |
@@ -316,7 +316,7 @@ dedupeKey = channelId + callLogId
 n8n static data에 lastSuccessfulPollAt 저장
 ```
 
-Phone-Claw는 session dedupe를 최종 방어선으로 둔다. n8n cursor가 흔들려 같은 payload가 다시 들어와도 endpoint는 idempotent하게 동작해야 한다.
+ixi-O Agent는 session dedupe를 최종 방어선으로 둔다. n8n cursor가 흔들려 같은 payload가 다시 들어와도 endpoint는 idempotent하게 동작해야 한다.
 
 Manual backfill은 polling cursor를 수정하지 않는다.
 
@@ -364,7 +364,7 @@ HTTP status:
 
 sample workflow가 합격하려면 아래가 모두 되어야 한다.
 
-- n8n Manual Trigger로 Phone-Claw endpoint 호출 성공
+- n8n Manual Trigger로 ixi-O Agent endpoint 호출 성공
 - session folder 생성
 - `source/channel-talk.payload.json` 생성
 - `source/channel-transcript.raw.md` 생성
@@ -386,5 +386,5 @@ n8n에 붙일 수 있는 다음 작업:
 
 ## 13. 남은 결정
 
-1. `PHONE_CLAW_INGEST_SECRET` 생성 방식을 `openssl rand` 같은 로컬 생성으로 둘지, 사용자가 직접 입력하게 할지
+1. `IXI_O_AGENT_INGEST_SECRET` 생성 방식을 `openssl rand` 같은 로컬 생성으로 둘지, 사용자가 직접 입력하게 할지
 2. Channel Talk API에서 meet root message를 찾는 구체 로직을 call log 기준으로 먼저 구현할지, user chat messages 기준으로 먼저 구현할지

@@ -1,14 +1,14 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Phone-Claw Restricted Voice Session Tool",
+    "title": "ixi-O Agent Restricted Voice Session Tool",
     "version": "0.1.0",
-    "description": "Restricted local API for MISO to list reviewed Phone-Claw voice sessions and read only user-approved redacted handoff payloads. Raw audio and raw transcript text are never returned."
+    "description": "Restricted local API for MISO to list reviewed ixi-O Agent voice sessions and read only user-approved redacted handoff payloads. Raw audio and raw transcript text are never returned."
   },
   "servers": [
     {
       "url": "http://localhost:3000",
-      "description": "Local Phone-Claw app. Replace with a Cloudflare Tunnel URL for MISO cloud access."
+      "description": "Local ixi-O Agent app. Replace with a Cloudflare Tunnel URL for MISO cloud access."
     }
   ],
   "security": [
@@ -21,7 +21,7 @@
       "get": {
         "operationId": "listVoiceSessions",
         "summary": "List restricted voice-session metadata",
-        "description": "Lists local Phone-Claw voice sessions without raw transcript or raw audio. Use this before reading a session detail.",
+        "description": "Lists local ixi-O Agent voice sessions without raw transcript or raw audio. Use this before reading a session detail.",
         "responses": {
           "200": {
             "description": "Voice-session metadata list",
@@ -49,7 +49,7 @@
             "name": "sessionId",
             "in": "path",
             "required": true,
-            "description": "Phone-Claw local voice session ID",
+            "description": "ixi-O Agent local voice session ID",
             "schema": {
               "type": "string"
             }
@@ -81,12 +81,12 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "description": "Use PHONE_CLAW_INGEST_SECRET as the bearer token."
+        "description": "Use IXI_O_AGENT_INGEST_SECRET as the bearer token."
       }
     },
     "responses": {
       "Unauthorized": {
-        "description": "Missing or invalid Phone-Claw local token"
+        "description": "Missing or invalid ixi-O Agent local token"
       }
     },
     "schemas": {
@@ -253,13 +253,13 @@
         ],
         "properties": {
           "schemaVersion": {
-            "const": "phone-claw.miso.voice-session.v0"
+            "const": "ixi-o-agent.miso.voice-session.v0"
           },
           "eventType": {
             "const": "voice-session.created"
           },
           "source": {
-            "const": "phone-claw-private-local-voice-bridge"
+            "const": "ixi-o-agent-private-local-voice-bridge"
           },
           "sourceSystem": {
             "type": "string",

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./styles.css";
 
 export const metadata: Metadata = {
-  title: "Phone-Claw",
+  title: "ixi-O Agent",
   description: "Local voice bridge for agent-ready work context"
 };
 

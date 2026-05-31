@@ -156,7 +156,7 @@ export function LocalVoiceForm() {
 function buildRecordingFileName(mimeType: string): string {
   const extension = mimeType.includes("mp4") || mimeType.includes("mpeg") ? "m4a" : "webm";
   const timestamp = new Date().toISOString().replaceAll(":", "").replaceAll(".", "-");
-  return `phone-claw-recording-${timestamp}.${extension}`;
+  return `ixi-o-agent-recording-${timestamp}.${extension}`;
 }
 
 function formatBytes(bytes: number): string {

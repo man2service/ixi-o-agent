@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://phone-claw.local/schemas/miso/proposed-inbound-voice-event.schema.json",
+  "$id": "https://ixi-o-agent.local/schemas/miso/proposed-inbound-voice-event.schema.json",
   "title": "Proposed MISO inbound voice-session event",
   "description": "Schema proposal for a future MISO inbound event endpoint. This is not claimed as a currently supported MISO push API.",
   "type": "object",
@@ -26,13 +26,13 @@
   ],
   "properties": {
     "schemaVersion": {
-      "const": "phone-claw.miso.voice-session.v0"
+      "const": "ixi-o-agent.miso.voice-session.v0"
     },
     "eventType": {
       "const": "voice-session.created"
     },
     "source": {
-      "const": "phone-claw-private-local-voice-bridge"
+      "const": "ixi-o-agent-private-local-voice-bridge"
     },
     "sourceSystem": {
       "type": "string",

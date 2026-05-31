@@ -1,5 +1,5 @@
 {
-  "name": "@phone-claw/local-web",
+  "name": "@ixi-o-agent/local-web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,8 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@phone-claw/core": "workspace:*",
-    "@phone-claw/storage": "workspace:*",
+    "@ixi-o-agent/core": "workspace:*",
+    "@ixi-o-agent/storage": "workspace:*",
     "next": "^15.3.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

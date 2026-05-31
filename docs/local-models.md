@@ -1,6 +1,6 @@
 # Local STT And EXAONE Models
 
-Phone-Claw keeps voice processing local for the hackathon demo.
+ixi-O Agent keeps voice processing local for the hackathon demo.
 
 ## Installed Tools
 
@@ -54,7 +54,7 @@ whisper-cli \
   -m models/whisper/ggml-small.bin \
   -f /opt/homebrew/Cellar/whisper-cpp/1.8.4/share/whisper-cpp/jfk.wav \
   -otxt \
-  -of /tmp/phone-claw-jfk
+  -of /tmp/ixi-o-agent-jfk
 ```
 
 Verified on the local Mac mini M4:

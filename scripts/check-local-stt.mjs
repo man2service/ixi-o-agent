@@ -7,6 +7,7 @@ import { spawn } from "node:child_process";
 const workspaceRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const whisperCli = process.env.WHISPER_CLI_PATH ?? "whisper-cli";
 const modelPath =
+  process.env.IXI_O_AGENT_WHISPER_MODEL_PATH ??
   process.env.PHONE_CLAW_WHISPER_MODEL_PATH ??
   path.join(workspaceRoot, "models", "whisper", "ggml-small.bin");
 const audioPath = process.argv[2] ?? (await findDefaultAudioPath());
@@ -20,7 +21,7 @@ if (!audioPath) {
 await assertReadable(modelPath, "whisper_model_not_readable");
 await assertReadable(audioPath, "audio_file_not_readable");
 
-const tempRoot = await mkdtemp(path.join(tmpdir(), "phone-claw-stt-"));
+const tempRoot = await mkdtemp(path.join(tmpdir(), "ixi-o-agent-stt-"));
 const outputStem = path.join(tempRoot, "stt-output");
 
 try {
@@ -54,7 +55,7 @@ try {
     )
   );
 } finally {
-  if (process.env.PHONE_CLAW_STT_KEEP_TMP !== "1") {
+  if ((process.env.IXI_O_AGENT_STT_KEEP_TMP ?? process.env.PHONE_CLAW_STT_KEEP_TMP) !== "1") {
     await rm(tempRoot, { recursive: true, force: true });
   }
 }

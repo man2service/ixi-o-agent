@@ -2,7 +2,7 @@
 
 Updated: 2026-05-31 KST
 
-This guide is for pulling the GitHub repo on another Apple Silicon Mac and running Phone-Claw without committing any local credentials, transcripts, n8n runtime data, or model files.
+This guide is for pulling the GitHub repo on another Apple Silicon Mac and running ixi-O Agent without committing any local credentials, transcripts, n8n runtime data, or model files.
 
 ## What Works Without Secrets
 
@@ -13,14 +13,14 @@ Channel Talk realtime/backfill requires local-only Channel Talk credentials. n8n
 ## 1. Clone Or Pull
 
 ```bash
-git clone https://github.com/man2service/Phoneclaw.git
-cd Phoneclaw
+git clone https://github.com/man2service/ixi-o-agent.git
+cd ixi-o-agent
 ```
 
 If the repo already exists:
 
 ```bash
-cd /path/to/Phoneclaw
+cd /path/to/ixi-o-agent
 git pull origin main
 ```
 
@@ -61,14 +61,14 @@ openssl rand -hex 32
 Put those generated values into:
 
 ```text
-PHONE_CLAW_INGEST_SECRET=<first-random-value>
+IXI_O_AGENT_INGEST_SECRET=<first-random-value>
 N8N_ENCRYPTION_KEY=<second-random-value>
 ```
 
 Use local-only n8n owner values:
 
 ```text
-N8N_OWNER_EMAIL=phoneclaw.local@example.com
+N8N_OWNER_EMAIL=ixi-o-agent.local@example.com
 N8N_OWNER_PASSWORD=<local-password>
 ```
 
@@ -109,7 +109,7 @@ It also creates a `local_voice_upload` meeting session through the same local ap
 If port `3210` is already in use:
 
 ```bash
-PHONE_CLAW_SMOKE_PORT=3211 pnpm smoke:local
+IXI_O_AGENT_SMOKE_PORT=3211 pnpm smoke:local
 ```
 
 ## 5. Optional: Channel Talk Credentials
@@ -159,9 +159,9 @@ EXECUTIONS_DATA_SAVE_ON_SUCCESS=none \
 EXECUTIONS_DATA_SAVE_ON_ERROR=all \
 EXECUTIONS_DATA_PRUNE=true \
 EXECUTIONS_DATA_MAX_AGE=24 \
-PHONE_CLAW_INGEST_URL=http://localhost:3000/api/ingest/channel-talk \
-PHONE_CLAW_OPENAPI_INGEST_URL=http://localhost:3000/api/ingest/channel-talk/openapi \
-PHONE_CLAW_BACKFILL_URL=http://localhost:3000/api/backfill/channel-talk \
+IXI_O_AGENT_INGEST_URL=http://localhost:3000/api/ingest/channel-talk \
+IXI_O_AGENT_OPENAPI_INGEST_URL=http://localhost:3000/api/ingest/channel-talk/openapi \
+IXI_O_AGENT_BACKFILL_URL=http://localhost:3000/api/backfill/channel-talk \
 fnm exec --using 20.20.2 -- pnpm dlx n8n@1.118.2
 ```
 
@@ -170,9 +170,9 @@ Import workflows:
 ```bash
 set -a; source .env.local; set +a
 N8N_USER_FOLDER="$PWD/n8n-data-v1" \
-PHONE_CLAW_INGEST_URL=http://localhost:3000/api/ingest/channel-talk \
-PHONE_CLAW_OPENAPI_INGEST_URL=http://localhost:3000/api/ingest/channel-talk/openapi \
-PHONE_CLAW_BACKFILL_URL=http://localhost:3000/api/backfill/channel-talk \
+IXI_O_AGENT_INGEST_URL=http://localhost:3000/api/ingest/channel-talk \
+IXI_O_AGENT_OPENAPI_INGEST_URL=http://localhost:3000/api/ingest/channel-talk/openapi \
+IXI_O_AGENT_BACKFILL_URL=http://localhost:3000/api/backfill/channel-talk \
 fnm exec --using 20.20.2 -- pnpm dlx n8n@1.118.2 import:workflow --separate --input=./n8n/workflows
 ```
 
@@ -226,7 +226,7 @@ These model files are ignored by git.
 
 The dashboard includes a `Private Mode` form for local meetings, calls, and voice notes.
 
-- If you paste a transcript, Phone-Claw creates a local session immediately.
+- If you paste a transcript, ixi-O Agent creates a local session immediately.
 - If you upload an audio/video file and `whisper-cli` plus `models/whisper/ggml-small.bin` are available, the server attempts local STT.
 - If local STT is not available and no transcript was pasted, the session is saved as `fallback_pending` so the audio remains local and the transcript can be added later.
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { updateVoiceSessionReview } from "@phone-claw/storage";
+import { updateVoiceSessionReview } from "@ixi-o-agent/storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

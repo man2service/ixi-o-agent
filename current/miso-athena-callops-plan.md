@@ -12,7 +12,7 @@
 
 이번 트랙에서는 네 가지 예시 유즈케이스 중 **요청 접수·분류 에이전트**를 검증한다.
 
-Phone-Claw/ixi-O 기획은 통화 전사문을 에이전트가 읽을 수 있는 업무 메모리로 바꾸는 구조다. MISO 트랙에서는 이를 고객센터/컨택센터 업무에 맞춰 재해석한다.
+ixi-O Agent/ixi-O 기획은 통화 전사문을 에이전트가 읽을 수 있는 업무 메모리로 바꾸는 구조다. MISO 트랙에서는 이를 고객센터/컨택센터 업무에 맞춰 재해석한다.
 
 한 줄 정의:
 
@@ -49,7 +49,7 @@ MISO Document MCP 서버로 정책/SOP 문서를 조회해, 분류 결과의 근
 
 ---
 
-## 3. 기존 Phone-Claw 기획과의 연결
+## 3. 기존 ixi-O Agent 기획과의 연결
 
 기존 기획의 핵심 흐름:
 
@@ -67,7 +67,7 @@ MISO 트랙 버전:
 
 ```text
 고객 통화 전사문
-  -> Phone-Claw CallRecord
+  -> ixi-O Agent CallRecord
   -> ATHENA request classifier
   -> MISO Document MCP로 SOP/정책 검색
   -> 다음 행동 / 승인 필요 여부 / 담당 부서 제안
@@ -75,7 +75,7 @@ MISO 트랙 버전:
   -> MISO가 다음에 열어야 할 API/MCP/웹훅/스키마 제안
 ```
 
-즉, Phone-Claw는 **통화 입력 레이어**, ATHENA는 **업무 판단 레이어**, MISO는 **엔터프라이즈 워크플로우 런타임**으로 둔다.
+즉, ixi-O Agent는 **통화 입력 레이어**, ATHENA는 **업무 판단 레이어**, MISO는 **엔터프라이즈 워크플로우 런타임**으로 둔다.
 
 ---
 
@@ -151,7 +151,7 @@ ATHENA CallOps는 다음을 출력한다.
 기존 문서가 제안한 구현 루트는 다음이다.
 
 ```text
-/Users/bot_mandu/Documents/Phone-Claw/ixi-o-agent-memory/
+/Users/bot_mandu/Documents/ixi-O Agent/ixi-o-agent-memory/
 ```
 
 MISO 트랙용 확장은 기존 구조를 유지하면서 아래 파일만 추가하는 방식이 좋다.
@@ -286,7 +286,7 @@ type CallTranscriptCreatedEvent = {
     startSec?: number
     endSec?: number
   }[]
-  source: "ixi-o" | "phone-claw" | "upload" | "other"
+  source: "ixi-o" | "ixi-o-agent" | "upload" | "other"
 }
 ```
 
@@ -336,7 +336,7 @@ type ActionResultEvent = {
 
 ## 11. 최종 발표 메시지
 
-발표에서는 Phone-Claw를 전면에 세우기보다, MISO 트랙 문제정의에 맞춰 이렇게 말한다.
+발표에서는 ixi-O Agent를 전면에 세우기보다, MISO 트랙 문제정의에 맞춰 이렇게 말한다.
 
 > 우리는 고객센터 통화가 끝난 뒤 생기는 비정형 대화를, MISO 같은 엔터프라이즈 에이전트 런타임이 실행 가능한 업무 컨텍스트로 바꾸는 실험을 했습니다.
 >

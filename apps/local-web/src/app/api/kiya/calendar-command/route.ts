@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { readStoredVoiceSessionDetail } from "@phone-claw/storage";
+import { readStoredVoiceSessionDetail } from "@ixi-o-agent/storage";
 import { recordKiyaCalendarResult, type KiyaCalendarResultStatus } from "../../../../lib/kiya";
+import { isAuthorizedByIngestSecret } from "../../../../lib/runtime-config";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -95,7 +96,7 @@ function toResultStatus(action: CalendarCommandAction): KiyaCalendarResultStatus
 function buildDefaultTitle(session: Awaited<ReturnType<typeof readStoredVoiceSessionDetail>>): string {
   const summary = session?.exaone?.summary ?? session?.transcript.rawText ?? "";
   const short = summary.replace(/\s+/g, " ").slice(0, 48).trim();
-  return short ? `Phone-Claw: ${short}` : "Phone-Claw 후속 일정";
+  return short ? `ixi-O Agent: ${short}` : "ixi-O Agent 후속 일정";
 }
 
 function buildNote(action: CalendarCommandAction, body: Record<string, unknown>): string {
@@ -122,18 +123,7 @@ function buildResponseMessage(action: CalendarCommandAction): string {
 }
 
 function isAuthorized(request: Request): boolean {
-  const expected = process.env.PHONE_CLAW_INGEST_SECRET;
-  if (!expected) return true;
-  const headerSecret = request.headers.get("x-phone-claw-ingest-secret");
-  const bearerSecret = parseBearerToken(request.headers.get("authorization"));
-  return headerSecret === expected || bearerSecret === expected;
-}
-
-function parseBearerToken(value: string | null): string | undefined {
-  if (!value) return undefined;
-  const [scheme, token] = value.split(/\s+/, 2);
-  if (scheme?.toLowerCase() !== "bearer") return undefined;
-  return token;
+  return isAuthorizedByIngestSecret(request);
 }
 
 function getString(value: unknown): string | undefined {

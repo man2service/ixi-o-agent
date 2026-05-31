@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { readStoredVoiceSessionDetail } from "@phone-claw/storage";
+import { readStoredVoiceSessionDetail } from "@ixi-o-agent/storage";
 import { readLatestKiyaCalendarResult, readLatestKiyaNotification } from "../../../lib/kiya";
 
 export const dynamic = "force-dynamic";

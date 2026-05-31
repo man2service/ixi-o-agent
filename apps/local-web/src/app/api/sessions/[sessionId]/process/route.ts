@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import {
   readStoredVoiceSessionDetail,
   writeExaoneProcessingResult
-} from "@phone-claw/storage";
+} from "@ixi-o-agent/storage";
 import { processSessionWithLocalExaone } from "../../../../../lib/exaone";
 import { notifyKiyaForSession } from "../../../../../lib/kiya";
+import { getIxiOAgentEnv } from "../../../../../lib/runtime-config";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,10 +29,10 @@ export async function POST(
   const result = await processSessionWithLocalExaone(session);
   const updatedSession = await writeExaoneProcessingResult(sessionId, result);
   const kiya =
-    process.env.PHONE_CLAW_KIYA_AUTO_NOTIFY === "false"
+    getIxiOAgentEnv("KIYA_AUTO_NOTIFY") === "false"
       ? {
           skipped: true,
-          reason: "PHONE_CLAW_KIYA_AUTO_NOTIFY=false"
+          reason: "IXI_O_AGENT_KIYA_AUTO_NOTIFY=false"
         }
       : await notifyKiyaForSession(updatedSession);
 

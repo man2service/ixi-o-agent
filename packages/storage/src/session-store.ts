@@ -6,8 +6,13 @@ import {
   type ChannelTalkN8nPayload,
   type IngestResult,
   type TranscriptUtterance
-} from "@phone-claw/core";
+} from "@ixi-o-agent/core";
 import { getStorageDir } from "./config";
+
+const EXAONE_SCHEMA_VERSION = "ixi-o-agent.exaone.local-output.v0" as const;
+const MISO_SCHEMA_VERSION = "ixi-o-agent.miso.voice-session.v0" as const;
+const MISO_SOURCE = "ixi-o-agent-private-local-voice-bridge" as const;
+const LEGACY_MISO_SCHEMA_VERSION = "phone-claw.miso.voice-session.v0";
 
 type DedupeIndexEntry = {
   sessionId: string;
@@ -61,7 +66,7 @@ export type ExaoneActionItem = {
 };
 
 export type ExaoneProcessingResult = {
-  schemaVersion: "phone-claw.exaone.local-output.v0";
+  schemaVersion: "ixi-o-agent.exaone.local-output.v0";
   processedAt: string;
   engine: "exaone-local" | "fallback-local";
   modelPath: string | null;
@@ -133,9 +138,9 @@ export type MisoVoiceSessionDetail = MisoVoiceSessionSummary & {
 };
 
 export type MisoHandoffPayload = {
-  schemaVersion: "phone-claw.miso.voice-session.v0";
+  schemaVersion: "ixi-o-agent.miso.voice-session.v0";
   eventType: "voice-session.created";
-  source: "phone-claw-private-local-voice-bridge";
+  source: "ixi-o-agent-private-local-voice-bridge";
   sourceSystem: "channel_talk" | "local_voice";
   sourceMode: string;
   sessionId: string;
@@ -167,14 +172,18 @@ export async function ingestChannelTalkPayload(
 ): Promise<IngestChannelTalkResult> {
   const storageDir = getStorageDir();
   const sessionsRoot = path.join(storageDir, "sessions");
-  const indexPath = path.join(storageDir, ".phone-claw-index", "channel-talk-dedupe.json");
+  const indexPath = path.join(storageDir, ".ixi-o-agent-index", "channel-talk-dedupe.json");
+  const legacyIndexPath = path.join(storageDir, ".phone-claw-index", "channel-talk-dedupe.json");
 
   await mkdir(path.dirname(indexPath), { recursive: true });
   await mkdir(sessionsRoot, { recursive: true });
 
   const dedupeKey = buildDedupeKey(payload);
   const payloadHash = hashJson(payload);
-  const index = await readDedupeIndex(indexPath);
+  const index = {
+    ...(await readDedupeIndex(legacyIndexPath)),
+    ...(await readDedupeIndex(indexPath))
+  };
   const existing = index[dedupeKey];
 
   if (existing && existing.payloadHash === payloadHash) {
@@ -372,7 +381,7 @@ export async function writeExaoneProcessingResult(
 
   const normalizedResult: ExaoneProcessingResult = {
     ...result,
-    schemaVersion: "phone-claw.exaone.local-output.v0",
+    schemaVersion: EXAONE_SCHEMA_VERSION,
     processedAt: result.processedAt || new Date().toISOString(),
     humanReviewRequired: true
   };
@@ -670,9 +679,9 @@ function buildInitialMisoHandoffPayload(args: {
   const redactedPreview = redactText(toRawText(payload.transcript)).slice(0, 360);
 
   return {
-    schemaVersion: "phone-claw.miso.voice-session.v0",
+    schemaVersion: MISO_SCHEMA_VERSION,
     eventType: "voice-session.created",
-    source: "phone-claw-private-local-voice-bridge",
+    source: MISO_SOURCE,
     sourceSystem: payload.source === "local_voice_upload" ? "local_voice" : "channel_talk",
     sourceMode: payload.mode,
     sessionId,
@@ -709,9 +718,9 @@ function buildMisoHandoffPayloadFromProcessed(args: {
   const { agentDraft, metadata, result, reviewStatus, sessionId } = args;
 
   return {
-    schemaVersion: "phone-claw.miso.voice-session.v0",
+    schemaVersion: MISO_SCHEMA_VERSION,
     eventType: "voice-session.created",
-    source: "phone-claw-private-local-voice-bridge",
+    source: MISO_SOURCE,
     sourceSystem:
       getString(agentDraft, ["source"]) === "local_voice_upload" ? "local_voice" : "channel_talk",
     sourceMode: getString(metadata, ["mode"]) ?? "call",
@@ -874,7 +883,7 @@ function normalizeExaoneResult(value: unknown): ExaoneProcessingResult | undefin
       : "unknown";
 
   return {
-    schemaVersion: "phone-claw.exaone.local-output.v0",
+    schemaVersion: EXAONE_SCHEMA_VERSION,
     processedAt: getString(value, ["processedAt"]) ?? "",
     engine: getString(value, ["engine"]) === "exaone-local" ? "exaone-local" : "fallback-local",
     modelPath: getNullableString(value, ["modelPath"]),
@@ -892,10 +901,15 @@ function normalizeExaoneResult(value: unknown): ExaoneProcessingResult | undefin
 
 function normalizeMisoHandoffPayload(value: unknown): MisoHandoffPayload | undefined {
   if (!isRecord(value)) return undefined;
-  if (getString(value, ["schemaVersion"]) !== "phone-claw.miso.voice-session.v0") {
+  const schemaVersion = getString(value, ["schemaVersion"]);
+  if (schemaVersion !== MISO_SCHEMA_VERSION && schemaVersion !== LEGACY_MISO_SCHEMA_VERSION) {
     return undefined;
   }
-  return value as MisoHandoffPayload;
+  return {
+    ...value,
+    schemaVersion: MISO_SCHEMA_VERSION,
+    source: MISO_SOURCE
+  } as MisoHandoffPayload;
 }
 
 function normalizeActionItems(value: unknown[] | undefined): ExaoneActionItem[] {

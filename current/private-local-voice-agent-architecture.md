@@ -32,7 +32,7 @@
 
 제품명/슬로건 후보:
 
-> Phone-Claw Private Voice Bridge: 일상의 모든 voice를 에이전트에게 안전하게 전하는 로컬 브릿지
+> ixi-O Agent Private Voice Bridge: 일상의 모든 voice를 에이전트에게 안전하게 전하는 로컬 브릿지
 
 제품이 해결하는 문제:
 
@@ -373,7 +373,7 @@ EXAONE: EXAONE 4.0 1.2B Q4
 ## 9. MVP 구현 순서
 
 1. 저장 폴더 설정과 `{storageDir}/sessions/{sessionId}` 생성 로직을 만든다.
-2. `PHONE_CLAW_INGEST_SECRET` 검증 규칙을 둔다.
+2. `IXI_O_AGENT_INGEST_SECRET` 검증 규칙을 둔다.
 3. `/api/ingest/channel-talk` endpoint를 만든다.
 4. `channel_talk_n8n` adapter가 n8n normalized payload를 `VoiceSessionDraft`로 바꾼다.
 5. `source/channel-talk.payload.json`, `source/channel-transcript.raw.md`, `transcript/transcript.raw.md`를 저장한다.
@@ -436,7 +436,7 @@ EXAONE: EXAONE 4.0 1.2B Q4
 ```text
 1. 로컬 n8n workflow 수동 실행
 2. sample Channel Talk payload POST
-3. Phone-Claw가 세션 폴더 생성
+3. ixi-O Agent가 세션 폴더 생성
 4. source/channel-talk.payload.json 저장
 5. transcript/transcript.raw.md 저장
 6. 세션 상태는 pending_processing
@@ -444,7 +444,7 @@ EXAONE: EXAONE 4.0 1.2B Q4
 
 발표 포인트:
 
-> Phone-Claw는 처리 모델이 붙기 전에도 업무 음성 이벤트를 잃지 않고 쌓아둘 수 있습니다. 이후 로컬 EXAONE 처리기가 준비되면 쌓인 세션을 같은 계약으로 후처리합니다.
+> ixi-O Agent는 처리 모델이 붙기 전에도 업무 음성 이벤트를 잃지 않고 쌓아둘 수 있습니다. 이후 로컬 EXAONE 처리기가 준비되면 쌓인 세션을 같은 계약으로 후처리합니다.
 
 ### Expansion Demo
 
@@ -475,7 +475,7 @@ MISO는 실행/워크플로우 레이어로 둔다. 문서상 외부 voice event
 
 ```json
 {
-  "source": "phone-claw-private-local-voice-bridge",
+  "source": "ixi-o-agent-private-local-voice-bridge",
   "sourceMode": "private_local",
   "mode": "meeting",
   "title": "장애 보상 검토 회의",
@@ -500,11 +500,11 @@ MISO는 실행/워크플로우 레이어로 둔다. 문서상 외부 voice event
 
 짧은 버전:
 
-> Phone-Claw는 일상의 모든 음성을 에이전트가 이해할 수 있는 업무 입력으로 바꾸는 로컬 Voice Bridge입니다. 음성 파일, 전사문, EXAONE 후처리는 사용자의 Mac 또는 개인 서버에서 처리되고, 외부 워크플로우에는 사람이 승인한 결과만 전달됩니다.
+> ixi-O Agent는 일상의 모든 음성을 에이전트가 이해할 수 있는 업무 입력으로 바꾸는 로컬 Voice Bridge입니다. 음성 파일, 전사문, EXAONE 후처리는 사용자의 Mac 또는 개인 서버에서 처리되고, 외부 워크플로우에는 사람이 승인한 결과만 전달됩니다.
 
 LG U+ 트랙 버전:
 
-> 우리는 Voice AI를 클라우드 STT 호출로만 보지 않았습니다. 민감한 통화와 회의가 실제 업무 에이전트로 이어지려면 로컬 처리와 승인 게이트가 필요합니다. Phone-Claw는 로컬 STT와 EXAONE 후처리로 음성을 구조화하고, MISO 같은 워크플로우에는 안전하게 정리된 payload만 전달합니다.
+> 우리는 Voice AI를 클라우드 STT 호출로만 보지 않았습니다. 민감한 통화와 회의가 실제 업무 에이전트로 이어지려면 로컬 처리와 승인 게이트가 필요합니다. ixi-O Agent는 로컬 STT와 EXAONE 후처리로 음성을 구조화하고, MISO 같은 워크플로우에는 안전하게 정리된 payload만 전달합니다.
 
 ## 13. 지금 열어둘 결정
 

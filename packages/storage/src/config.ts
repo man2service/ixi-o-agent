@@ -22,7 +22,7 @@ export function getWorkspaceRoot(startDir = process.cwd()): string {
 
 export function getStorageDir(): string {
   const root = getWorkspaceRoot();
-  const envDir = process.env.PHONE_CLAW_STORAGE_DIR;
+  const envDir = process.env.IXI_O_AGENT_STORAGE_DIR ?? process.env.PHONE_CLAW_STORAGE_DIR;
   if (envDir) {
     return path.resolve(root, envDir);
   }
@@ -37,4 +37,3 @@ export function getStorageDir(): string {
 
   return path.join(root, "private-voice-inbox");
 }
-

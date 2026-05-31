@@ -5,11 +5,11 @@ content. Use synthetic or explicitly approved data for public demos.
 
 ## Goal
 
-Show the full Phone-Claw loop:
+Show the full ixi-O Agent loop:
 
 ```text
 Channel Talk or Private Mode
-  -> local Phone-Claw inbox
+  -> local ixi-O Agent inbox
   -> EXAONE/local processing
   -> human review
   -> redacted MISO-facing handoff
@@ -48,13 +48,13 @@ Expected:
 Kiya outbound delivery is automatic after EXAONE processing unless disabled:
 
 ```text
-PHONE_CLAW_KIYA_AUTO_NOTIFY=true
+IXI_O_AGENT_KIYA_AUTO_NOTIFY=true
 ```
 
 To disable automatic delivery:
 
 ```text
-PHONE_CLAW_KIYA_AUTO_NOTIFY=false
+IXI_O_AGENT_KIYA_AUTO_NOTIFY=false
 ```
 
 Optional live settings:
@@ -66,7 +66,7 @@ TELEGRAM_BOT_TOKEN=
 TELEGRAM_KIYA_CHAT_ID=
 ```
 
-If `HERMES_AGENT_WEBHOOK_URL` is empty, Phone-Claw uses a local planner to detect
+If `HERMES_AGENT_WEBHOOK_URL` is empty, ixi-O Agent uses a local planner to detect
 only calendar-worthy follow-ups. Kiya receives the summary message first. A
 second calendar-confirmation prompt is sent only when the session looks
 schedulable. If Telegram credentials are empty, the route returns a dry-run
@@ -83,7 +83,7 @@ demo can prove the outbound payload even before live Telegram credentials are
 configured.
 
 If Kiya/Hermes later performs the calendar action, it can record the result
-without Phone-Claw owning calendar execution:
+without ixi-O Agent owning calendar execution:
 
 ```text
 POST /api/sessions/{sessionId}/kiya-calendar-result
@@ -98,7 +98,7 @@ directly:
 ```bash
 curl -fsS -X POST \
   -H "content-type: application/json" \
-  -H "x-phone-claw-ingest-secret: $PHONE_CLAW_INGEST_SECRET" \
+  -H "x-ixi-o-agent-ingest-secret: $IXI_O_AGENT_INGEST_SECRET" \
   http://localhost:3000/api/kiya/calendar-command \
   -d '{"command":"pc:cal:ok:SESSION_ID"}'
 ```
@@ -142,9 +142,9 @@ EXECUTIONS_DATA_SAVE_ON_SUCCESS=none \
 EXECUTIONS_DATA_SAVE_ON_ERROR=all \
 EXECUTIONS_DATA_PRUNE=true \
 EXECUTIONS_DATA_MAX_AGE=24 \
-PHONE_CLAW_INGEST_URL=http://localhost:3000/api/ingest/channel-talk \
-PHONE_CLAW_OPENAPI_INGEST_URL=http://localhost:3000/api/ingest/channel-talk/openapi \
-PHONE_CLAW_BACKFILL_URL=http://localhost:3000/api/backfill/channel-talk \
+IXI_O_AGENT_INGEST_URL=http://localhost:3000/api/ingest/channel-talk \
+IXI_O_AGENT_OPENAPI_INGEST_URL=http://localhost:3000/api/ingest/channel-talk/openapi \
+IXI_O_AGENT_BACKFILL_URL=http://localhost:3000/api/backfill/channel-talk \
 fnm exec --using 20.20.2 -- pnpm dlx n8n@1.118.2
 ```
 
@@ -156,10 +156,10 @@ http://localhost:5678
 
 Confirm these workflows are imported:
 
-- `Phone-Claw Channel Talk Webhook Ingest Draft`
-- `Phone-Claw Channel Talk Polling Backup`
-- `Phone-Claw Channel Talk Manual Backfill`
-- `Phone-Claw Channel Talk Sample Ingest`
+- `ixi-O Agent Channel Talk Webhook Ingest Draft`
+- `ixi-O Agent Channel Talk Polling Backup`
+- `ixi-O Agent Channel Talk Manual Backfill`
+- `ixi-O Agent Channel Talk Sample Ingest`
 
 ## Start Cloudflare Tunnel
 
@@ -172,7 +172,7 @@ cloudflared tunnel --url http://localhost:5678
 Copy the generated `https://*.trycloudflare.com` URL and append:
 
 ```text
-/webhook/channel-talk-phone-claw
+/webhook/channel-talk-ixi-o-agent
 ```
 
 ## Channel Talk Webhook
@@ -182,7 +182,7 @@ Use the Channel Talk UI for live demo runs:
 
 1. Open Channel Talk settings.
 2. Go to webhook settings.
-3. Update or create `Phone-Claw n8n realtime`.
+3. Update or create `ixi-O Agent n8n realtime`.
 4. Set scopes to:
 
 ```text
@@ -230,9 +230,9 @@ pnpm webhook:channel-talk list
 
 If live Channel Talk webhook delivery is unreliable:
 
-1. Run `Phone-Claw Channel Talk Sample Ingest`.
-2. Or run `Phone-Claw Channel Talk Manual Backfill`.
-3. Show the resulting local session in Phone-Claw.
+1. Run `ixi-O Agent Channel Talk Sample Ingest`.
+2. Or run `ixi-O Agent Channel Talk Manual Backfill`.
+3. Show the resulting local session in ixi-O Agent.
 
 ## Shutdown
 

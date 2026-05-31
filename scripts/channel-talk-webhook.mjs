@@ -1,7 +1,7 @@
 const accessKey = process.env.CHANNEL_TALK_ACCESS_KEY;
 const accessSecret = process.env.CHANNEL_TALK_ACCESS_SECRET;
 const action = process.argv[2] ?? process.env.CHANNEL_TALK_WEBHOOK_ACTION ?? "list";
-const webhookName = process.env.CHANNEL_TALK_WEBHOOK_NAME ?? "Phone-Claw n8n realtime";
+const webhookName = process.env.CHANNEL_TALK_WEBHOOK_NAME ?? "ixi-O Agent n8n realtime";
 const webhookUrl = process.env.CHANNEL_TALK_WEBHOOK_URL;
 const scopes = (process.env.CHANNEL_TALK_WEBHOOK_SCOPES ?? "message.created.userChat,userChat.opened")
   .split(",")

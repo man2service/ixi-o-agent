@@ -1,5 +1,5 @@
 {
-  "name": "Phone-Claw Channel Talk Polling Backup",
+  "name": "ixi-O Agent Channel Talk Polling Backup",
   "active": false,
   "nodes": [
     {
@@ -28,7 +28,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{$env.PHONE_CLAW_BACKFILL_URL || 'http://host.docker.internal:3000/api/backfill/channel-talk'}}",
+        "url": "={{$env.IXI_O_AGENT_BACKFILL_URL || $env.PHONE_CLAW_BACKFILL_URL || 'http://host.docker.internal:3000/api/backfill/channel-talk'}}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -37,8 +37,8 @@
               "value": "application/json"
             },
             {
-              "name": "x-phone-claw-ingest-secret",
-              "value": "={{$env.PHONE_CLAW_INGEST_SECRET}}"
+              "name": "x-ixi-o-agent-ingest-secret",
+              "value": "={{$env.IXI_O_AGENT_INGEST_SECRET || $env.PHONE_CLAW_INGEST_SECRET}}"
             }
           ]
         },
@@ -48,7 +48,7 @@
         "jsonBody": "={{$json}}"
       },
       "id": "post-backfill",
-      "name": "Run Phone-Claw Backfill",
+      "name": "Run ixi-O Agent Backfill",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [780, 300]
@@ -59,7 +59,7 @@
       "main": [[{ "node": "Polling Settings", "type": "main", "index": 0 }]]
     },
     "Polling Settings": {
-      "main": [[{ "node": "Run Phone-Claw Backfill", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Run ixi-O Agent Backfill", "type": "main", "index": 0 }]]
     }
   },
   "settings": {

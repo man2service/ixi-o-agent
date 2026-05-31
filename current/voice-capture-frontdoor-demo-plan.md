@@ -201,7 +201,7 @@ MISO에는 최종적으로 `miso-payload.json`을 넘긴다.
 
 ```json
 {
-  "source": "phone-claw-voice-frontdoor",
+  "source": "ixi-o-agent-voice-frontdoor",
   "mode": "meeting",
   "title": "장애 보상 검토 회의",
   "summary": "...",

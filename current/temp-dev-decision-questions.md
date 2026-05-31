@@ -43,13 +43,13 @@ MISO: 직접 전송 아님, redacted payload 생성 + copy/download + 제안 sch
 
 1. 채널톡 live 계정을 바로 연결할지, 먼저 n8n sample payload 저장 파이프라인부터 만들지 -> **결정: n8n sample payload 저장 파이프라인 먼저**
 2. n8n을 cloud로 쓸지, 로컬/self-host로 쓸지 -> **결정: 로컬 n8n Docker 우선**
-3. Phone-Claw local bridge를 n8n에서 호출할 방법을 `localhost`, LAN IP, tunnel 중 무엇으로 둘지 -> **임시 결정: 로컬 n8n Docker면 `host.docker.internal`, npm/desktop이면 `localhost`**
+3. ixi-O Agent local bridge를 n8n에서 호출할 방법을 `localhost`, LAN IP, tunnel 중 무엇으로 둘지 -> **임시 결정: 로컬 n8n Docker면 `host.docker.internal`, npm/desktop이면 `localhost`**
 4. 채널톡 전사문이 아직 없을 때 녹음 URL fallback까지 구현할지, transcript-only로 시작할지 -> **결정: transcript-only로 시작**
 5. Channel Talk verified node를 설치할지, HTTP Request node로 시작할지 -> **결정: HTTP Request node로 시작**
 6. 실시간 수집은 webhook으로 할지 polling으로 할지 -> **결정: webhook-first, polling backup**
 7. polling 주기는 몇 분으로 둘지 -> **임시 결정: 2분**
 8. 빌딩 중 과거 내역 import 방식 -> **결정: manual historical backfill workflow**
-9. Phone-Claw ingest secret 전달 방식 -> **결정: `x-phone-claw-ingest-secret` header**
+9. ixi-O Agent ingest secret 전달 방식 -> **결정: `x-ixi-o-agent-ingest-secret` header**
 10. n8n execution data 보관 -> **임시 결정: 성공 실행 저장 끄기, 오류 실행만 저장, max age 24시간**
 11. Channel Talk sample ingest 합격 기준 -> **결정: endpoint 호출, 세션/파일 생성, duplicate 재호출 무해성까지 확인**
 
