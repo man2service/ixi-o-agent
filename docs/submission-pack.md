@@ -39,8 +39,11 @@ It does not include raw transcripts, local model execution, Channel Talk
 credentials, or any customer data.
 
 Design implementation note: the showcase uses ixi-O Agent's own semantic CSS
-tokens and components. Toss UI Kit assets are not copied or imported; see
-`docs/tds-inspired-design-system.md` for the source review and license boundary.
+tokens and components. Toss UI Kit assets are not copied or imported. Visual
+materials use an LG U+ / ixi-O-inspired palette with LG RED as the primary
+anchor and a restrained digital purple secondary accent; see
+`docs/tds-inspired-design-system.md` for the source review, token locations,
+and license boundary.
 
 ## Architecture
 

@@ -11,6 +11,8 @@ ixi-O Agent applies Toss Design System ideas as product design principles, not a
 - TDS Mobile ListRow: https://tossmini-docs.toss.im/tds-mobile/components/ListRow/list-row-overview/
 - TDS Mobile Segmented Control: https://tossmini-docs.toss.im/tds-mobile/components/segmented-control/
 - TDS Mobile Colors: https://tossmini-docs.toss.im/tds-mobile/foundation/colors/
+- LG CI color system: https://www.lgcorp.com/about/ci/element
+- LG U+ AI / ixi-O service context: https://www.lguplus.com/about/en/service/ai
 
 ## License Boundary
 
@@ -27,6 +29,7 @@ The Apps in Toss Figma/TDS Mobile UI Kit license restricts use of the UI Kit and
 - ListRow: represent artifacts and handoff payloads as left context, center meaning, and right status/action.
 - Segmented control: use a two-option control for Enterprise and Personal modes because only one path is active at a time.
 - Colors: use semantic variables first, then map brand colors to variables. Avoid hardcoded brand values inside components.
+- Brand expression: use LG RED as the primary anchor, restrained ixi-O digital purple only as a secondary accent, and keep the base UI neutral/TDS-like so the page does not become a one-color marketing screen.
 
 ## Token Locations
 
@@ -49,7 +52,31 @@ The main brand-editable tokens are:
 --brand-primary-hover
 --brand-primary-weak
 --brand-primary-weak-border
+--brand-secondary
+--brand-secondary-weak
+--brand-accent-warm
 --brand-focus-ring
+```
+
+Current mapping:
+
+```css
+--brand-primary: #a50034; /* LG RED, based on LG CI RGB 165 0 52 */
+--brand-primary-hover: #87002a;
+--brand-primary-weak: #fff0f5;
+--brand-primary-weak-border: #f1bad0;
+--brand-secondary: #6f2cff; /* ixi-O digital accent, not an official locked value */
+--brand-secondary-weak: #f4f0ff;
+--brand-accent-warm: #f0406d;
+--brand-focus-ring: rgba(165, 0, 52, 0.24);
+```
+
+The screenshot asset used in the showcase has also been recolored from the
+earlier teal prototype accents to this LG U+ / ixi-O palette:
+
+```text
+apps/local-web/public/assets/ixi-o-agent-voice-bridge.png
+apps/showcase-static/assets/ixi-o-agent-voice-bridge.png
 ```
 
 Neutral UI tokens are intentionally separate:
@@ -65,3 +92,5 @@ Neutral UI tokens are intentionally separate:
 ```
 
 This lets the final ixi-O Agent brand color change later without revisiting every component.
+If LG U+ or ixi-O supplies exact event-safe brand values, replace the token
+values above and regenerate the screenshot asset from the local dashboard.

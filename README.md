@@ -50,6 +50,7 @@ The public showcase and local `/showcase` page now use a TDS-inspired interactio
 - ListRow-style rows show source artifacts, meaning, and current status in one scan path.
 - Enterprise/Personal switching follows a segmented-control pattern.
 - Brand colors are isolated in `--brand-*` CSS variables so the visual identity can be changed later without rewriting component styles.
+- Current visual materials use an LG U+ / ixi-O-inspired palette: LG RED as the primary anchor, restrained digital purple as a secondary accent, and neutral TDS-like surfaces for readability.
 
 We do not copy or import Toss UI Kit assets. See `docs/tds-inspired-design-system.md` for source links, license boundary, and token locations.
 
