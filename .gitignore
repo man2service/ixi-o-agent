@@ -20,4 +20,6 @@ n8n-data/
 n8n-data-v1/
 models/
 miso/generated/
+contest-source-pack/
+docs/evidence/miso/ixi-o-agent-openapi.current-tunnel.v3.json
 .vercel

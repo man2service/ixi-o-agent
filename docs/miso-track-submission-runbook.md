@@ -76,8 +76,8 @@ As of 2026-05-31 12:57 KST:
 - App status: imported, custom tool attached, saved, shared as `현재 워크스페이스 공개`
 - Custom tool: `ixi-O Agent VoiceOps Bridge`
 - Enabled sub-tools: `listVoiceSessions`, `readVoiceSessionHandoff`
-- Current demo gateway URL: `https://<trycloudflare-host>`
-- Current live OpenAPI schema snapshot: `docs/evidence/miso/ixi-o-agent-openapi.current-tunnel.v3.json`
+- Demo gateway URL: set locally before judging, for example `https://<trycloudflare-host>`
+- Live OpenAPI schema snapshot: generate locally with `pnpm miso:openapi:v3 https://<trycloudflare-host>`
 - `listVoiceSessions` MISO tool test: passed, returned `ok: true` with 67 sessions
 - Verified session: `20260531T023933_utc_local_voice_1fa0e9c632`
 - `readVoiceSessionHandoff` MISO tool test: passed, returned approved,

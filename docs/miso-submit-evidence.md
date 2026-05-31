@@ -36,9 +36,10 @@ Captured at 2026-05-31 12:57 KST.
 - App runtime URL: `https://console.miso.gs/chatList/T4JZ5CTOJpifUz3L`
 - App share setting: `현재 워크스페이스 공개`
 - Custom tool name: `ixi-O Agent VoiceOps Bridge`
-- Current demo gateway URL: `https://<trycloudflare-host>`
-- Current live OpenAPI schema snapshot:
-  `docs/evidence/miso/ixi-o-agent-openapi.current-tunnel.v3.json`
+- Demo gateway URL: set locally before judging, for example
+  `https://<trycloudflare-host>`
+- Live OpenAPI schema snapshot: generated locally with
+  `pnpm miso:openapi:v3 https://<trycloudflare-host>`
 - Sub-tools imported: `listVoiceSessions`, `readVoiceSessionHandoff`
 - `listVoiceSessions` MISO tool test: returned `ok: true` with 67 sessions.
 - `readVoiceSessionHandoff` MISO tool test: returned `ok: true` for
