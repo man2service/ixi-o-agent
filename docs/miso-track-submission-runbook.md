@@ -50,6 +50,21 @@ Prepare these links/files for judging:
 
 ## MISO Workspace Setup
 
+### Current Hackathon Workspace State
+
+As of 2026-05-31 11:51 KST:
+
+- Workspace: `럭키밀 (모난돌컴퍼니) Team`
+- App: `ixi-O Agent VoiceOps Copilot`
+- App URL: `https://console.miso.gs/app-config/chat/a61da945-3cf7-466a-b8fe-c59a48ea07e9`
+- App status: imported, custom tool attached, saved, published
+- Custom tool: `ixi-O Agent VoiceOps Bridge`
+- Enabled sub-tools: `listVoiceSessions`, `readVoiceSessionHandoff`
+- Verified session: `20260531T023933_utc_local_voice_1fa0e9c632`
+- Verified response shape: MISO produced a business card, next actions, Human Review, and MISO interface proposal from the approved redacted handoff.
+
+The disposable MISO account password is intentionally not stored in this repo.
+
 ### 0. Run Local Web And The MISO Gateway
 
 The local Next app lives under `apps/local-web`, so a root `.env.local` is not
@@ -90,7 +105,7 @@ the public tunnel.
 ### 1. Register the Custom Tool
 
 1. Open `플레이그라운드` -> `도구 모음` -> `사용자 정의`.
-2. Create a custom tool named `ixi-O Agent Restricted Voice Session Tool`.
+2. Create a custom tool named `ixi-O Agent VoiceOps Bridge`.
 3. Paste `miso/ixi-o-agent-openapi.v3.json` first. If MISO accepts OpenAPI 3.1,
    `miso/ixi-o-agent-openapi.json` is also available.
 4. Replace `servers[0].url` before pasting:

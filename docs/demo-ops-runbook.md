@@ -100,7 +100,7 @@ curl -fsS -X POST \
   -H "content-type: application/json" \
   -H "x-ixi-o-agent-ingest-secret: $IXI_O_AGENT_INGEST_SECRET" \
   http://localhost:3000/api/kiya/calendar-command \
-  -d '{"command":"pc:cal:ok:SESSION_ID"}'
+  -d '{"command":"ixo:cal:ok:SESSION_ID"}'
 ```
 
 This records the confirmation/edit/cancel result locally. It does not create a

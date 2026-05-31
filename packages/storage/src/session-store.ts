@@ -295,9 +295,9 @@ export async function readMisoVoiceSession(
   if (!summary) return undefined;
 
   const sessionPath = path.join(sessionsRoot, sessionId);
-  const redactedPayload = (await readOptionalJson(
-    path.join(sessionPath, "handoff", "miso-payload.redacted.json")
-  )) as MisoHandoffPayload | undefined;
+  const redactedPayload = normalizeMisoHandoffPayload(
+    await readOptionalJson(path.join(sessionPath, "handoff", "miso-payload.redacted.json"))
+  );
   const availableForExternalWorkflow =
     summary.review.reviewed && summary.review.externalAllowed && Boolean(redactedPayload);
 

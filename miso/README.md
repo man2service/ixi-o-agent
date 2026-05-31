@@ -39,8 +39,13 @@ proposal in `proposed-inbound-voice-event.schema.json` and
 
 ## Security Rule
 
-The custom tool endpoints require a bearer token or `x-ixi-o-agent-ingest-secret`
-matching the local `IXI_O_AGENT_INGEST_SECRET`.
+When MISO calls the restricted gateway, it must use a bearer token matching
+`IXI_O_AGENT_MISO_GATEWAY_TOKEN`. The gateway then calls the local Next app with
+the local `IXI_O_AGENT_INGEST_SECRET`. The full local Next app should not be
+tunneled for judging.
+
+When testing the local Next API directly, use `IXI_O_AGENT_INGEST_SECRET` as
+the bearer token or `x-ixi-o-agent-ingest-secret` header.
 
 The detail endpoint does not return a handoff payload until the local review
 state has both:

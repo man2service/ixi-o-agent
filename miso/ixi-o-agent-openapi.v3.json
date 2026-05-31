@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "ixi-O Agent Restricted Voice Session Tool",
+    "title": "ixi-O Agent VoiceOps Bridge",
     "version": "0.1.0",
     "description": "Restricted local API for MISO to list reviewed ixi-O Agent voice sessions and read only user-approved redacted handoff payloads. Raw audio and raw transcript text are never returned."
   },
@@ -81,7 +81,7 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "description": "Use IXI_O_AGENT_INGEST_SECRET as the bearer token."
+        "description": "Use IXI_O_AGENT_MISO_GATEWAY_TOKEN as the bearer token when this schema is served through the restricted MISO gateway."
       }
     },
     "responses": {

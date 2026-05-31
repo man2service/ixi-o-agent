@@ -21,7 +21,7 @@ export async function POST(request: Request) {
         ok: false,
         error: "invalid_calendar_command",
         expected:
-          "Provide sessionId plus action=confirm|edit|cancel, or command=pc:cal:ok:{sessionId}"
+          "Provide sessionId plus action=confirm|edit|cancel, or command=ixo:cal:ok:{sessionId}"
       },
       { status: 400 }
     );
@@ -68,7 +68,7 @@ function parseCommand(body: Record<string, unknown>):
   const command = getString(body.command);
   if (!command) return undefined;
 
-  const match = command.match(/^pc:cal:(ok|edit|cancel):([a-zA-Z0-9_.-]+)$/);
+  const match = command.match(/^(?:ixo|pc):cal:(ok|edit|cancel):([a-zA-Z0-9_.-]+)$/);
   if (!match) return undefined;
 
   const action = match[1] === "ok" ? "confirm" : normalizeAction(match[1]);

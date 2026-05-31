@@ -107,9 +107,12 @@ Message 2: "캘린더 며칠에 일정을 추가해드릴까요?" or "내일 오
 The second message includes Telegram inline button payloads:
 
 ```text
-pc:cal:ok:<sessionId>
-pc:cal:edit:<sessionId>
+ixo:cal:ok:<sessionId>
+ixo:cal:edit:<sessionId>
 ```
+
+The local API still accepts the legacy `pc:cal:*` prefix for old demos, but new
+Kiya button payloads should use `ixo:cal:*`.
 
 Kiya/Hermes should own the actual calendar registration and modification
 conversation. ixi-O Agent does not write the calendar directly in this step.
