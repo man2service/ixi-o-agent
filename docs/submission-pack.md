@@ -17,10 +17,19 @@ Phone-Claw turns calls, meetings, and voice notes into private local agent conte
 Phone-Claw is a local voice bridge:
 
 1. Collect voice-derived text from Channel Talk/n8n or the local Private Mode form.
-2. Store source material and transcripts only in the local `private-voice-inbox`.
+2. Store source material and transcripts only under the local `PHONE_CLAW_STORAGE_DIR`.
 3. Use local EXAONE post-processing to create summary, urgency, teams, action items, and review reasons.
 4. Require human review before any external workflow handoff.
 5. Expose only redacted payloads through the restricted MISO-facing API.
+
+## Public Showcase
+
+- Vercel showcase: `https://phoneclaw-showcase.vercel.app`
+- Static source: `apps/showcase-static/`
+- Local Next.js version: `http://localhost:3000/showcase`
+
+The public showcase is a safe mockup. It does not include raw transcripts, local
+model execution, Channel Talk credentials, or any customer data.
 
 ## Architecture
 
@@ -52,12 +61,13 @@ GS Neotek / MISO Track:
 
 ## Demo Script
 
-1. Open `http://localhost:3000`.
-2. Show the four-step golden path: Voice 수집, EXAONE 후처리, Human Review, MISO 제안.
-3. Show `Private Mode` as the local meeting/voice input path.
-4. Open synthetic proof session `20260530T153141_utc_channel_talk_e7b435ae0b`.
-5. Show local transcript, EXAONE output, review approval, and MISO redacted payload.
-6. Explain that the proof session is synthetic and real customer raw transcripts are not used for external demo payloads.
+1. Open `https://phoneclaw-showcase.vercel.app` for the public overview.
+2. Show the interactive mock flow: Voice 수집, EXAONE 후처리, Kiya 전달, MISO 제안.
+3. Open `http://localhost:3000` for the real local demo.
+4. Show `Private Mode` as the local meeting/voice input path.
+5. Open synthetic proof session `20260530T153141_utc_channel_talk_e7b435ae0b`.
+6. Show local transcript, EXAONE output, review approval, and MISO redacted payload.
+7. Explain that the proof session is synthetic and real customer raw transcripts are not used for external demo payloads.
 
 ## Verification
 

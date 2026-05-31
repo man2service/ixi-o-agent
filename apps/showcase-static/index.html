@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Phone-Claw Showcase</title>
+    <meta
+      name="description"
+      content="Submission-ready Phone-Claw demo mockup for OBA Weekend-thon S1"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <nav class="nav" aria-label="showcase navigation">
+        <a class="brand" href="./">
+          <span>PC</span>
+          Phone-Claw
+        </a>
+        <div>
+          <a href="#demo-flow">Demo</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#submission">Submission</a>
+          <a href="https://github.com/man2service/Phoneclaw">GitHub</a>
+        </div>
+      </nav>
+
+      <section class="hero">
+        <div class="hero-copy">
+          <h1>일상의 모든 Voice를, 에이전트와 함께</h1>
+          <p>
+            Phone-Claw는 통화와 회의에서 생긴 음성 맥락을 로컬에서 전사/요약하고,
+            Kiya와 MISO 같은 업무 에이전트가 안전하게 읽을 수 있는 작업 단위로 바꿉니다.
+          </p>
+          <div class="actions">
+            <a class="primary" href="#demo-flow">데모 플로우 보기</a>
+            <a class="secondary" href="https://github.com/man2service/Phoneclaw">GitHub 보기</a>
+          </div>
+        </div>
+
+        <div class="product" aria-label="Phone-Claw product preview">
+          <div class="product-header">
+            <span>Live mock session</span>
+            <strong>approved_for_external_workflow</strong>
+          </div>
+          <figure class="product-visual">
+            <img
+              src="./assets/phone-claw-voice-bridge.png"
+              alt="Phone-Claw voice bridge concept dashboard"
+            />
+          </figure>
+          <div class="product-grid">
+            <article>
+              <span>Channel Talk</span>
+              <p>내일 오후 3시 픽업 일정 확인 요청</p>
+            </article>
+            <article>
+              <span>EXAONE Local</span>
+              <p>요약, 긴급도, 액션아이템 생성</p>
+            </article>
+            <article>
+              <span>Kiya Telegram</span>
+              <p>요약 전송 후 캘린더 후보 확인</p>
+            </article>
+            <article>
+              <span>MISO Handoff</span>
+              <p>검수된 비식별 payload만 공개</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="demo" id="demo-flow" aria-label="Phone-Claw demo flow">
+        <div class="section-head">
+          <div>
+            <h2>제출 데모 플로우</h2>
+            <p>
+              실제 고객 데이터 없이도 심사위원이 입력, 로컬 처리, 에이전트 전달,
+              MISO 제안 경계를 한 번에 확인할 수 있는 mock session입니다.
+            </p>
+          </div>
+        </div>
+
+        <div class="flow-grid">
+          <div class="stage-list" role="tablist" aria-label="demo stages">
+            <button class="stage selected" type="button" data-stage="ingest" aria-selected="true">
+              <span>01</span>
+              <strong>Voice 수집</strong>
+              <em>Channel Talk, 회의 녹음, 로컬 파일</em>
+            </button>
+            <button class="stage" type="button" data-stage="process" aria-selected="false">
+              <span>02</span>
+              <strong>EXAONE 후처리</strong>
+              <em>요약, 액션아이템, 긴급도</em>
+            </button>
+            <button class="stage" type="button" data-stage="kiya" aria-selected="false">
+              <span>03</span>
+              <strong>Kiya 전달</strong>
+              <em>요약 우선, 일정 후보는 별도 확인</em>
+            </button>
+            <button class="stage" type="button" data-stage="miso" aria-selected="false">
+              <span>04</span>
+              <strong>MISO 제안</strong>
+              <em>검수 후 비식별 payload만 공개</em>
+            </button>
+          </div>
+
+          <article class="live-panel">
+            <div class="panel-top">
+              <div>
+                <span class="label">Selected Artifact</span>
+                <h3 id="stage-title">채널톡 통화 전사문</h3>
+              </div>
+              <code id="stage-result">source/channel-talk.payload.json</code>
+            </div>
+            <p class="panel-detail" id="stage-detail">
+              고객이 내일 오후 3시 납품 가능 여부와 대체 픽업 시간을 문의했습니다.
+            </p>
+            <div class="result-grid">
+              <div>
+                <span>raw transcript</span>
+                <strong id="stage-raw">local only</strong>
+              </div>
+              <div>
+                <span>agent action</span>
+                <strong id="stage-action">prepare</strong>
+              </div>
+              <div>
+                <span>review gate</span>
+                <strong id="stage-review">required</strong>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="architecture" id="architecture">
+        <div class="section-head">
+          <div>
+            <h2>아키텍처 요약</h2>
+            <p>Vercel 페이지는 제출용 mockup이고, 실제 민감 처리는 로컬 Mac mini에서 실행합니다.</p>
+          </div>
+        </div>
+        <div class="architecture-line">
+          <div>
+            <span>Input</span>
+            <strong>Channel Talk / Meeting / Future ixi-O</strong>
+          </div>
+          <div>
+            <span>Local Bridge</span>
+            <strong>n8n + Phone-Claw storage</strong>
+          </div>
+          <div>
+            <span>Local AI</span>
+            <strong>Whisper small + EXAONE 1.2B</strong>
+          </div>
+          <div>
+            <span>Agent</span>
+            <strong>Kiya summary + calendar command</strong>
+          </div>
+          <div>
+            <span>Workflow</span>
+            <strong>MISO custom tool proposal</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="session">
+        <div class="section-head">
+          <div>
+            <h2>Mock 세션 인박스</h2>
+            <p>실제 제출 페이지에서는 비식별 샘플만 보여주고, 원문은 로컬 데모에서 확인합니다.</p>
+          </div>
+        </div>
+        <div class="table" role="table" aria-label="mock voice sessions">
+          <div class="table-row header" role="row">
+            <span>Source</span>
+            <span>Mode</span>
+            <span>Status</span>
+            <span>Redacted summary</span>
+          </div>
+          <div class="table-row" role="row">
+            <span>Channel Talk</span>
+            <span>call</span>
+            <span>pending review</span>
+            <span>고객이 내일 오후 3시 픽업 가능 여부와 대체 시간을 문의했습니다.</span>
+          </div>
+          <div class="table-row" role="row">
+            <span>Private Mode</span>
+            <span>meeting</span>
+            <span>kiya sent</span>
+            <span>OBA 제출 전 최종 점검 미팅을 캘린더 후보로 제안했습니다.</span>
+          </div>
+          <div class="table-row" role="row">
+            <span>Future ixi-O</span>
+            <span>call</span>
+            <span>planned</span>
+            <span>통화 앱 연동 시 동일한 voice-session 계약으로 확장합니다.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="submission" id="submission">
+        <div>
+          <h2>제출에서 보여줄 메시지</h2>
+          <p>
+            “음성은 어디에서 오든 같은 voice-session 계약으로 들어오고, 민감한 처리는
+            로컬에서 끝내며, 에이전트에는 검수된 작업 맥락만 전달한다”는 점을 가장 앞에 둡니다.
+          </p>
+        </div>
+        <ul>
+          <li>LG U+ Track: Voice AI 사례와 EXAONE 활용을 화면 첫 흐름에서 명확히 보여줍니다.</li>
+          <li>MISO Track: 직접 push가 아니라 custom tool/OpenAPI와 inbound schema 제안을 분리합니다.</li>
+          <li>Security: raw audio와 raw transcript는 로컬에 두고, 검수된 redacted payload만 외부에 엽니다.</li>
+          <li>Demo: 실제 고객 통화 없이도 mock session으로 전체 흐름을 설명할 수 있습니다.</li>
+        </ul>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>

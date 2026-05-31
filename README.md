@@ -26,6 +26,15 @@ Channel Talk or Local Voice -> Phone-Claw local inbox -> EXAONE local processing
   -> Kiya summary -> optional Kiya calendar confirmation -> human review -> redacted MISO handoff proposal
 ```
 
+Public Vercel showcase:
+
+```text
+https://phoneclaw-showcase.vercel.app
+```
+
+The Vercel page is a safe submission mockup. It does not include raw
+transcripts, local model execution, Channel Talk credentials, or customer data.
+
 The first screen is the local inbox. Click any stored session to open the detail/review view.
 
 Current synthetic full-path proof session:

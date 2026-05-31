@@ -1,10 +1,15 @@
 import { getStorageDir, listStoredVoiceSessions } from "@phone-claw/storage";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { LocalVoiceForm } from "./LocalVoiceForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
+  if (process.env.VERCEL === "1" || process.env.PHONE_CLAW_SHOWCASE_HOME === "true") {
+    redirect("/showcase");
+  }
+
   const sessions = await listStoredVoiceSessions();
   const storageDir = getStorageDir();
   const latest = sessions[0];
@@ -26,6 +31,9 @@ export default async function Home() {
             Channel Talk 통화 전사문을 n8n과 로컬 브릿지로 받아 EXAONE으로
             후처리하고, 사람이 승인한 비식별 payload만 MISO 제안 API로 엽니다.
           </p>
+          <Link className="text-button" href="/showcase">
+            제출 쇼케이스 열기
+          </Link>
         </div>
         <div className="status-strip" aria-label="ingest status">
           <div>
