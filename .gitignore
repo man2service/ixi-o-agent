@@ -21,5 +21,6 @@ n8n-data-v1/
 models/
 miso/generated/
 contest-source-pack/
+archive/legacy-research-2026-05-28/research/
 docs/evidence/miso/ixi-o-agent-openapi.current-tunnel.v3.json
 .vercel
