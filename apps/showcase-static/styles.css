@@ -151,6 +151,10 @@ p {
   font-size: 18px;
 }
 
+.hero-copy > p span {
+  display: block;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
