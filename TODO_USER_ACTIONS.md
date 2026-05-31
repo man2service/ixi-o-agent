@@ -20,6 +20,9 @@ entry, or live service approval. Do not put secrets in this file.
 
 3. If showing MISO live:
    - Confirm you can access the `럭키밀 (모난돌컴퍼니) Team` workspace in MISO.
+   - Decide whether to attach the official MISO Document MCP before judging, or
+     explicitly present Document MCP as source-grounding/proposal rather than a
+     live app dependency.
    - Start the local app with `.env.local` loaded.
    - Start `pnpm miso:gateway` in a separate terminal with a real short-lived
      token, not the `.env.example` placeholder.
