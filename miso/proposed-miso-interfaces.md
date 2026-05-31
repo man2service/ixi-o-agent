@@ -37,6 +37,8 @@ The event is deliberately narrow:
 
 - `sourceSystem`: `channel_talk` or `local_voice`
 - `sourceMode`: `call`, `meeting`, or `voice_note`
+- `eventId`, `idempotencyKey`, `issuedAt`, `expiresAt`, and `payloadHash` for
+  replay protection, deduplication, freshness checks, and payload integrity
 - `summary`, `urgency`, `requiredTeams`, `actionItems`
 - `sourceRefs` for traceability back to the source system
 - no raw audio

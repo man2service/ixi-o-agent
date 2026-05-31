@@ -11,7 +11,8 @@ push integration.
 
 ## Files
 
-- `ixi-o-agent-openapi.json`: OpenAPI 3.1 schema for registering ixi-O Agent as a MISO custom tool.
+- `ixi-o-agent-openapi.v3.json`: OpenAPI 3.0 template for registering ixi-O Agent as a MISO custom tool.
+- `ixi-o-agent-openapi.json`: OpenAPI 3.1 template, only if the MISO importer accepts OpenAPI 3.1.
 - `apps/ixi-o-agent-voiceops-copilot.yml`: importable MISO agent draft for the judging demo.
 - `samples/approved-voice-session-handoff.sample.json`: safe fallback payload for judging when live tool auth/tunnel is unstable.
 - `samples/blocked-voice-session-detail.sample.json`: safe fallback payload that proves the human-review gate.
@@ -45,8 +46,9 @@ When MISO calls the restricted gateway, it must use a bearer token matching
 the local `IXI_O_AGENT_INGEST_SECRET`. The full local Next app should not be
 tunneled for judging.
 
-The gateway fails closed when `IXI_O_AGENT_MISO_GATEWAY_TOKEN` is not set. Do
-not use the long-lived local ingest secret as the MISO tool credential.
+The gateway fails closed when `IXI_O_AGENT_MISO_GATEWAY_TOKEN` is not set or
+still contains a placeholder value. Do not use the long-lived local ingest
+secret as the MISO tool credential.
 
 When testing the local Next API directly, use `IXI_O_AGENT_INGEST_SECRET` as
 the bearer token or `x-ixi-o-agent-ingest-secret` header.
@@ -70,23 +72,53 @@ In MISO:
 
 1. Open `플레이그라운드` -> `도구 모음` -> `사용자 정의`.
 2. Create a custom tool.
-3. Paste `ixi-o-agent-openapi.v3.json` first. Use
-   `ixi-o-agent-openapi.json` only if the importer accepts OpenAPI 3.1.
+3. Paste a tunnel-specific generated OpenAPI schema. For a live cloud MISO
+   demo, do not paste the static templates as-is because their server URL is
+   local-only.
 4. Set auth as Bearer Token with `IXI_O_AGENT_MISO_GATEWAY_TOKEN`.
 5. Import sub-tools and test `listVoiceSessions`.
 6. Import `apps/ixi-o-agent-voiceops-copilot.yml` from `앱 만들기` -> `기존 앱 가져오기`.
-7. Add the custom tool to the imported app, then save and publish.
+7. Add the custom tool to the imported app, then save and share.
 
-Expose only the MISO gateway, not the full local Next app:
+Expose only the MISO gateway, not the full local Next app.
+
+Terminal 1, local Next app:
 
 ```bash
+set -a
+source .env.local
+set +a
+pnpm dev
+```
+
+Terminal 2, MISO gateway:
+
+```bash
+set -a
+source .env.local
+set +a
+export IXI_O_AGENT_MISO_GATEWAY_TOKEN=<short-lived-demo-token>
 pnpm miso:gateway
+```
+
+Terminal 3, Cloudflare tunnel:
+
+```bash
 cloudflared tunnel --url http://localhost:3321
+```
+
+Terminal 4, generate the live OpenAPI schema:
+
+```bash
 pnpm miso:openapi:v3 https://<trycloudflare-host>
 ```
 
 Then paste `miso/generated/ixi-o-agent-openapi.current-tunnel.v3.json` into
 MISO.
+
+Cloudflare quick tunnel URLs are ephemeral. If the tunnel or token changes,
+update the existing MISO custom tool schema and bearer token, then re-test
+`listVoiceSessions` and `readVoiceSessionHandoff`.
 
 For a full judging checklist, see `docs/miso-track-submission-runbook.md`.
 

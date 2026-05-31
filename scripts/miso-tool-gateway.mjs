@@ -15,8 +15,18 @@ if (!upstreamSecret) {
   process.exit(1);
 }
 
+if (looksLikePlaceholderSecret(upstreamSecret)) {
+  console.error("IXI_O_AGENT_INGEST_SECRET must be replaced with a real local secret.");
+  process.exit(1);
+}
+
 if (!gatewayToken) {
   console.error("IXI_O_AGENT_MISO_GATEWAY_TOKEN is required. Use a short-lived token for MISO.");
+  process.exit(1);
+}
+
+if (looksLikePlaceholderSecret(gatewayToken)) {
+  console.error("IXI_O_AGENT_MISO_GATEWAY_TOKEN must be replaced with a real short-lived token.");
   process.exit(1);
 }
 
@@ -79,6 +89,10 @@ function readBearerToken(value) {
   if (!value) return undefined;
   const [scheme, token] = value.split(/\s+/, 2);
   return scheme?.toLowerCase() === "bearer" ? token : undefined;
+}
+
+function looksLikePlaceholderSecret(value) {
+  return /replace-with|example|changeme|placeholder/i.test(value);
 }
 
 function sendJson(response, status, body) {

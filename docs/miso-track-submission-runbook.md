@@ -25,8 +25,8 @@ Local source files reviewed:
 
 Important constraints from the source material:
 
-- MISO apps must be saved and published before judges/team members can run the
-  latest version.
+- MISO apps must be saved and shared before judges/team members in the
+  workspace can run the latest version.
 - MISO supports custom REST tools through OpenAPI 3.x schemas.
 - MISO supports MCP tool registration.
 - The MISO track presentation frames the track as hard mode: public open APIs
@@ -40,7 +40,11 @@ Prepare these links/files for judging:
 - GitHub: `https://github.com/man2service/ixi-o-agent`
 - Public experience page: `https://ixi-o-agent.vercel.app`
 - MISO app YAML import draft: `miso/apps/ixi-o-agent-voiceops-copilot.yml`
-- MISO custom tool OpenAPI: `miso/ixi-o-agent-openapi.json`
+- MISO custom tool OpenAPI templates:
+  - `miso/ixi-o-agent-openapi.v3.json` for OpenAPI 3.0 import
+  - `miso/ixi-o-agent-openapi.json` for OpenAPI 3.1 import if accepted
+- Live tunnel OpenAPI snapshot for the current rehearsal:
+  `docs/evidence/miso/ixi-o-agent-openapi.current-tunnel.v3.json`
 - Approved fallback payload: `miso/samples/approved-voice-session-handoff.sample.json`
 - Blocked-before-review payload: `miso/samples/blocked-voice-session-detail.sample.json`
 - Interface proposal docs:
@@ -57,25 +61,36 @@ Important packaging note:
   suggested questions, model settings, and fallback behavior.
 - MISO does not export/import our local custom-tool credential binding in that
   YAML. After importing the app, manually attach the custom tool named
-  `ixi-O Agent VoiceOps Bridge`, then save and publish.
+  `ixi-O Agent VoiceOps Bridge`, then save and share it.
 - If MISO later exports tool bindings in app YAML, re-export the published app
   and replace the draft.
 
 ### Current Hackathon Workspace State
 
-As of 2026-05-31 11:51 KST:
+As of 2026-05-31 12:57 KST:
 
 - Workspace: `럭키밀 (모난돌컴퍼니) Team`
 - App: `ixi-O Agent VoiceOps Copilot`
-- App URL: `https://console.miso.gs/app-config/chat/a61da945-3cf7-466a-b8fe-c59a48ea07e9`
-- App status: imported, custom tool attached, saved, published
+- App config URL: `https://console.miso.gs/app-config/chat/a61da945-3cf7-466a-b8fe-c59a48ea07e9`
+- App runtime URL: `https://console.miso.gs/chatList/T4JZ5CTOJpifUz3L`
+- App status: imported, custom tool attached, saved, shared as `현재 워크스페이스 공개`
 - Custom tool: `ixi-O Agent VoiceOps Bridge`
 - Enabled sub-tools: `listVoiceSessions`, `readVoiceSessionHandoff`
+- Current demo gateway URL: `https://<trycloudflare-host>`
+- Current live OpenAPI schema snapshot: `docs/evidence/miso/ixi-o-agent-openapi.current-tunnel.v3.json`
+- `listVoiceSessions` MISO tool test: passed, returned `ok: true` with 67 sessions
 - Verified session: `20260531T023933_utc_local_voice_1fa0e9c632`
-- Verified response shape: MISO produced a business card, next actions, Human Review, and MISO interface proposal from the approved redacted handoff.
+- `readVoiceSessionHandoff` MISO tool test: passed, returned approved,
+  redacted handoff with no raw audio or raw transcript
+- Runtime prompt test: `승인된 voice session 목록을 보고 업무 카드로 정리해 주세요.`
+- Verified response shape: MISO produced a business card, next actions, Human
+  Review, and MISO interface proposal from the approved redacted handoff.
 - Evidence doc: `docs/miso-submit-evidence.md`
 
 The disposable MISO account password is intentionally not stored in this repo.
+Operators need access to the `럭키밀 (모난돌컴퍼니) Team` MISO workspace to use
+the live app/config URLs. If a judge or teammate lacks access, use the fallback
+JSON paste demo in Scenario B instead.
 
 ### 0. Run Local Web And The MISO Gateway
 
@@ -83,6 +98,11 @@ The local Next app lives under `apps/local-web`, so a root `.env.local` is not
 automatically loaded by `next dev` unless the variables are exported first.
 Before exposing anything to MISO, make sure `IXI_O_AGENT_INGEST_SECRET` is
 available to the running server.
+
+If you run `pnpm build` while `next dev` is already serving the local API,
+restart `next dev` before a live MISO demo. The production build can rewrite
+`.next` while the dev server is running, which may temporarily make API routes
+return 500 until the dev server is restarted.
 
 Safe local check:
 
@@ -97,17 +117,46 @@ Expected without a bearer token:
 
 Do not register the live custom tool in MISO while the endpoint returns `503`.
 
-Do not tunnel the full Next app. Start the MISO-only gateway and tunnel that
-port instead:
+Do not tunnel the full Next app. Start the local API, MISO-only gateway, and
+tunnel in separate terminals.
+
+Terminal 1, local Next app:
 
 ```bash
+set -a
+source .env.local
+set +a
+pnpm dev
+```
+
+Terminal 2, MISO gateway:
+
+```bash
+set -a
+source .env.local
+set +a
 export IXI_O_AGENT_MISO_GATEWAY_TOKEN=<short-lived-demo-token>
 pnpm miso:gateway
+```
+
+Terminal 3, Cloudflare tunnel to the gateway:
+
+```bash
 cloudflared tunnel --url http://localhost:3321
 ```
 
-`pnpm miso:gateway` fails closed if `IXI_O_AGENT_MISO_GATEWAY_TOKEN` is not set.
-Do not reuse `IXI_O_AGENT_INGEST_SECRET` as the MISO bearer token.
+Terminal 4, generate the live OpenAPI schema after the tunnel URL appears:
+
+```bash
+pnpm miso:openapi:v3 https://<trycloudflare-host>
+```
+
+Then paste `miso/generated/ixi-o-agent-openapi.current-tunnel.v3.json` into
+the existing MISO custom tool and re-test both sub-tools.
+
+`pnpm miso:gateway` fails closed if `IXI_O_AGENT_MISO_GATEWAY_TOKEN` is not set
+or still contains a placeholder value. Do not reuse `IXI_O_AGENT_INGEST_SECRET`
+as the MISO bearer token.
 
 The gateway allows only:
 
@@ -133,8 +182,11 @@ the public tunnel.
 6. Import sub-tools and test:
    - `listVoiceSessions`
    - `readVoiceSessionHandoff`
-7. Capture the tool test result and app publish state in
+7. Capture the tool test result and app share state in
    `docs/miso-submit-evidence.md` before final judging.
+8. If the tunnel or token changes, update the existing MISO custom tool schema
+   and auth token before running the live app. Cloudflare quick tunnels are
+   ephemeral and the current live URL will break after restart.
 
 Expected behavior:
 
@@ -149,7 +201,7 @@ Expected behavior:
 3. Upload `miso/apps/ixi-o-agent-voiceops-copilot.yml`.
 4. Open the imported app.
 5. Add the custom tool from step 1 to the app tools.
-6. Save and publish.
+6. Save and share.
 
 If the imported app cannot bind the custom tool automatically, keep the prompt
 and manually add the tool in the app editor.

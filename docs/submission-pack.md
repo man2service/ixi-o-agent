@@ -78,6 +78,9 @@ GS Neotek / MISO Track:
 - ixi-O Agent proposes a practical inbound handoff pattern for MISO workflows.
 - Current MISO path is a restricted custom tool/OpenAPI and MCP proposal, not an unsupported direct push.
 - The API blocks payload access until human review approves external workflow use.
+- A live MISO app now uses the restricted custom tool to read approved,
+  redacted voice-session handoffs and turn them into business cards, next
+  actions, and human-review prompts.
 
 ## Demo Script
 
@@ -90,7 +93,9 @@ GS Neotek / MISO Track:
 5. Show `Private Mode` as the local meeting/voice input path.
 6. Open synthetic proof session `20260530T153141_utc_channel_talk_e7b435ae0b`.
 7. Show local transcript, EXAONE output, review approval, and MISO redacted payload.
-8. Explain that the proof session is synthetic and real customer raw transcripts are not used for external demo payloads.
+8. Open the MISO runtime app and run:
+   `승인된 voice session 목록을 보고 업무 카드로 정리해 주세요.`
+9. Explain that the proof session is synthetic and real customer raw transcripts are not used for external demo payloads.
 
 ## FriendliAI Option
 
@@ -142,6 +147,9 @@ judges can distinguish "works without model files" from "real EXAONE ran".
 
 - Realtime Channel Talk webhook proof session: `20260530T153141_utc_channel_talk_e7b435ae0b`
 - Current GitHub repo: `https://github.com/man2service/ixi-o-agent`
+- Live MISO runtime app: `https://console.miso.gs/chatList/T4JZ5CTOJpifUz3L`
+- Live MISO app config: `https://console.miso.gs/app-config/chat/a61da945-3cf7-466a-b8fe-c59a48ea07e9`
+- Live MISO evidence: `docs/miso-submit-evidence.md`
 - Long-run goal plan: `docs/agent-goal-plan.md`
 - MISO judging runbook: `docs/miso-track-submission-runbook.md`
 - User-owned final actions: `TODO_USER_ACTIONS.md`
@@ -161,12 +169,14 @@ judges can distinguish "works without model files" from "real EXAONE ran".
 
 - Do not commit `.env.local`, `private-voice-inbox/`, `n8n-data*/`, `models/`, raw transcripts, or audio files.
 - MISO-facing responses never include raw audio or raw transcript text.
-- `IXI_O_AGENT_INGEST_SECRET` protects local ingest/MISO tool endpoints.
+- `IXI_O_AGENT_INGEST_SECRET` protects local ingest endpoints and the private
+  upstream hop from the MISO gateway to the local app.
 - Live MISO demos expose only `pnpm miso:gateway` through the tunnel, not the
   full local Next app.
 - MISO receives a short-lived `IXI_O_AGENT_MISO_GATEWAY_TOKEN`; the gateway maps
   that to the local ingest secret.
 - The gateway now fails closed if `IXI_O_AGENT_MISO_GATEWAY_TOKEN` is missing,
+  still has a placeholder value, or the local ingest secret is not configured,
   so MISO never reuses the long-lived local ingest secret as its bearer token.
 - Legacy `PHONE_CLAW_*` env vars and `x-phone-claw-ingest-secret` headers remain
   readable only to keep existing local demos from breaking during the rename.

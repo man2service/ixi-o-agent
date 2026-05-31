@@ -6,11 +6,16 @@
   "type": "object",
   "required": [
     "schemaVersion",
+    "eventId",
+    "idempotencyKey",
     "eventType",
     "source",
     "sourceSystem",
     "sourceMode",
     "sessionId",
+    "issuedAt",
+    "expiresAt",
+    "payloadHash",
     "startedAt",
     "endedAt",
     "summary",
@@ -28,6 +33,14 @@
     "schemaVersion": {
       "const": "ixi-o-agent.miso.voice-session.v0"
     },
+    "eventId": {
+      "type": "string",
+      "description": "Globally unique event id for audit, replay detection, and tracing."
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "description": "Stable key MISO can use to ignore duplicate deliveries of the same voice-session event."
+    },
     "eventType": {
       "const": "voice-session.created"
     },
@@ -44,6 +57,24 @@
     },
     "sessionId": {
       "type": "string"
+    },
+    "issuedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the sender issued this event. MISO should reject stale events."
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "After this time MISO should reject the event to limit replay windows."
+    },
+    "payloadHash": {
+      "type": "string",
+      "description": "Digest of the canonical redacted payload for integrity checks before workflow execution."
+    },
+    "signature": {
+      "type": "string",
+      "description": "Optional detached signature if MISO chooses body-level signing instead of an HTTP signature header."
     },
     "startedAt": {
       "type": "string"

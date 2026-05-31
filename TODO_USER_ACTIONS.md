@@ -19,12 +19,17 @@ entry, or live service approval. Do not put secrets in this file.
    - Hermes webhook URL/API key if Kiya should call the bound Hermes agent
 
 3. If showing MISO live:
-   - Start `pnpm miso:gateway`.
-   - Start a Cloudflare tunnel to port `3321`.
+   - Confirm you can access the `럭키밀 (모난돌컴퍼니) Team` workspace in MISO.
+   - Start the local app with `.env.local` loaded.
+   - Start `pnpm miso:gateway` in a separate terminal with a real short-lived
+     token, not the `.env.example` placeholder.
+   - Start a Cloudflare tunnel to port `3321` in another terminal.
    - Generate current OpenAPI with `pnpm miso:openapi:v3 https://<trycloudflare-host>`.
    - Paste `miso/generated/ixi-o-agent-openapi.current-tunnel.v3.json` into MISO custom tool.
    - Use the short-lived `IXI_O_AGENT_MISO_GATEWAY_TOKEN` as the MISO bearer token.
-   - Save and publish the MISO app before judging.
+   - Re-test `listVoiceSessions` and `readVoiceSessionHandoff` after every
+     tunnel/token change.
+   - Save and share the MISO app before judging.
    - Record non-secret evidence in `docs/miso-submit-evidence.md`.
 
 4. If showing live Channel Talk:
