@@ -38,6 +38,30 @@ const friendliNotes = [
   }
 ];
 
+const designDecisions = [
+  {
+    number: "01",
+    title: "Button hierarchy",
+    detail: "주요 진행은 fill 버튼, 보조 탐색은 weak 버튼으로 분리합니다.",
+    badge: "Primary",
+    badgeTone: "fill"
+  },
+  {
+    number: "02",
+    title: "Status badge",
+    detail: "로컬 처리, 검수, 전달 가능 여부를 짧은 상태 값으로 표시합니다.",
+    badge: "Reviewed",
+    badgeTone: "weak"
+  },
+  {
+    number: "03",
+    title: "ListRow handoff",
+    detail: "전사문 원본, 요약, 마스킹 payload를 좌측 맥락과 우측 상태로 읽게 합니다.",
+    badge: "Ready",
+    badgeTone: "success"
+  }
+];
+
 const submissionMessages = [
   "LG U+ Track: Voice AI 입력과 EXAONE 활용이 체험 플로우의 핵심 단계에 드러납니다.",
   "Security: 기업용은 raw audio/transcript를 로컬에 두고, 개인정보 마스킹 뒤 결정 사항만 전달합니다.",
@@ -60,6 +84,7 @@ export default function ShowcasePage() {
         </Link>
         <div>
           <a href="#experience">Experience</a>
+          <a href="#design">Design</a>
           <a href="#architecture">Architecture</a>
           <a href="#ops">Ops</a>
           <a href="#submission">Submission</a>
@@ -74,11 +99,16 @@ export default function ShowcasePage() {
             ixi-O Agent는 기업 고객 통화와 개인 회의 음성을 같은 로컬 브릿지로 받아,
             Whisper 전사와 EXAONE 요약을 거쳐 에이전트가 바로 읽을 수 있는 context로 바꿉니다.
           </p>
+          <div className="showcase-hero-badges" aria-label="product principles">
+            <span className="showcase-tds-badge fill">Local first</span>
+            <span className="showcase-tds-badge weak">Review gate</span>
+            <span className="showcase-tds-badge weak">Agent-ready</span>
+          </div>
           <div className="showcase-actions">
-            <a className="showcase-primary" href="#experience">
+            <a className="showcase-primary showcase-tds-button fill" href="#experience">
               체험 플로우 보기
             </a>
-            <a className="showcase-secondary" href="https://github.com/man2service/ixi-o-agent">
+            <a className="showcase-secondary showcase-tds-button weak" href="https://github.com/man2service/ixi-o-agent">
               GitHub 보기
             </a>
           </div>
@@ -113,6 +143,31 @@ export default function ShowcasePage() {
               <p>FriendliAI는 필요할 때만 가속 경로로</p>
             </article>
           </div>
+        </div>
+      </section>
+
+      <section className="showcase-design-system" id="design" aria-label="TDS-inspired design system">
+        <div className="showcase-section-head">
+          <div>
+            <span className="showcase-label">TDS-inspired system</span>
+            <h2>명확한 상태, 조용한 보조 액션, 리스트 중심의 정보 전달</h2>
+            <p>
+              TDS UI Kit 자산은 복제하지 않고, 공개 문서의 컴포넌트 원칙을 ixi-O Agent의
+              자체 토큰과 컴포넌트 규칙으로 옮겼습니다.
+            </p>
+          </div>
+        </div>
+        <div className="showcase-tds-list" aria-label="design decisions">
+          {designDecisions.map((decision) => (
+            <article className="showcase-tds-row" key={decision.number}>
+              <span className="showcase-tds-row-icon">{decision.number}</span>
+              <div>
+                <strong>{decision.title}</strong>
+                <p>{decision.detail}</p>
+              </div>
+              <span className={`showcase-tds-badge ${decision.badgeTone}`}>{decision.badge}</span>
+            </article>
+          ))}
         </div>
       </section>
 

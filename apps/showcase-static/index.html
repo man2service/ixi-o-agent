@@ -8,6 +8,7 @@
       name="description"
       content="Interactive ixi-O Agent personal and enterprise flow demo"
     />
+    <link rel="icon" href="data:," />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -19,6 +20,7 @@
         </a>
         <div>
           <a href="#experience">Experience</a>
+          <a href="#design">Design</a>
           <a href="#architecture">Architecture</a>
           <a href="#ops">Ops</a>
           <a href="#submission">Submission</a>
@@ -33,9 +35,14 @@
             ixi-O Agent는 기업 고객 통화와 개인 회의 음성을 같은 로컬 브릿지로 받아,
             Whisper 전사와 EXAONE 요약을 거쳐 에이전트가 바로 읽을 수 있는 context로 바꿉니다.
           </p>
+          <div class="hero-badges" aria-label="product principles">
+            <span class="tds-badge fill">Local first</span>
+            <span class="tds-badge weak">Review gate</span>
+            <span class="tds-badge weak">Agent-ready</span>
+          </div>
           <div class="actions">
-            <a class="primary" href="#experience">체험 플로우 보기</a>
-            <a class="secondary" href="https://github.com/man2service/ixi-o-agent">GitHub 보기</a>
+            <a class="primary tds-button fill" href="#experience">체험 플로우 보기</a>
+            <a class="secondary tds-button weak" href="https://github.com/man2service/ixi-o-agent">GitHub 보기</a>
           </div>
         </div>
 
@@ -68,6 +75,45 @@
               <p>FriendliAI는 필요할 때만 가속 경로로</p>
             </article>
           </div>
+        </div>
+      </section>
+
+      <section class="design-system" id="design" aria-label="TDS-inspired design system">
+        <div class="section-head">
+          <div>
+            <span class="label">TDS-inspired system</span>
+            <h2>명확한 상태, 조용한 보조 액션, 리스트 중심의 정보 전달</h2>
+            <p>
+              TDS UI Kit 자산은 복제하지 않고, 공개 문서의 컴포넌트 원칙을 ixi-O Agent의
+              자체 토큰과 컴포넌트 규칙으로 옮겼습니다.
+            </p>
+          </div>
+        </div>
+        <div class="tds-list" aria-label="design decisions">
+          <article class="tds-row">
+            <span class="tds-row-icon">01</span>
+            <div>
+              <strong>Button hierarchy</strong>
+              <p>주요 진행은 fill 버튼, 보조 탐색은 weak 버튼으로 분리합니다.</p>
+            </div>
+            <span class="tds-badge fill">Primary</span>
+          </article>
+          <article class="tds-row">
+            <span class="tds-row-icon">02</span>
+            <div>
+              <strong>Status badge</strong>
+              <p>로컬 처리, 검수, 전달 가능 여부를 짧은 상태 값으로 표시합니다.</p>
+            </div>
+            <span class="tds-badge weak">Reviewed</span>
+          </article>
+          <article class="tds-row">
+            <span class="tds-row-icon">03</span>
+            <div>
+              <strong>ListRow handoff</strong>
+              <p>전사문 원본, 요약, 마스킹 payload를 좌측 맥락과 우측 상태로 읽게 합니다.</p>
+            </div>
+            <span class="tds-badge success">Ready</span>
+          </article>
         </div>
       </section>
 

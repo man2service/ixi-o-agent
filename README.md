@@ -41,6 +41,18 @@ https://ixi-o-agent.vercel.app
 The Vercel page is a safe submission mockup. It does not include raw
 transcripts, local model execution, Channel Talk credentials, or customer data.
 
+## Design System
+
+The public showcase and local `/showcase` page now use a TDS-inspired interaction system implemented with ixi-O Agent's own CSS tokens and components.
+
+- Button hierarchy separates primary fill actions from quieter weak actions.
+- Badges show short processing/review/handoff states.
+- ListRow-style rows show source artifacts, meaning, and current status in one scan path.
+- Enterprise/Personal switching follows a segmented-control pattern.
+- Brand colors are isolated in `--brand-*` CSS variables so the visual identity can be changed later without rewriting component styles.
+
+We do not copy or import Toss UI Kit assets. See `docs/tds-inspired-design-system.md` for source links, license boundary, and token locations.
+
 The first screen is the local inbox. Click any stored session to open the detail/review view.
 
 Current synthetic full-path proof session:
@@ -151,6 +163,7 @@ For M1 MacBook setup, local model downloads, and n8n instructions, see `docs/m1-
 - STT field validation: `docs/stt-field-validation.md`
 - Demo intro: `docs/demo-intro.md`
 - Submission pack: `docs/submission-pack.md`
+- TDS-inspired design system: `docs/tds-inspired-design-system.md`
 - MISO custom tool/proposal pack: `miso/README.md`
 - Telegram Kiya research: `docs/telegram-kiya-integration-research.md`
 

@@ -33,9 +33,14 @@ experience modes:
 
 - Enterprise flow: Channel Talk data -> Mac mini M4 local processing -> Whisper STT -> EXAONE summary -> PII masking -> decision-only agent handoff.
 - Personal flow: local recorder/file -> Whisper STT -> EXAONE full-context summary -> full transcript and summary handoff to the user's personal agent.
+- TDS-inspired design section: primary/weak button hierarchy, short status badges, ListRow-style artifact handoff, and segmented Enterprise/Personal switching.
 
 It does not include raw transcripts, local model execution, Channel Talk
 credentials, or any customer data.
+
+Design implementation note: the showcase uses ixi-O Agent's own semantic CSS
+tokens and components. Toss UI Kit assets are not copied or imported; see
+`docs/tds-inspired-design-system.md` for the source review and license boundary.
 
 ## Architecture
 
