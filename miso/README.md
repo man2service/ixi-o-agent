@@ -12,6 +12,9 @@ push integration.
 ## Files
 
 - `ixi-o-agent-openapi.json`: OpenAPI 3.1 schema for registering ixi-O Agent as a MISO custom tool.
+- `apps/ixi-o-agent-voiceops-copilot.yml`: importable MISO agent draft for the judging demo.
+- `samples/approved-voice-session-handoff.sample.json`: safe fallback payload for judging when live tool auth/tunnel is unstable.
+- `samples/blocked-voice-session-detail.sample.json`: safe fallback payload that proves the human-review gate.
 - `mcp-tool-proposal.json`: MCP tool shape we would propose if MISO wants a local MCP bridge.
 - `proposed-inbound-voice-event.schema.json`: JSON schema for the inbound voice event we propose MISO should support later.
 - `proposed-miso-interfaces.md`: readable explanation of implemented pull APIs vs proposed MISO interfaces.
@@ -61,9 +64,13 @@ In MISO:
 3. Paste `ixi-o-agent-openapi.json`.
 4. Set auth as Bearer Token with the local ixi-O Agent ingest secret.
 5. Import sub-tools and test `listVoiceSessions`.
+6. Import `apps/ixi-o-agent-voiceops-copilot.yml` from `앱 만들기` -> `기존 앱 가져오기`.
+7. Add the custom tool to the imported app, then save and publish.
 
 If the endpoint is exposed through Cloudflare Tunnel, replace
 `servers[0].url` with the tunnel URL before pasting into MISO.
+
+For a full judging checklist, see `docs/miso-track-submission-runbook.md`.
 
 ## Local Verification
 
@@ -71,6 +78,12 @@ Validate the MISO artifacts:
 
 ```bash
 node -e "for (const f of ['miso/ixi-o-agent-openapi.json','miso/mcp-tool-proposal.json','miso/proposed-inbound-voice-event.schema.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('ok')"
+```
+
+Validate the MISO app import draft:
+
+```bash
+ruby -e "require 'yaml'; YAML.load_file('miso/apps/ixi-o-agent-voiceops-copilot.yml'); puts 'ok'"
 ```
 
 Inspect the implemented API:

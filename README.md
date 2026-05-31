@@ -68,6 +68,9 @@ pnpm install
 cp .env.example .env.local
 ```
 
+The repo includes `.node-version` with `20.20.2`; run `fnm use` in new shells
+before local verification if `node -v` points to a different version.
+
 Edit `.env.local` locally. Do not commit it. At minimum, set:
 
 ```text
@@ -143,6 +146,7 @@ For M1 MacBook setup, local model downloads, and n8n instructions, see `docs/m1-
 - n8n setup: `docs/n8n/local-docker.md`
 - Channel Talk realtime webhook: `docs/channel-talk-webhook.md`
 - Demo operations runbook: `docs/demo-ops-runbook.md`
+- MISO judging runbook: `docs/miso-track-submission-runbook.md`
 - Local models: `docs/local-models.md`
 - STT field validation: `docs/stt-field-validation.md`
 - Demo intro: `docs/demo-intro.md`

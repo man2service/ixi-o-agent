@@ -116,6 +116,11 @@ pnpm smoke:local
 
 - Realtime Channel Talk webhook proof session: `20260530T153141_utc_channel_talk_e7b435ae0b`
 - Current GitHub repo: `https://github.com/man2service/ixi-o-agent`
+- MISO judging runbook: `docs/miso-track-submission-runbook.md`
+- MISO app import draft: `miso/apps/ixi-o-agent-voiceops-copilot.yml`
+- MISO fallback samples:
+  - `miso/samples/approved-voice-session-handoff.sample.json`
+  - `miso/samples/blocked-voice-session-detail.sample.json`
 - Main docs:
   - `README.md`
   - `docs/demo-intro.md`

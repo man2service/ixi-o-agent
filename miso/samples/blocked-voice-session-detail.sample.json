@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "session": {
+    "sessionId": "20260531T101500_kst_channel_talk_pending_review",
+    "status": "processed_pending_review",
+    "source": "channel_talk",
+    "mode": "call",
+    "sourceStartedAt": "2026-05-31T01:15:00.000Z",
+    "sourceEndedAt": "2026-05-31T01:22:00.000Z",
+    "createdAt": "2026-05-31T01:23:00.000Z",
+    "utteranceCount": 9,
+    "review": {
+      "reviewed": false,
+      "externalAllowed": false
+    },
+    "safety": {
+      "redactionApplied": true,
+      "rawTranscriptIncluded": false,
+      "rawAudioIncluded": false,
+      "humanReviewRequired": true
+    },
+    "handoff": {
+      "availableForExternalWorkflow": false,
+      "blockedReason": "Local human review has not approved this voice session for external workflow access."
+    }
+  }
+}

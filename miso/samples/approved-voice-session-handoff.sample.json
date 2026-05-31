@@ -1,0 +1,71 @@
+{
+  "ok": true,
+  "session": {
+    "sessionId": "20260531T093000_kst_channel_talk_demo_incident",
+    "status": "approved_for_external_workflow",
+    "source": "channel_talk",
+    "mode": "call",
+    "sourceStartedAt": "2026-05-31T00:30:00.000Z",
+    "sourceEndedAt": "2026-05-31T00:39:00.000Z",
+    "createdAt": "2026-05-31T00:40:00.000Z",
+    "utteranceCount": 12,
+    "review": {
+      "reviewed": true,
+      "externalAllowed": true
+    },
+    "safety": {
+      "redactionApplied": true,
+      "rawTranscriptIncluded": false,
+      "rawAudioIncluded": false,
+      "humanReviewRequired": true
+    },
+    "handoff": {
+      "availableForExternalWorkflow": true,
+      "redactedPayload": {
+        "schemaVersion": "ixi-o-agent.miso.voice-session.v0",
+        "eventType": "voice-session.created",
+        "source": "ixi-o-agent-private-local-voice-bridge",
+        "sourceSystem": "channel_talk",
+        "sourceMode": "call",
+        "sessionId": "20260531T093000_kst_channel_talk_demo_incident",
+        "startedAt": "2026-05-31T00:30:00.000Z",
+        "endedAt": "2026-05-31T00:39:00.000Z",
+        "summary": "고객은 전일 오후 CDN 캐시 이상으로 쇼핑몰 이미지 로딩이 지연되었고, 행사 중 주문 전환율에 영향이 있었다고 주장했습니다. 장애 여부와 보상 가능성에 대한 당일 답변을 요청했습니다.",
+        "urgency": "high",
+        "requiredTeams": [
+          "NOC",
+          "CDN 운영",
+          "고객 성공"
+        ],
+        "actionItems": [
+          {
+            "text": "고객이 언급한 시간대의 CDN 로그와 모니터링 알림을 확인합니다.",
+            "owner": "NOC",
+            "status": "open"
+          },
+          {
+            "text": "SLA 및 보상 정책 적용 가능성을 운영 매니저에게 검토 요청합니다.",
+            "owner": "고객 성공",
+            "status": "open"
+          },
+          {
+            "text": "고객에게 접수 완료와 1차 확인 예정 시간을 회신합니다.",
+            "owner": "고객 성공",
+            "status": "open"
+          }
+        ],
+        "redactionApplied": true,
+        "humanReviewRequired": true,
+        "rawTranscriptIncluded": false,
+        "rawAudioIncluded": false,
+        "reviewStatus": "approved_for_external_workflow",
+        "sourceRefs": {
+          "channelId": "demo-channel",
+          "userChatId": "demo-user-chat",
+          "callLogId": "demo-call-log",
+          "meetMessageId": null
+        }
+      }
+    }
+  }
+}
