@@ -27,10 +27,9 @@ export default async function Home() {
       <section className="hero">
         <div>
           <p className="eyebrow">ixi-O Agent</p>
-          <h1>일상의 모든 Voice를, 에이전트와 함께</h1>
+          <h1>일상의 Voice를 에이전트와 함께</h1>
           <p className="lede">
-            Channel Talk 통화 전사문을 n8n과 로컬 브릿지로 받아 EXAONE으로
-            후처리하고, 사람이 승인한 비식별 payload만 MISO 제안 API로 엽니다.
+            통화·회의를 로컬 STT/EXAONE으로 처리하고, 검수된 payload만 MISO와 Kiya에 전달합니다.
           </p>
           <Link className="text-button" href="/showcase">
             제출 쇼케이스 열기
