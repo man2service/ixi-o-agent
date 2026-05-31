@@ -32,6 +32,7 @@ git status --short
 pnpm typecheck
 pnpm build
 pnpm smoke:local
+pnpm smoke:exaone
 pnpm check:stt
 ```
 
@@ -41,7 +42,13 @@ Expected:
 - `pnpm smoke:local` reports `miso_blocked_before_review`,
   `miso_available_after_review`, `local_voice_frontdoor_ingested`, and Kiya
   dry-run checks.
-- `pnpm check:stt` returns a non-empty transcript preview.
+- `pnpm smoke:exaone` requires `llama-cli` and
+  `models/exaone/EXAONE-4.0-1.2B-Q4_K_M.gguf`; it proves the real local EXAONE
+  path with `engine: exaone-local`.
+- `pnpm check:stt` requires `whisper-cli` and `models/whisper/ggml-small.bin`;
+  it returns a non-empty transcript preview when the local STT model is
+  installed. If the model is missing, the failure is expected and the fallback
+  demo path still works.
 
 ## Kiya/Hermes Settings
 
@@ -204,13 +211,15 @@ pnpm webhook:channel-talk list
 ### Safe Primary Path
 
 1. Open `http://localhost:3000`.
-2. Open the synthetic proof session:
+2. On this working machine, open the synthetic proof session if it exists:
 
 ```text
 20260530T153141_utc_channel_talk_e7b435ae0b
 ```
 
-3. Show local transcript, EXAONE output, review approval, and MISO handoff.
+3. On a fresh clone, first run `pnpm test:ingest` and open the generated
+   session ID instead.
+4. Show local transcript, EXAONE output, review approval, and MISO handoff.
 
 ### Private Mode Backup
 

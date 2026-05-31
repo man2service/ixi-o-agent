@@ -5,7 +5,11 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 
 const workspaceRoot = path.resolve(new URL("..", import.meta.url).pathname);
-const whisperCli = process.env.WHISPER_CLI_PATH ?? "whisper-cli";
+const whisperCli =
+  process.env.IXI_O_AGENT_WHISPER_CLI ??
+  process.env.PHONE_CLAW_WHISPER_CLI ??
+  process.env.WHISPER_CLI_PATH ??
+  "whisper-cli";
 const modelPath =
   process.env.IXI_O_AGENT_WHISPER_MODEL_PATH ??
   process.env.PHONE_CLAW_WHISPER_MODEL_PATH ??

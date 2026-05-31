@@ -8,7 +8,7 @@ const upstreamUrl = (process.env.IXI_O_AGENT_MISO_UPSTREAM_URL ?? "http://localh
 );
 const upstreamSecret =
   process.env.IXI_O_AGENT_INGEST_SECRET ?? process.env.PHONE_CLAW_INGEST_SECRET;
-const gatewayToken = process.env.IXI_O_AGENT_MISO_GATEWAY_TOKEN ?? upstreamSecret;
+const gatewayToken = process.env.IXI_O_AGENT_MISO_GATEWAY_TOKEN;
 
 if (!upstreamSecret) {
   console.error("IXI_O_AGENT_INGEST_SECRET is required.");
@@ -16,7 +16,7 @@ if (!upstreamSecret) {
 }
 
 if (!gatewayToken) {
-  console.error("IXI_O_AGENT_MISO_GATEWAY_TOKEN is required.");
+  console.error("IXI_O_AGENT_MISO_GATEWAY_TOKEN is required. Use a short-lived token for MISO.");
   process.exit(1);
 }
 

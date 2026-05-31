@@ -65,6 +65,24 @@ And so my fellow Americans, ask not what your country can do for you, ask what y
 
 ## EXAONE Smoke Test
 
+Preferred reusable command:
+
+```bash
+pnpm smoke:exaone
+```
+
+This starts an isolated local Next server, ingests a synthetic voice session,
+runs the real EXAONE process route, and fails unless the stored result reports:
+
+```json
+{
+  "engine": "exaone-local",
+  "modelAvailable": true
+}
+```
+
+Direct `llama-cli` command:
+
 ```bash
 llama-cli \
   -m models/exaone/EXAONE-4.0-1.2B-Q4_K_M.gguf \

@@ -10,6 +10,7 @@
     "typecheck": "pnpm -r typecheck",
     "test:ingest": "node scripts/test-channel-talk-ingest.mjs",
     "smoke:local": "node scripts/blackbox-local-sample.mjs",
+    "smoke:exaone": "node scripts/smoke-exaone-local.mjs",
     "check:stt": "node scripts/check-local-stt.mjs",
     "check:channel-talk": "node scripts/check-channel-talk-credentials.mjs",
     "miso:gateway": "node scripts/miso-tool-gateway.mjs",

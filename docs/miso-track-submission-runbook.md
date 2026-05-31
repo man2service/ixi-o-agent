@@ -47,8 +47,19 @@ Prepare these links/files for judging:
   - `miso/proposed-miso-interfaces.md`
   - `miso/proposed-inbound-voice-event.schema.json`
   - `miso/mcp-tool-proposal.json`
+  - `miso/voice-session-workflow-outline.md`
 
 ## MISO Workspace Setup
+
+Important packaging note:
+
+- `miso/apps/ixi-o-agent-voiceops-copilot.yml` preserves the agent prompt,
+  suggested questions, model settings, and fallback behavior.
+- MISO does not export/import our local custom-tool credential binding in that
+  YAML. After importing the app, manually attach the custom tool named
+  `ixi-O Agent VoiceOps Bridge`, then save and publish.
+- If MISO later exports tool bindings in app YAML, re-export the published app
+  and replace the draft.
 
 ### Current Hackathon Workspace State
 
@@ -62,6 +73,7 @@ As of 2026-05-31 11:51 KST:
 - Enabled sub-tools: `listVoiceSessions`, `readVoiceSessionHandoff`
 - Verified session: `20260531T023933_utc_local_voice_1fa0e9c632`
 - Verified response shape: MISO produced a business card, next actions, Human Review, and MISO interface proposal from the approved redacted handoff.
+- Evidence doc: `docs/miso-submit-evidence.md`
 
 The disposable MISO account password is intentionally not stored in this repo.
 
@@ -94,6 +106,9 @@ pnpm miso:gateway
 cloudflared tunnel --url http://localhost:3321
 ```
 
+`pnpm miso:gateway` fails closed if `IXI_O_AGENT_MISO_GATEWAY_TOKEN` is not set.
+Do not reuse `IXI_O_AGENT_INGEST_SECRET` as the MISO bearer token.
+
 The gateway allows only:
 
 - `GET /api/miso/voice-sessions`
@@ -118,6 +133,8 @@ the public tunnel.
 6. Import sub-tools and test:
    - `listVoiceSessions`
    - `readVoiceSessionHandoff`
+7. Capture the tool test result and app publish state in
+   `docs/miso-submit-evidence.md` before final judging.
 
 Expected behavior:
 

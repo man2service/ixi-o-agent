@@ -18,6 +18,7 @@ push integration.
 - `mcp-tool-proposal.json`: MCP tool shape we would propose if MISO wants a local MCP bridge.
 - `proposed-inbound-voice-event.schema.json`: JSON schema for the inbound voice event we propose MISO should support later.
 - `proposed-miso-interfaces.md`: readable explanation of implemented pull APIs vs proposed MISO interfaces.
+- `voice-session-workflow-outline.md`: visual workflow/chaining outline for turning a session into a MISO business card and next actions.
 
 ## What Works Now
 
@@ -43,6 +44,9 @@ When MISO calls the restricted gateway, it must use a bearer token matching
 `IXI_O_AGENT_MISO_GATEWAY_TOKEN`. The gateway then calls the local Next app with
 the local `IXI_O_AGENT_INGEST_SECRET`. The full local Next app should not be
 tunneled for judging.
+
+The gateway fails closed when `IXI_O_AGENT_MISO_GATEWAY_TOKEN` is not set. Do
+not use the long-lived local ingest secret as the MISO tool credential.
 
 When testing the local Next API directly, use `IXI_O_AGENT_INGEST_SECRET` as
 the bearer token or `x-ixi-o-agent-ingest-secret` header.

@@ -65,6 +65,9 @@ LG U+ Track:
 
 - Voice AI use case: calls, meetings, and voice notes become structured agent input.
 - EXAONE is in the processing pipeline.
+- EXAONE is used after STT, not as the STT engine: Whisper turns audio into
+  text, then EXAONE summarizes, extracts decisions, proposes action items, and
+  creates agent-readable context.
 - Local-first design keeps raw voice context on the operator machine.
 - Personal and enterprise flows demonstrate why EXAONE is useful after STT:
   summarization, decision extraction, action candidates, and agent-readable
@@ -105,6 +108,8 @@ Official references checked:
 
 ## Verification
 
+Credential-free fallback proof:
+
 ```bash
 pnpm typecheck
 pnpm build
@@ -120,11 +125,26 @@ pnpm smoke:local
 - approved redacted payload becomes available after review
 - local voice frontdoor creates a `local_voice_upload` session
 
+Real local model proof on the Mac mini M4:
+
+```bash
+pnpm check:stt
+pnpm smoke:exaone
+```
+
+`pnpm check:stt` proves local Whisper STT when `whisper-cli` and
+`models/whisper/ggml-small.bin` are installed. `pnpm smoke:exaone` proves local
+EXAONE GGUF inference by requiring `engine: "exaone-local"` and
+`modelAvailable: true`. These are separate from the fallback smoke test so
+judges can distinguish "works without model files" from "real EXAONE ran".
+
 ## Demo Evidence
 
 - Realtime Channel Talk webhook proof session: `20260530T153141_utc_channel_talk_e7b435ae0b`
 - Current GitHub repo: `https://github.com/man2service/ixi-o-agent`
+- Long-run goal plan: `docs/agent-goal-plan.md`
 - MISO judging runbook: `docs/miso-track-submission-runbook.md`
+- User-owned final actions: `TODO_USER_ACTIONS.md`
 - MISO app import draft: `miso/apps/ixi-o-agent-voiceops-copilot.yml`
 - MISO fallback samples:
   - `miso/samples/approved-voice-session-handoff.sample.json`
@@ -146,6 +166,8 @@ pnpm smoke:local
   full local Next app.
 - MISO receives a short-lived `IXI_O_AGENT_MISO_GATEWAY_TOKEN`; the gateway maps
   that to the local ingest secret.
+- The gateway now fails closed if `IXI_O_AGENT_MISO_GATEWAY_TOKEN` is missing,
+  so MISO never reuses the long-lived local ingest secret as its bearer token.
 - Legacy `PHONE_CLAW_*` env vars and `x-phone-claw-ingest-secret` headers remain
   readable only to keep existing local demos from breaking during the rename.
 - Human review is required before external workflow access.

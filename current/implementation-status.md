@@ -28,6 +28,9 @@ The first working path is implemented:
 20. Kiya/Hermes notification attempts are persisted per session for demo review, even when Telegram delivery is a dry-run.
 21. Kiya/Hermes can report calendar action results back to ixi-O Agent through an audit-only callback; ixi-O Agent still does not own calendar execution.
 22. A toy Kiya calendar command endpoint records confirm/edit/cancel commands from Telegram callback data such as `pc:cal:ok:{sessionId}`.
+23. `pnpm smoke:exaone` proves the real local EXAONE GGUF path with `engine: "exaone-local"` and `modelAvailable: true` when the Mac mini M4 model files are installed.
+24. MISO gateway now fails closed unless a short-lived `IXI_O_AGENT_MISO_GATEWAY_TOKEN` is set.
+25. Award-run planning, MISO evidence capture, and user-owned final actions are tracked in `docs/agent-goal-plan.md`, `docs/miso-submit-evidence.md`, and `TODO_USER_ACTIONS.md`.
 
 ## Local App
 
@@ -80,6 +83,8 @@ The polling and manual backfill workflows call the local backfill endpoint. Chan
 - MISO JSON artifacts parse successfully, including `miso/proposed-inbound-voice-event.schema.json`
 - `pnpm check:stt` verifies the installed Whisper small model on a local sample file
 - `pnpm smoke:local` verifies Kiya/Hermes notification dry-run behavior without Telegram credentials, including persisted notification logs and the summary-first/optional calendar-prompt message split
+- `pnpm smoke:exaone` verifies real local EXAONE GGUF inference with the installed model
+- `pnpm check:stt` verifies the installed local Whisper small model
 
 The live backfill stored Channel Talk sessions locally. Credentials were not written to source files.
 
@@ -113,8 +118,9 @@ The persistent task queue is now tracked in `current/agent-task-queue.md`.
 
 Recommended next work unit:
 
-1. Configure real Kiya/Hermes secrets and run a live summary + calendar prompt rehearsal.
-2. Let Kiya/Hermes own calendar confirmation/edit/registration, then document the callback or audit trail it exposes back to ixi-O Agent if needed.
+1. Capture final MISO workspace evidence in `docs/miso-submit-evidence.md`.
+2. Configure real Kiya/Hermes secrets and run a live summary + calendar prompt rehearsal.
+3. Let Kiya/Hermes own calendar confirmation/edit/registration, then document the callback or audit trail it exposes back to ixi-O Agent if needed.
 
 ## Runtime Note
 

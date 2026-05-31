@@ -56,6 +56,41 @@ We do not copy or import Toss UI Kit assets. See `docs/tds-inspired-design-syste
 
 The first screen is the local inbox. Click any stored session to open the detail/review view.
 
+## 5-Minute Fresh Demo
+
+This path needs no Channel Talk, Telegram, MISO, Whisper, or EXAONE secrets:
+
+```bash
+git clone https://github.com/man2service/ixi-o-agent.git
+cd ixi-o-agent
+fnm install 20.20.2
+fnm use 20.20.2
+corepack enable
+pnpm install --frozen-lockfile
+cp .env.example .env.local
+pnpm typecheck
+pnpm build
+pnpm smoke:local
+```
+
+Then start the app and create a local sample session:
+
+```bash
+set -a; source .env.local; set +a
+pnpm dev
+```
+
+In another terminal:
+
+```bash
+set -a; source .env.local; set +a
+pnpm test:ingest
+```
+
+Open `http://localhost:3000`, click the generated session, run EXAONE processing,
+approve external handoff, then inspect the redacted MISO payload. On a fresh
+clone the generated session ID may differ from the synthetic proof session below.
+
 Current synthetic full-path proof session:
 
 ```text
@@ -150,6 +185,20 @@ Check local STT with the installed Whisper small model:
 ```bash
 pnpm check:stt
 ```
+
+This command requires `whisper-cli` and `models/whisper/ggml-small.bin`. If the
+model is not installed, failure is expected and does not affect the credential-free
+fallback demo.
+
+Check real local EXAONE inference with the installed GGUF model:
+
+```bash
+pnpm smoke:exaone
+```
+
+This command requires `llama-cli` and
+`models/exaone/EXAONE-4.0-1.2B-Q4_K_M.gguf`. It is separate from `pnpm
+smoke:local`, which intentionally verifies the model-free fallback path.
 
 For M1 MacBook setup, local model downloads, and n8n instructions, see `docs/m1-macbook-setup.md`.
 
