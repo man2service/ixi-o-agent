@@ -134,6 +134,10 @@ pnpm smoke:local
 - Do not commit `.env.local`, `private-voice-inbox/`, `n8n-data*/`, `models/`, raw transcripts, or audio files.
 - MISO-facing responses never include raw audio or raw transcript text.
 - `IXI_O_AGENT_INGEST_SECRET` protects local ingest/MISO tool endpoints.
+- Live MISO demos expose only `pnpm miso:gateway` through the tunnel, not the
+  full local Next app.
+- MISO receives a short-lived `IXI_O_AGENT_MISO_GATEWAY_TOKEN`; the gateway maps
+  that to the local ingest secret.
 - Legacy `PHONE_CLAW_*` env vars and `x-phone-claw-ingest-secret` headers remain
   readable only to keep existing local demos from breaking during the rename.
 - Human review is required before external workflow access.

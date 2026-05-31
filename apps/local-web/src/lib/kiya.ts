@@ -171,7 +171,7 @@ export async function readLatestKiyaCalendarResult(
 
 function buildSafeSessionPayload(session: StoredVoiceSessionDetail) {
   const handoff = session.handoff;
-  const actionItems = session.exaone?.actionItems ?? handoff?.actionItems ?? [];
+  const actionItems = handoff?.actionItems ?? session.exaone?.actionItems ?? [];
 
   return {
     schemaVersion: "ixi-o-agent.kiya.hermes-input.v0",
@@ -181,11 +181,11 @@ function buildSafeSessionPayload(session: StoredVoiceSessionDetail) {
     sourceStartedAt: session.sourceStartedAt,
     sourceEndedAt: session.sourceEndedAt,
     summary:
-      session.exaone?.summary ??
       handoff?.summary ??
+      session.exaone?.summary ??
       "아직 요약이 없습니다. EXAONE 후처리를 먼저 실행해야 합니다.",
-    urgency: session.exaone?.urgency ?? handoff?.urgency ?? "unknown",
-    requiredTeams: session.exaone?.requiredTeams ?? handoff?.requiredTeams ?? [],
+    urgency: handoff?.urgency ?? session.exaone?.urgency ?? "unknown",
+    requiredTeams: handoff?.requiredTeams ?? session.exaone?.requiredTeams ?? [],
     actionItems: actionItems.map((item) => ({
       text: item.text,
       owner: item.owner,

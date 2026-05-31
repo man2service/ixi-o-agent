@@ -19,7 +19,7 @@ export function getIngestSecretFromRequest(request: Request): string | undefined
 
 export function isAuthorizedByIngestSecret(request: Request): boolean {
   const expected = getIngestSecret();
-  if (!expected) return true;
+  if (!expected) return false;
   return getIngestSecretFromRequest(request) === expected;
 }
 

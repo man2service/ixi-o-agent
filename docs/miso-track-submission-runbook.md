@@ -50,15 +50,56 @@ Prepare these links/files for judging:
 
 ## MISO Workspace Setup
 
+### 0. Run Local Web And The MISO Gateway
+
+The local Next app lives under `apps/local-web`, so a root `.env.local` is not
+automatically loaded by `next dev` unless the variables are exported first.
+Before exposing anything to MISO, make sure `IXI_O_AGENT_INGEST_SECRET` is
+available to the running server.
+
+Safe local check:
+
+```bash
+curl -i http://localhost:3000/api/miso/voice-sessions
+```
+
+Expected without a bearer token:
+
+- `401 unauthorized` when the secret is configured
+- `503 ingest_secret_not_configured` when the server was started without the secret
+
+Do not register the live custom tool in MISO while the endpoint returns `503`.
+
+Do not tunnel the full Next app. Start the MISO-only gateway and tunnel that
+port instead:
+
+```bash
+export IXI_O_AGENT_MISO_GATEWAY_TOKEN=<short-lived-demo-token>
+pnpm miso:gateway
+cloudflared tunnel --url http://localhost:3321
+```
+
+The gateway allows only:
+
+- `GET /api/miso/voice-sessions`
+- `GET /api/miso/voice-sessions/{sessionId}`
+
+All local UI, raw session APIs, review actions, and source transcripts stay off
+the public tunnel.
+
 ### 1. Register the Custom Tool
 
 1. Open `플레이그라운드` -> `도구 모음` -> `사용자 정의`.
 2. Create a custom tool named `ixi-O Agent Restricted Voice Session Tool`.
-3. Paste `miso/ixi-o-agent-openapi.json`.
+3. Paste `miso/ixi-o-agent-openapi.v3.json` first. If MISO accepts OpenAPI 3.1,
+   `miso/ixi-o-agent-openapi.json` is also available.
 4. Replace `servers[0].url` before pasting:
-   - local-only test: `http://localhost:3000`
-   - cloud MISO calling local Mac: current Cloudflare Tunnel URL
-5. Set auth as Bearer Token with the local `IXI_O_AGENT_INGEST_SECRET`.
+   - local-only gateway test: `http://localhost:3321`
+   - cloud MISO calling local Mac: current gateway Cloudflare Tunnel URL
+   - helper:
+     `pnpm miso:openapi:v3 https://<trycloudflare-host>`
+5. Set auth as Bearer Token with `IXI_O_AGENT_MISO_GATEWAY_TOKEN`, not the
+   long-lived local ingest secret.
 6. Import sub-tools and test:
    - `listVoiceSessions`
    - `readVoiceSessionHandoff`
@@ -162,6 +203,25 @@ Expected MISO output:
 - The proposal is useful to GS Neotek because it names the missing interface in
   a concrete schema they can evaluate.
 
+## MISO-Side Security Observations To Verify
+
+Do not treat these as confirmed vulnerabilities without MISO operator context.
+For judging, present them as product/security hardening questions that surfaced
+while integrating a privacy-sensitive voice workflow.
+
+- Custom tool secrets: if Bearer Token values are stored workspace-wide, MISO
+  should make masking, rotation, owner visibility, and audit logs explicit.
+  Confirm whether broad visibility is relaxed only for the hackathon workspace.
+- Public/external sharing: MISO supports wider sharing scopes. For voice-derived
+  workflow apps, external/public sharing should warn when tools can reach
+  private local tunnels or sensitive APIs.
+- Quick tunnel endpoints: Cloudflare quick tunnels are useful for demos but
+  ephemeral and not production-grade. MISO could label them as demo-only or
+  recommend named tunnels/private network connectors for real deployments.
+- Inbound event proposal: if MISO later adds a `voice-session.created` inbound
+  API, require per-app scoped tokens, replay protection, idempotency keys, and
+  payload size limits by default.
+
 ## Support Question Template
 
 Use this if MISO setup blocks the live custom-tool path:
@@ -183,9 +243,25 @@ Use this if MISO setup blocks the live custom-tool path:
 
 ```bash
 git status --short
-node -e "for (const f of ['miso/ixi-o-agent-openapi.json','miso/mcp-tool-proposal.json','miso/proposed-inbound-voice-event.schema.json','miso/samples/approved-voice-session-handoff.sample.json','miso/samples/blocked-voice-session-detail.sample.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('ok')"
+node -e "for (const f of ['miso/ixi-o-agent-openapi.json','miso/ixi-o-agent-openapi.v3.json','miso/mcp-tool-proposal.json','miso/proposed-inbound-voice-event.schema.json','miso/samples/approved-voice-session-handoff.sample.json','miso/samples/blocked-voice-session-detail.sample.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('ok')"
 ruby -e "require 'yaml'; YAML.load_file('miso/apps/ixi-o-agent-voiceops-copilot.yml'); puts 'ok'"
 pnpm smoke:local
 ```
+
+Tunnel exposure check before MISO registration:
+
+```bash
+curl -i "$TUNNEL_URL/"
+curl -i "$TUNNEL_URL/api/sessions"
+curl -i "$TUNNEL_URL/api/miso/voice-sessions"
+curl -i -H "Authorization: Bearer wrong" "$TUNNEL_URL/api/miso/voice-sessions"
+curl -i -H "Authorization: Bearer $IXI_O_AGENT_MISO_GATEWAY_TOKEN" "$TUNNEL_URL/api/miso/voice-sessions"
+```
+
+Expected:
+
+- `/` and `/api/sessions`: `404`
+- MISO API with no or wrong token: `401`
+- MISO API with gateway token: `200`
 
 Do not use real customer raw transcripts for the public demo.

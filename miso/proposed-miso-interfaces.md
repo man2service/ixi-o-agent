@@ -50,6 +50,24 @@ approved voice sessions, read a redacted handoff, and prepare a case-creation
 request. This follows the same security rule as the custom REST tool: metadata
 first, payload only after review.
 
+## Security Product Suggestions For MISO
+
+These are not claims of confirmed vulnerabilities. They are security/product
+checks that matter once voice-derived business context is connected to MISO.
+
+- Make custom tool credential scope and visibility explicit. If a hackathon
+  workspace temporarily relaxes visibility, label that separately from normal
+  production behavior.
+- Add audit logs for custom tool creation, credential changes, sub-tool import,
+  app save, app publish, and external sharing changes.
+- Warn before publishing or externally sharing an app that can call a private
+  tunnel or sensitive internal API.
+- If MISO adds inbound voice-session ingest, require scoped event tokens, replay
+  protection, idempotency keys, and payload size limits.
+- Distinguish demo connectivity such as quick Cloudflare tunnels from
+  production connectivity such as named tunnels, allowlists, or private network
+  connectors.
+
 ## Workflow MISO Could Automate
 
 Given an approved ixi-O Agent payload, a MISO app could:

@@ -18,4 +18,5 @@ private-voice-inbox/
 n8n-data/
 n8n-data-v1/
 models/
+miso/generated/
 .vercel

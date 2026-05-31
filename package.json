@@ -12,6 +12,10 @@
     "smoke:local": "node scripts/blackbox-local-sample.mjs",
     "check:stt": "node scripts/check-local-stt.mjs",
     "check:channel-talk": "node scripts/check-channel-talk-credentials.mjs",
+    "miso:gateway": "node scripts/miso-tool-gateway.mjs",
+    "miso:openapi": "node scripts/write-miso-openapi-for-server.mjs",
+    "miso:openapi:v3": "node scripts/write-miso-openapi-for-server.mjs --v3",
+    "miso:openapi:build-v3": "node scripts/write-miso-openapi-v3.mjs",
     "backfill:channel-talk": "node scripts/channel-talk-backfill.mjs",
     "webhook:channel-talk": "node scripts/channel-talk-webhook.mjs"
   },

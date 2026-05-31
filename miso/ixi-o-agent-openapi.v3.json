@@ -1,0 +1,424 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ixi-O Agent Restricted Voice Session Tool",
+    "version": "0.1.0",
+    "description": "Restricted local API for MISO to list reviewed ixi-O Agent voice sessions and read only user-approved redacted handoff payloads. Raw audio and raw transcript text are never returned."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local ixi-O Agent app. Replace with a Cloudflare Tunnel URL for MISO cloud access."
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/miso/voice-sessions": {
+      "get": {
+        "operationId": "listVoiceSessions",
+        "summary": "List restricted voice-session metadata",
+        "description": "Lists local ixi-O Agent voice sessions without raw transcript or raw audio. Use this before reading a session detail.",
+        "responses": {
+          "200": {
+            "description": "Voice-session metadata list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListVoiceSessionsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/miso/voice-sessions/{sessionId}": {
+      "get": {
+        "operationId": "readVoiceSessionHandoff",
+        "summary": "Read a reviewed redacted voice-session handoff",
+        "description": "Returns a redacted MISO handoff payload only after local human review allows external workflow access. Otherwise returns a blocked reason.",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "description": "ixi-O Agent local voice session ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Restricted voice-session detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadVoiceSessionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "description": "Session not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Use IXI_O_AGENT_INGEST_SECRET as the bearer token."
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Missing or invalid ixi-O Agent local token"
+      }
+    },
+    "schemas": {
+      "ListVoiceSessionsResponse": {
+        "type": "object",
+        "required": [
+          "ok",
+          "sessions"
+        ],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VoiceSessionSummary"
+            }
+          }
+        }
+      },
+      "ReadVoiceSessionResponse": {
+        "type": "object",
+        "required": [
+          "ok",
+          "session"
+        ],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "session": {
+            "$ref": "#/components/schemas/VoiceSessionDetail"
+          }
+        }
+      },
+      "VoiceSessionSummary": {
+        "type": "object",
+        "required": [
+          "sessionId",
+          "status",
+          "source",
+          "mode",
+          "sourceStartedAt",
+          "createdAt",
+          "utteranceCount",
+          "review",
+          "safety"
+        ],
+        "properties": {
+          "sessionId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "sourceStartedAt": {
+            "type": "string"
+          },
+          "sourceEndedAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "utteranceCount": {
+            "type": "integer"
+          },
+          "review": {
+            "$ref": "#/components/schemas/ReviewState"
+          },
+          "safety": {
+            "$ref": "#/components/schemas/SafetyState"
+          }
+        }
+      },
+      "VoiceSessionDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VoiceSessionSummary"
+          },
+          {
+            "type": "object",
+            "required": [
+              "handoff"
+            ],
+            "properties": {
+              "handoff": {
+                "$ref": "#/components/schemas/HandoffState"
+              }
+            }
+          }
+        ]
+      },
+      "ReviewState": {
+        "type": "object",
+        "required": [
+          "reviewed",
+          "externalAllowed"
+        ],
+        "properties": {
+          "reviewed": {
+            "type": "boolean"
+          },
+          "externalAllowed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SafetyState": {
+        "type": "object",
+        "required": [
+          "redactionApplied",
+          "rawTranscriptIncluded",
+          "rawAudioIncluded",
+          "humanReviewRequired"
+        ],
+        "properties": {
+          "redactionApplied": {
+            "enum": [
+              true
+            ]
+          },
+          "rawTranscriptIncluded": {
+            "enum": [
+              false
+            ]
+          },
+          "rawAudioIncluded": {
+            "enum": [
+              false
+            ]
+          },
+          "humanReviewRequired": {
+            "enum": [
+              true
+            ]
+          }
+        }
+      },
+      "HandoffState": {
+        "type": "object",
+        "required": [
+          "availableForExternalWorkflow"
+        ],
+        "properties": {
+          "availableForExternalWorkflow": {
+            "type": "boolean"
+          },
+          "blockedReason": {
+            "type": "string"
+          },
+          "redactedPayload": {
+            "$ref": "#/components/schemas/MisoHandoffPayload"
+          }
+        }
+      },
+      "MisoHandoffPayload": {
+        "type": "object",
+        "required": [
+          "schemaVersion",
+          "eventType",
+          "source",
+          "sourceSystem",
+          "sourceMode",
+          "sessionId",
+          "startedAt",
+          "endedAt",
+          "summary",
+          "urgency",
+          "requiredTeams",
+          "actionItems",
+          "redactionApplied",
+          "humanReviewRequired",
+          "rawTranscriptIncluded",
+          "rawAudioIncluded",
+          "reviewStatus",
+          "sourceRefs"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "enum": [
+              "ixi-o-agent.miso.voice-session.v0"
+            ]
+          },
+          "eventType": {
+            "enum": [
+              "voice-session.created"
+            ]
+          },
+          "source": {
+            "enum": [
+              "ixi-o-agent-private-local-voice-bridge"
+            ]
+          },
+          "sourceSystem": {
+            "type": "string",
+            "enum": [
+              "channel_talk",
+              "local_voice"
+            ],
+            "description": "Original input adapter. channel_talk covers Channel Talk/n8n sessions; local_voice covers the Private Mode local voice frontdoor."
+          },
+          "sourceMode": {
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "startedAt": {
+            "type": "string"
+          },
+          "endedAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "summary": {
+            "type": "string"
+          },
+          "urgency": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "low",
+              "normal",
+              "high",
+              "critical"
+            ]
+          },
+          "requiredTeams": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "actionItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HandoffActionItem"
+            }
+          },
+          "redactionApplied": {
+            "enum": [
+              true
+            ]
+          },
+          "humanReviewRequired": {
+            "enum": [
+              true
+            ]
+          },
+          "rawTranscriptIncluded": {
+            "enum": [
+              false
+            ]
+          },
+          "rawAudioIncluded": {
+            "enum": [
+              false
+            ]
+          },
+          "reviewStatus": {
+            "type": "string",
+            "enum": [
+              "pending_human_review",
+              "approved_for_external_workflow"
+            ]
+          },
+          "sourceRefs": {
+            "$ref": "#/components/schemas/SourceRefs"
+          }
+        }
+      },
+      "HandoffActionItem": {
+        "type": "object",
+        "required": [
+          "text",
+          "owner",
+          "status"
+        ],
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "done",
+              "blocked"
+            ]
+          }
+        }
+      },
+      "SourceRefs": {
+        "type": "object",
+        "required": [
+          "channelId",
+          "userChatId",
+          "callLogId",
+          "meetMessageId"
+        ],
+        "properties": {
+          "channelId": {
+            "type": "string",
+            "description": "Channel Talk channel ID when available; local_voice sessions may use an internal local source identifier."
+          },
+          "userChatId": {
+            "type": "string",
+            "description": "Channel Talk userChat ID when available; local_voice sessions may use an internal local source identifier."
+          },
+          "callLogId": {
+            "type": "string",
+            "nullable": true
+          },
+          "meetMessageId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      }
+    }
+  }
+}

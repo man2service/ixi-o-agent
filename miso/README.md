@@ -61,14 +61,23 @@ In MISO:
 
 1. Open `플레이그라운드` -> `도구 모음` -> `사용자 정의`.
 2. Create a custom tool.
-3. Paste `ixi-o-agent-openapi.json`.
-4. Set auth as Bearer Token with the local ixi-O Agent ingest secret.
+3. Paste `ixi-o-agent-openapi.v3.json` first. Use
+   `ixi-o-agent-openapi.json` only if the importer accepts OpenAPI 3.1.
+4. Set auth as Bearer Token with `IXI_O_AGENT_MISO_GATEWAY_TOKEN`.
 5. Import sub-tools and test `listVoiceSessions`.
 6. Import `apps/ixi-o-agent-voiceops-copilot.yml` from `앱 만들기` -> `기존 앱 가져오기`.
 7. Add the custom tool to the imported app, then save and publish.
 
-If the endpoint is exposed through Cloudflare Tunnel, replace
-`servers[0].url` with the tunnel URL before pasting into MISO.
+Expose only the MISO gateway, not the full local Next app:
+
+```bash
+pnpm miso:gateway
+cloudflared tunnel --url http://localhost:3321
+pnpm miso:openapi:v3 https://<trycloudflare-host>
+```
+
+Then paste `miso/generated/ixi-o-agent-openapi.current-tunnel.v3.json` into
+MISO.
 
 For a full judging checklist, see `docs/miso-track-submission-runbook.md`.
 
