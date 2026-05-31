@@ -28,8 +28,14 @@ ixi-O Agent is a local voice bridge:
 - Static source: `apps/showcase-static/`
 - Local Next.js version: `http://localhost:3000/showcase`
 
-The public showcase is a safe mockup. It does not include raw transcripts, local
-model execution, Channel Talk credentials, or any customer data.
+The public showcase is a safe interactive mockup. It shows two selectable
+experience modes:
+
+- Enterprise flow: Channel Talk data -> Mac mini M4 local processing -> Whisper STT -> EXAONE summary -> PII masking -> decision-only agent handoff.
+- Personal flow: local recorder/file -> Whisper STT -> EXAONE full-context summary -> full transcript and summary handoff to the user's personal agent.
+
+It does not include raw transcripts, local model execution, Channel Talk
+credentials, or any customer data.
 
 ## Architecture
 
@@ -52,6 +58,9 @@ LG U+ Track:
 - Voice AI use case: calls, meetings, and voice notes become structured agent input.
 - EXAONE is in the processing pipeline.
 - Local-first design keeps raw voice context on the operator machine.
+- Personal and enterprise flows demonstrate why EXAONE is useful after STT:
+  summarization, decision extraction, action candidates, and agent-readable
+  context creation.
 
 GS Neotek / MISO Track:
 
@@ -62,12 +71,29 @@ GS Neotek / MISO Track:
 ## Demo Script
 
 1. Open `https://ixi-o-agent.vercel.app` for the public overview.
-2. Show the interactive mock flow: Voice 수집, EXAONE 후처리, Kiya 전달, MISO 제안.
-3. Open `http://localhost:3000` for the real local demo.
-4. Show `Private Mode` as the local meeting/voice input path.
-5. Open synthetic proof session `20260530T153141_utc_channel_talk_e7b435ae0b`.
-6. Show local transcript, EXAONE output, review approval, and MISO redacted payload.
-7. Explain that the proof session is synthetic and real customer raw transcripts are not used for external demo payloads.
+2. Show the interactive experience flow in Enterprise mode: Channel Talk input,
+   Mac mini local AI, PII masking, agent-folder handoff.
+3. Switch to Personal mode and show that the same product can send full
+   transcript plus summary to a personal agent without enterprise masking.
+4. Open `http://localhost:3000` for the real local demo.
+5. Show `Private Mode` as the local meeting/voice input path.
+6. Open synthetic proof session `20260530T153141_utc_channel_talk_e7b435ae0b`.
+7. Show local transcript, EXAONE output, review approval, and MISO redacted payload.
+8. Explain that the proof session is synthetic and real customer raw transcripts are not used for external demo payloads.
+
+## FriendliAI Option
+
+Default inference remains local on the Mac mini M4. FriendliAI is a practical
+optional hosted path when local inference is too slow or when a stable hosted GPU
+endpoint is useful for demos. The current page and local mock flow do not require
+an API key. Actual hosted calls should read `FRIENDLI_TOKEN` from local
+`.env.local` only.
+
+Official references checked:
+
+- Friendli OpenAI compatibility: `https://friendli.ai/docs/guides/openai-compatibility`
+- Friendli EXAONE 4.0 Dedicated Endpoint guide: `https://friendli.ai/docs/guides/tutorials/getting-started-with-exaone-4.0`
+- Friendli serverless Whisper transcription API: `https://friendli.ai/docs/openapi/serverless/audio-transcriptions`
 
 ## Verification
 

@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ixi-O Agent Showcase</title>
+    <title>ixi-O Agent Experience</title>
     <meta
       name="description"
-      content="Submission-ready ixi-O Agent demo mockup for OBA Weekend-thon S1"
+      content="Interactive ixi-O Agent personal and enterprise flow demo"
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
@@ -18,8 +18,9 @@
           ixi-O Agent
         </a>
         <div>
-          <a href="#demo-flow">Demo</a>
+          <a href="#experience">Experience</a>
           <a href="#architecture">Architecture</a>
+          <a href="#ops">Ops</a>
           <a href="#submission">Submission</a>
           <a href="https://github.com/man2service/ixi-o-agent">GitHub</a>
         </div>
@@ -29,19 +30,19 @@
         <div class="hero-copy">
           <h1>일상의 모든 Voice를, 에이전트와 함께</h1>
           <p>
-            ixi-O Agent는 통화와 회의에서 생긴 음성 맥락을 로컬에서 전사/요약하고,
-            Kiya와 MISO 같은 업무 에이전트가 안전하게 읽을 수 있는 작업 단위로 바꿉니다.
+            ixi-O Agent는 기업 고객 통화와 개인 회의 음성을 같은 로컬 브릿지로 받아,
+            Whisper 전사와 EXAONE 요약을 거쳐 에이전트가 바로 읽을 수 있는 context로 바꿉니다.
           </p>
           <div class="actions">
-            <a class="primary" href="#demo-flow">데모 플로우 보기</a>
+            <a class="primary" href="#experience">체험 플로우 보기</a>
             <a class="secondary" href="https://github.com/man2service/ixi-o-agent">GitHub 보기</a>
           </div>
         </div>
 
-        <div class="product" aria-label="ixi-O Agent product preview">
+        <div class="product" aria-label="ixi-O Agent experience preview">
           <div class="product-header">
-            <span>Live mock session</span>
-            <strong>approved_for_external_workflow</strong>
+            <span>Experience mode</span>
+            <strong>enterprise / personal</strong>
           </div>
           <figure class="product-visual">
             <img
@@ -51,152 +52,207 @@
           </figure>
           <div class="product-grid">
             <article>
-              <span>Channel Talk</span>
-              <p>내일 오후 3시 픽업 일정 확인 요청</p>
+              <span>Enterprise</span>
+              <p>채널톡 데이터는 로컬 처리 후 마스킹</p>
             </article>
             <article>
-              <span>EXAONE Local</span>
-              <p>요약, 긴급도, 액션아이템 생성</p>
+              <span>Personal</span>
+              <p>개인 음성은 전체 맥락을 에이전트에게</p>
             </article>
             <article>
-              <span>Kiya Telegram</span>
-              <p>요약 전송 후 캘린더 후보 확인</p>
+              <span>Local AI</span>
+              <p>Whisper STT와 EXAONE 요약을 Mac mini에서</p>
             </article>
             <article>
-              <span>MISO Handoff</span>
-              <p>검수된 비식별 payload만 공개</p>
+              <span>Optional GPU</span>
+              <p>FriendliAI는 필요할 때만 가속 경로로</p>
             </article>
           </div>
         </div>
       </section>
 
-      <section class="demo" id="demo-flow" aria-label="ixi-O Agent demo flow">
+      <section class="demo" id="experience" aria-label="ixi-O Agent experience flow">
         <div class="section-head">
           <div>
-            <h2>제출 데모 플로우</h2>
-            <p>
-              실제 고객 데이터 없이도 심사위원이 입력, 로컬 처리, 에이전트 전달,
-              MISO 제안 경계를 한 번에 확인할 수 있는 mock session입니다.
-            </p>
+            <h2>체험 플로우</h2>
+            <p>기업용과 개인용을 나눠 큰 단계만 따라가며 완료 상태를 확인합니다.</p>
+          </div>
+          <div class="mode-switch" role="tablist" aria-label="mode switch">
+            <button
+              class="mode-button selected"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              data-mode="enterprise"
+            >
+              기업용
+            </button>
+            <button
+              class="mode-button"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              data-mode="personal"
+            >
+              개인용
+            </button>
           </div>
         </div>
 
-        <div class="flow-grid">
-          <div class="stage-list" role="tablist" aria-label="demo stages">
-            <button class="stage selected" type="button" data-stage="ingest" aria-selected="true">
-              <span>01</span>
-              <strong>Voice 수집</strong>
-              <em>Channel Talk, 회의 녹음, 로컬 파일</em>
-            </button>
-            <button class="stage" type="button" data-stage="process" aria-selected="false">
-              <span>02</span>
-              <strong>EXAONE 후처리</strong>
-              <em>요약, 액션아이템, 긴급도</em>
-            </button>
-            <button class="stage" type="button" data-stage="kiya" aria-selected="false">
-              <span>03</span>
-              <strong>Kiya 전달</strong>
-              <em>요약 우선, 일정 후보는 별도 확인</em>
-            </button>
-            <button class="stage" type="button" data-stage="miso" aria-selected="false">
-              <span>04</span>
-              <strong>MISO 제안</strong>
-              <em>검수 후 비식별 payload만 공개</em>
-            </button>
+        <div class="experience-card">
+          <div class="experience-summary">
+            <div>
+              <span class="label" id="flow-source">Channel Talk + n8n webhook</span>
+              <h3 id="flow-title">채널톡에서 들어온 고객 음성을 로컬에서 정리</h3>
+              <p id="flow-summary">
+                Channel Talk 전화/녹음 데이터는 Mac mini M4 로컬 서버에서 처리하고,
+                개인정보를 마스킹한 뒤 결정 사항만 에이전트 폴더로 넘깁니다.
+              </p>
+            </div>
+            <div class="progress-box" aria-label="flow progress">
+              <span id="flow-progress">25%</span>
+              <div class="progress-track">
+                <div id="flow-progress-bar" style="width: 25%"></div>
+              </div>
+              <strong id="flow-status">수집 완료</strong>
+            </div>
           </div>
 
-          <article class="live-panel">
-            <div class="panel-top">
-              <div>
-                <span class="label">Selected Artifact</span>
-                <h3 id="stage-title">채널톡 통화 전사문</h3>
-              </div>
-              <code id="stage-result">source/channel-talk.payload.json</code>
-            </div>
-            <p class="panel-detail" id="stage-detail">
-              고객이 내일 오후 3시 납품 가능 여부와 대체 픽업 시간을 문의했습니다.
-            </p>
-            <div class="result-grid">
-              <div>
-                <span>raw transcript</span>
-                <strong id="stage-raw">local only</strong>
-              </div>
-              <div>
-                <span>agent action</span>
-                <strong id="stage-action">prepare</strong>
-              </div>
-              <div>
-                <span>review gate</span>
-                <strong id="stage-review">required</strong>
+          <div class="flow-grid">
+            <div>
+              <div class="stage-list" id="stage-list" role="tablist" aria-label="flow stages"></div>
+              <div class="step-controls">
+                <button class="control" type="button" id="previous-step" disabled>이전 단계</button>
+                <button class="control primary" type="button" id="next-step">단계 완료</button>
               </div>
             </div>
-          </article>
+
+            <article class="live-panel">
+              <div class="panel-top">
+                <div>
+                  <span class="label" id="current-mode-label">기업용 current step</span>
+                  <h3 id="stage-title">채널톡 입력 수집</h3>
+                </div>
+                <code id="stage-artifact">source/channel-talk.payload.json</code>
+              </div>
+              <p class="panel-detail" id="stage-detail">
+                채널톡에 남은 통화/상담 데이터를 n8n webhook으로 받고, 누락 대비 polling/manual
+                backfill을 같은 저장 계약으로 맞춥니다.
+              </p>
+              <div class="result-grid">
+                <div>
+                  <span>privacy boundary</span>
+                  <strong id="flow-privacy">raw audio/transcript local only</strong>
+                </div>
+                <div>
+                  <span>transcript policy</span>
+                  <strong id="stage-policy">원문은 로컬 저장소에만 유지</strong>
+                </div>
+                <div>
+                  <span>agent handoff</span>
+                  <strong id="flow-handoff">masked decisions only</strong>
+                </div>
+              </div>
+              <div class="agent-preview">
+                <span class="label">Agent-readable payload</span>
+                <p id="stage-payload">source id, call time, customer thread id</p>
+              </div>
+            </article>
+          </div>
         </div>
       </section>
 
       <section class="architecture" id="architecture">
         <div class="section-head">
           <div>
-            <h2>아키텍처 요약</h2>
-            <p>Vercel 페이지는 제출용 mockup이고, 실제 민감 처리는 로컬 Mac mini에서 실행합니다.</p>
+            <h2>두 가지 사용 경로</h2>
+            <p>입력과 보안 정책은 다르지만, 저장 계약과 에이전트 handoff는 같은 구조를 씁니다.</p>
           </div>
         </div>
-        <div class="architecture-line">
-          <div>
-            <span>Input</span>
-            <strong>Channel Talk / Meeting / Future ixi-O</strong>
-          </div>
-          <div>
-            <span>Local Bridge</span>
-            <strong>n8n + ixi-O Agent storage</strong>
-          </div>
-          <div>
-            <span>Local AI</span>
-            <strong>Whisper small + EXAONE 1.2B</strong>
-          </div>
-          <div>
-            <span>Agent</span>
-            <strong>Kiya summary + calendar command</strong>
-          </div>
-          <div>
-            <span>Workflow</span>
-            <strong>MISO custom tool proposal</strong>
-          </div>
+        <div class="mode-grid">
+          <article class="mode-card">
+            <h3>기업용</h3>
+            <dl>
+              <div>
+                <dt>Input</dt>
+                <dd>Channel Talk</dd>
+              </div>
+              <div>
+                <dt>Processing</dt>
+                <dd>Mac mini M4 local server</dd>
+              </div>
+              <div>
+                <dt>AI</dt>
+                <dd>Whisper STT + EXAONE summary</dd>
+              </div>
+              <div>
+                <dt>Privacy</dt>
+                <dd>PII masking, decision-only handoff</dd>
+              </div>
+              <div>
+                <dt>Output</dt>
+                <dd>Kiya action proposal / MISO custom tool payload</dd>
+              </div>
+            </dl>
+          </article>
+          <article class="mode-card">
+            <h3>개인용</h3>
+            <dl>
+              <div>
+                <dt>Input</dt>
+                <dd>Local recorder or voice file</dd>
+              </div>
+              <div>
+                <dt>Processing</dt>
+                <dd>Private local processing</dd>
+              </div>
+              <div>
+                <dt>AI</dt>
+                <dd>Whisper STT + EXAONE full-context summary</dd>
+              </div>
+              <div>
+                <dt>Privacy</dt>
+                <dd>No masking by default</dd>
+              </div>
+              <div>
+                <dt>Output</dt>
+                <dd>Full transcript + summary to personal agent</dd>
+              </div>
+            </dl>
+          </article>
         </div>
       </section>
 
-      <section class="session">
+      <section class="session" id="ops">
         <div class="section-head">
           <div>
-            <h2>Mock 세션 인박스</h2>
-            <p>실제 제출 페이지에서는 비식별 샘플만 보여주고, 원문은 로컬 데모에서 확인합니다.</p>
+            <h2>FriendliAI 검토</h2>
+            <p>로컬 우선 구조는 유지하고, hosted inference가 필요해지는 순간에만 API 키를 받습니다.</p>
           </div>
+          <a class="text-link" href="https://friendli.ai/docs/guides/openai-compatibility">
+            Friendli docs
+          </a>
         </div>
-        <div class="table" role="table" aria-label="mock voice sessions">
-          <div class="table-row header" role="row">
-            <span>Source</span>
-            <span>Mode</span>
-            <span>Status</span>
-            <span>Redacted summary</span>
-          </div>
-          <div class="table-row" role="row">
-            <span>Channel Talk</span>
-            <span>call</span>
-            <span>pending review</span>
-            <span>고객이 내일 오후 3시 픽업 가능 여부와 대체 시간을 문의했습니다.</span>
-          </div>
-          <div class="table-row" role="row">
-            <span>Private Mode</span>
-            <span>meeting</span>
-            <span>kiya sent</span>
-            <span>OBA 제출 전 최종 점검 미팅을 캘린더 후보로 제안했습니다.</span>
-          </div>
-          <div class="table-row" role="row">
-            <span>Future ixi-O</span>
-            <span>call</span>
-            <span>planned</span>
-            <span>통화 앱 연동 시 동일한 voice-session 계약으로 확장합니다.</span>
-          </div>
+        <div class="option-grid">
+          <article class="option-card">
+            <h3>기본값은 로컬</h3>
+            <p>대회 데모와 실제 개인 사용의 기본 경로는 Mac mini M4에서 Whisper와 EXAONE을 직접 돌리는 구조입니다.</p>
+          </article>
+          <article class="option-card">
+            <h3>FriendliAI는 선택형 가속 경로</h3>
+            <p>로컬 추론이 느리거나 안정적인 hosted GPU가 필요할 때, OpenAI-compatible endpoint로 EXAONE/Whisper 경로를 붙일 수 있습니다.</p>
+          </article>
+          <article class="option-card">
+            <h3>기업용은 masked payload만</h3>
+            <p>FriendliAI를 쓰더라도 기업용 원문 통화와 개인정보는 보내지 않고, 마스킹된 요약 또는 명시 승인된 샘플만 보냅니다.</p>
+          </article>
+        </div>
+        <div class="api-note">
+          <strong>API 키 필요 시점</strong>
+          <p>
+            지금 페이지와 로컬 플로우 목업 구현에는 키가 필요 없습니다. 실제 FriendliAI hosted STT/LLM
+            호출을 붙일 때 FRIENDLI_TOKEN 또는 Friendli Personal API Key를 로컬 .env.local에만 입력하면 됩니다.
+          </p>
         </div>
       </section>
 
@@ -204,15 +260,15 @@
         <div>
           <h2>제출에서 보여줄 메시지</h2>
           <p>
-            “음성은 어디에서 오든 같은 voice-session 계약으로 들어오고, 민감한 처리는
-            로컬에서 끝내며, 에이전트에는 검수된 작업 맥락만 전달한다”는 점을 가장 앞에 둡니다.
+            같은 제품 안에서 기업용 보안 플로우와 개인용 전체 맥락 플로우를 분리해,
+            심사위원이 실제 사용 장면과 확장 방향을 한 화면에서 확인하도록 합니다.
           </p>
         </div>
         <ul>
-          <li>LG U+ Track: Voice AI 사례와 EXAONE 활용을 화면 첫 흐름에서 명확히 보여줍니다.</li>
-          <li>MISO Track: 직접 push가 아니라 custom tool/OpenAPI와 inbound schema 제안을 분리합니다.</li>
-          <li>Security: raw audio와 raw transcript는 로컬에 두고, 검수된 redacted payload만 외부에 엽니다.</li>
-          <li>Demo: 실제 고객 통화 없이도 mock session으로 전체 흐름을 설명할 수 있습니다.</li>
+          <li>LG U+ Track: Voice AI 입력과 EXAONE 활용이 체험 플로우의 핵심 단계에 드러납니다.</li>
+          <li>Security: 기업용은 raw audio/transcript를 로컬에 두고, 개인정보 마스킹 뒤 결정 사항만 전달합니다.</li>
+          <li>Personal Mode: 사용자가 원하면 마스킹 없이 전체 맥락을 개인 에이전트에게 넘깁니다.</li>
+          <li>MISO Track: 직접 push가 아니라 custom tool/OpenAPI로 안전한 inbound voice context를 제안합니다.</li>
         </ul>
       </section>
     </main>

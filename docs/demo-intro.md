@@ -22,17 +22,20 @@ ixi-O Agent turns calls and meetings into private local agent context, then open
 
 ## 3-Minute Demo Script
 
-1. Open `http://localhost:3000` and show the four-step golden path: Voice 수집, EXAONE 후처리, Human Review, MISO 제안.
-2. Show the `Private Mode` local input form as the non-Channel Talk meeting/voice path.
-3. Open the synthetic proof session `20260530T153141_utc_channel_talk_e7b435ae0b`.
-4. Show that the raw transcript is visible only in the local review screen.
-5. Show `EXAONE: exaone-local` and the generated agent-ready output.
-6. Show `MISO: 승인됨` and explain that the external API returns only the reviewed redacted payload.
+1. Open `https://ixi-o-agent.vercel.app` and show the Enterprise experience flow: Channel Talk, local AI, masking, agent-folder handoff.
+2. Switch to Personal mode and show full transcript plus summary handoff without enterprise masking.
+3. Open `http://localhost:3000` and show the real local inbox.
+4. Show the `Private Mode` local input form as the non-Channel Talk meeting/voice path.
+5. Open the synthetic proof session `20260530T153141_utc_channel_talk_e7b435ae0b`.
+6. Show that the raw transcript is visible only in the local review screen.
+7. Show `EXAONE: exaone-local` and the generated agent-ready output.
+8. Show `MISO: 승인됨` and explain that the external API returns only the reviewed redacted payload.
 
 This proof session was created from a synthetic Channel Talk user chat, not a real customer conversation.
 
 ## What To Show
 
+- Public experience page: Enterprise and Personal flows with visible step completion
 - Dashboard: collected Channel Talk sessions
 - Private Mode form: local meeting transcript/audio input without Channel Talk
 - Session detail: raw transcript stays local

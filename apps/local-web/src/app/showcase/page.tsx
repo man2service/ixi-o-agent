@@ -1,37 +1,53 @@
 import Link from "next/link";
 import { ShowcaseDemo } from "./ShowcaseDemo";
 
-const sessionRows = [
+const architectureModes = [
   {
-    channel: "Channel Talk",
-    mode: "call",
-    status: "pending review",
-    summary: "고객이 내일 오후 3시 픽업 가능 여부와 대체 시간을 문의했습니다."
+    title: "기업용",
+    source: "Channel Talk",
+    processing: "Mac mini M4 local server",
+    ai: "Whisper STT + EXAONE summary",
+    privacy: "PII masking, decision-only handoff",
+    output: "Kiya action proposal / MISO custom tool payload"
   },
   {
-    channel: "Private Mode",
-    mode: "meeting",
-    status: "kiya sent",
-    summary: "OBA 제출 전 최종 점검 미팅을 캘린더 후보로 제안했습니다."
-  },
-  {
-    channel: "Future ixi-O",
-    mode: "call",
-    status: "planned",
-    summary: "통화 앱 연동 시 동일한 voice-session 계약으로 확장합니다."
+    title: "개인용",
+    source: "Local recorder or voice file",
+    processing: "Private local processing",
+    ai: "Whisper STT + EXAONE full-context summary",
+    privacy: "No masking by default",
+    output: "Full transcript + summary to personal agent"
   }
 ];
 
-const checklist = [
-  "LG U+ Track: Voice AI 사례와 EXAONE 활용을 화면 첫 흐름에서 명확히 보여줍니다.",
-  "MISO Track: 직접 push가 아니라 custom tool/OpenAPI와 inbound schema 제안을 분리합니다.",
-  "Security: raw audio와 raw transcript는 로컬에 두고, 검수된 redacted payload만 외부에 엽니다.",
-  "Demo: 실제 고객 통화 없이도 mock session으로 전체 흐름을 설명할 수 있습니다."
+const friendliNotes = [
+  {
+    title: "기본값은 로컬",
+    detail:
+      "대회 데모와 실제 개인 사용의 기본 경로는 Mac mini M4에서 Whisper와 EXAONE을 직접 돌리는 구조입니다."
+  },
+  {
+    title: "FriendliAI는 선택형 가속 경로",
+    detail:
+      "로컬 추론이 느리거나 안정적인 hosted GPU가 필요할 때, OpenAI-compatible endpoint로 EXAONE/Whisper 경로를 붙일 수 있습니다."
+  },
+  {
+    title: "기업용은 masked payload만",
+    detail:
+      "FriendliAI를 쓰더라도 기업용 원문 통화와 개인정보는 보내지 않고, 마스킹된 요약 또는 명시 승인된 샘플만 보냅니다."
+  }
+];
+
+const submissionMessages = [
+  "LG U+ Track: Voice AI 입력과 EXAONE 활용이 체험 플로우의 핵심 단계에 드러납니다.",
+  "Security: 기업용은 raw audio/transcript를 로컬에 두고, 개인정보 마스킹 뒤 결정 사항만 전달합니다.",
+  "Personal Mode: 사용자가 원하면 마스킹 없이 전체 맥락을 개인 에이전트에게 넘깁니다.",
+  "MISO Track: 직접 push가 아니라 custom tool/OpenAPI로 안전한 inbound voice context를 제안합니다."
 ];
 
 export const metadata = {
-  title: "ixi-O Agent Showcase",
-  description: "Submission-ready ixi-O Agent demo mockup"
+  title: "ixi-O Agent Experience",
+  description: "Interactive ixi-O Agent personal and enterprise flow demo"
 };
 
 export default function ShowcasePage() {
@@ -43,8 +59,9 @@ export default function ShowcasePage() {
           ixi-O Agent
         </Link>
         <div>
-          <a href="#demo-flow">Demo</a>
+          <a href="#experience">Experience</a>
           <a href="#architecture">Architecture</a>
+          <a href="#ops">Ops</a>
           <a href="#submission">Submission</a>
           <a href="https://github.com/man2service/ixi-o-agent">GitHub</a>
         </div>
@@ -54,12 +71,12 @@ export default function ShowcasePage() {
         <div className="showcase-hero-copy">
           <h1>일상의 모든 Voice를, 에이전트와 함께</h1>
           <p>
-            ixi-O Agent는 통화와 회의에서 생긴 음성 맥락을 로컬에서 전사/요약하고,
-            Kiya와 MISO 같은 업무 에이전트가 안전하게 읽을 수 있는 작업 단위로 바꿉니다.
+            ixi-O Agent는 기업 고객 통화와 개인 회의 음성을 같은 로컬 브릿지로 받아,
+            Whisper 전사와 EXAONE 요약을 거쳐 에이전트가 바로 읽을 수 있는 context로 바꿉니다.
           </p>
           <div className="showcase-actions">
-            <a className="showcase-primary" href="#demo-flow">
-              데모 플로우 보기
+            <a className="showcase-primary" href="#experience">
+              체험 플로우 보기
             </a>
             <a className="showcase-secondary" href="https://github.com/man2service/ixi-o-agent">
               GitHub 보기
@@ -67,10 +84,10 @@ export default function ShowcasePage() {
           </div>
         </div>
 
-        <div className="showcase-product" aria-label="ixi-O Agent product preview">
+        <div className="showcase-product" aria-label="ixi-O Agent experience preview">
           <div className="showcase-product-header">
-            <span>Live mock session</span>
-            <strong>approved_for_external_workflow</strong>
+            <span>Experience mode</span>
+            <strong>enterprise / personal</strong>
           </div>
           <figure className="showcase-product-visual">
             <img
@@ -80,20 +97,20 @@ export default function ShowcasePage() {
           </figure>
           <div className="showcase-product-grid">
             <article>
-              <span>Channel Talk</span>
-              <p>내일 오후 3시 픽업 일정 확인 요청</p>
+              <span>Enterprise</span>
+              <p>채널톡 데이터는 로컬 처리 후 마스킹</p>
             </article>
             <article>
-              <span>EXAONE Local</span>
-              <p>요약, 긴급도, 액션아이템 생성</p>
+              <span>Personal</span>
+              <p>개인 음성은 전체 맥락을 에이전트에게</p>
             </article>
             <article>
-              <span>Kiya Telegram</span>
-              <p>요약 전송 후 캘린더 후보 확인</p>
+              <span>Local AI</span>
+              <p>Whisper STT와 EXAONE 요약을 Mac mini에서</p>
             </article>
             <article>
-              <span>MISO Handoff</span>
-              <p>검수된 비식별 payload만 공개</p>
+              <span>Optional GPU</span>
+              <p>FriendliAI는 필요할 때만 가속 경로로</p>
             </article>
           </div>
         </div>
@@ -104,56 +121,65 @@ export default function ShowcasePage() {
       <section className="showcase-architecture" id="architecture">
         <div className="showcase-section-head">
           <div>
-            <h2>아키텍처 요약</h2>
-            <p>Vercel 페이지는 제출용 mockup이고, 실제 민감 처리는 로컬 Mac mini에서 실행합니다.</p>
+            <h2>두 가지 사용 경로</h2>
+            <p>입력과 보안 정책은 다르지만, 저장 계약과 에이전트 handoff는 같은 구조를 씁니다.</p>
           </div>
         </div>
-        <div className="showcase-architecture-line">
-          <div>
-            <span>Input</span>
-            <strong>Channel Talk / Meeting / Future ixi-O</strong>
-          </div>
-          <div>
-            <span>Local Bridge</span>
-            <strong>n8n + ixi-O Agent storage</strong>
-          </div>
-          <div>
-            <span>Local AI</span>
-            <strong>Whisper small + EXAONE 1.2B</strong>
-          </div>
-          <div>
-            <span>Agent</span>
-            <strong>Kiya summary + calendar command</strong>
-          </div>
-          <div>
-            <span>Workflow</span>
-            <strong>MISO custom tool proposal</strong>
-          </div>
+        <div className="showcase-mode-grid">
+          {architectureModes.map((mode) => (
+            <article className="showcase-mode-card" key={mode.title}>
+              <h3>{mode.title}</h3>
+              <dl>
+                <div>
+                  <dt>Input</dt>
+                  <dd>{mode.source}</dd>
+                </div>
+                <div>
+                  <dt>Processing</dt>
+                  <dd>{mode.processing}</dd>
+                </div>
+                <div>
+                  <dt>AI</dt>
+                  <dd>{mode.ai}</dd>
+                </div>
+                <div>
+                  <dt>Privacy</dt>
+                  <dd>{mode.privacy}</dd>
+                </div>
+                <div>
+                  <dt>Output</dt>
+                  <dd>{mode.output}</dd>
+                </div>
+              </dl>
+            </article>
+          ))}
         </div>
       </section>
 
-      <section className="showcase-session">
+      <section className="showcase-session" id="ops">
         <div className="showcase-section-head">
           <div>
-            <h2>Mock 세션 인박스</h2>
-            <p>실제 제출 페이지에서는 아래처럼 비식별 샘플만 보여주고, 원문은 로컬 데모에서 확인합니다.</p>
+            <h2>FriendliAI 검토</h2>
+            <p>로컬 우선 구조는 유지하고, hosted inference가 필요해지는 순간에만 API 키를 받습니다.</p>
           </div>
+          <a className="showcase-text-link" href="https://friendli.ai/docs/guides/openai-compatibility">
+            Friendli docs
+          </a>
         </div>
-        <div className="showcase-table" role="table" aria-label="mock voice sessions">
-          <div className="showcase-table-row header" role="row">
-            <span>Source</span>
-            <span>Mode</span>
-            <span>Status</span>
-            <span>Redacted summary</span>
-          </div>
-          {sessionRows.map((row) => (
-            <div className="showcase-table-row" role="row" key={`${row.channel}-${row.mode}`}>
-              <span>{row.channel}</span>
-              <span>{row.mode}</span>
-              <span>{row.status}</span>
-              <span>{row.summary}</span>
-            </div>
+        <div className="showcase-option-grid">
+          {friendliNotes.map((note) => (
+            <article className="showcase-option-card" key={note.title}>
+              <h3>{note.title}</h3>
+              <p>{note.detail}</p>
+            </article>
           ))}
+        </div>
+        <div className="showcase-api-note">
+          <strong>API 키 필요 시점</strong>
+          <p>
+            지금 페이지와 로컬 플로우 목업 구현에는 키가 필요 없습니다. 실제 FriendliAI hosted STT/LLM
+            호출을 붙일 때 `FRIENDLI_TOKEN` 또는 Friendli Personal API Key를 로컬 `.env.local`에만 입력하면 됩니다.
+          </p>
         </div>
       </section>
 
@@ -161,12 +187,12 @@ export default function ShowcasePage() {
         <div>
           <h2>제출에서 보여줄 메시지</h2>
           <p>
-            “음성은 어디에서 오든 같은 voice-session 계약으로 들어오고, 민감한 처리는 로컬에서 끝내며,
-            에이전트에는 검수된 작업 맥락만 전달한다”는 점을 가장 앞에 둡니다.
+            같은 제품 안에서 기업용 보안 플로우와 개인용 전체 맥락 플로우를 분리해,
+            심사위원이 실제 사용 장면과 확장 방향을 한 화면에서 확인하도록 합니다.
           </p>
         </div>
         <ul>
-          {checklist.map((item) => (
+          {submissionMessages.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>

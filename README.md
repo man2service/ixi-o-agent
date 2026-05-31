@@ -26,6 +26,12 @@ Channel Talk or Local Voice -> ixi-O Agent local inbox -> EXAONE local processin
   -> Kiya summary -> optional Kiya calendar confirmation -> human review -> redacted MISO handoff proposal
 ```
 
+Experience modes:
+
+- Enterprise: Channel Talk voice data is processed on the Mac mini M4 local server with Whisper STT and EXAONE summarization, then PII is masked before decision-only handoff to agent folders.
+- Personal: local meeting/call recordings are processed privately with Whisper STT and EXAONE, then the full transcript and summary can be handed to the user's personal agent without masking.
+- FriendliAI is treated as an optional hosted inference path, not the default privacy path. Add a Friendli Personal API Key only when implementing hosted STT/LLM calls.
+
 Public Vercel showcase:
 
 ```text
@@ -69,6 +75,15 @@ IXI_O_AGENT_STORAGE_DIR=./private-voice-inbox
 IXI_O_AGENT_INGEST_SECRET=<random-local-secret>
 N8N_ENCRYPTION_KEY=<random-local-secret>
 ```
+
+Optional hosted inference:
+
+```text
+FRIENDLI_TOKEN=<friendli-personal-api-key>
+```
+
+Only set `FRIENDLI_TOKEN` if you intentionally enable FriendliAI hosted
+Whisper/EXAONE calls. The local-first demo does not need it.
 
 Existing `PHONE_CLAW_*` environment variables and `x-phone-claw-ingest-secret`
 headers are still accepted as legacy aliases, but new setups should use
